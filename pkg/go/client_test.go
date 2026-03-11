@@ -1,4 +1,4 @@
-package pkg_test
+package servicetemplate_test
 
 import (
 	"testing"
@@ -10,13 +10,13 @@ import (
 	golibproto "github.com/a-novel-kit/golib/grpcf/proto/gen"
 
 	"github.com/a-novel/service-template/internal/config/env"
-	"github.com/a-novel/service-template/pkg"
+	"github.com/a-novel/service-template/pkg/go"
 )
 
 func TestClient(t *testing.T) {
 	t.Parallel()
 
-	client, err := pkg.NewClient(env.GrpcUrl, grpc.WithTransportCredentials(insecure.NewCredentials()))
+	client, err := servicetemplate.NewClient(env.GrpcUrl, grpc.WithTransportCredentials(insecure.NewCredentials()))
 	require.NoError(t, err)
 
 	defer client.Close()
