@@ -2,6 +2,7 @@ package services
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"github.com/google/uuid"
@@ -37,7 +38,7 @@ func (service *ItemDelete) Exec(ctx context.Context, request *ItemDeleteRequest)
 
 	err := validate.Struct(request)
 	if err != nil {
-		return nil, otel.ReportError(span, fmt.Errorf("%w: %w", ErrInvalidRequest, err))
+		return nil, otel.ReportError(span, errors.Join(err, ErrInvalidRequest))
 	}
 
 	entity, err := service.repository.Exec(ctx, &dao.ItemDeleteRequest{ID: request.ID})

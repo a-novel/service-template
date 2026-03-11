@@ -96,8 +96,8 @@ func (_c *MockItemCreateService_Exec_Call) Run(run func(ctx context.Context, req
 	return _c
 }
 
-func (_c *MockItemCreateService_Exec_Call) Return(v *services.Item, err error) *MockItemCreateService_Exec_Call {
-	_c.Call.Return(v, err)
+func (_c *MockItemCreateService_Exec_Call) Return(item *services.Item, err error) *MockItemCreateService_Exec_Call {
+	_c.Call.Return(item, err)
 	return _c
 }
 
@@ -191,8 +191,8 @@ func (_c *MockItemDeleteService_Exec_Call) Run(run func(ctx context.Context, req
 	return _c
 }
 
-func (_c *MockItemDeleteService_Exec_Call) Return(v *services.Item, err error) *MockItemDeleteService_Exec_Call {
-	_c.Call.Return(v, err)
+func (_c *MockItemDeleteService_Exec_Call) Return(item *services.Item, err error) *MockItemDeleteService_Exec_Call {
+	_c.Call.Return(item, err)
 	return _c
 }
 
@@ -286,8 +286,8 @@ func (_c *MockItemGetService_Exec_Call) Run(run func(ctx context.Context, reques
 	return _c
 }
 
-func (_c *MockItemGetService_Exec_Call) Return(v *services.Item, err error) *MockItemGetService_Exec_Call {
-	_c.Call.Return(v, err)
+func (_c *MockItemGetService_Exec_Call) Return(item *services.Item, err error) *MockItemGetService_Exec_Call {
+	_c.Call.Return(item, err)
 	return _c
 }
 
@@ -381,8 +381,8 @@ func (_c *MockItemListService_Exec_Call) Run(run func(ctx context.Context, reque
 	return _c
 }
 
-func (_c *MockItemListService_Exec_Call) Return(vs []*services.Item, err error) *MockItemListService_Exec_Call {
-	_c.Call.Return(vs, err)
+func (_c *MockItemListService_Exec_Call) Return(items []*services.Item, err error) *MockItemListService_Exec_Call {
+	_c.Call.Return(items, err)
 	return _c
 }
 
@@ -476,8 +476,8 @@ func (_c *MockItemUpdateService_Exec_Call) Run(run func(ctx context.Context, req
 	return _c
 }
 
-func (_c *MockItemUpdateService_Exec_Call) Return(v *services.Item, err error) *MockItemUpdateService_Exec_Call {
-	_c.Call.Return(v, err)
+func (_c *MockItemUpdateService_Exec_Call) Return(item *services.Item, err error) *MockItemUpdateService_Exec_Call {
+	_c.Call.Return(item, err)
 	return _c
 }
 
@@ -571,8 +571,8 @@ func (_c *MockItemCreatePublicService_Exec_Call) Run(run func(ctx context.Contex
 	return _c
 }
 
-func (_c *MockItemCreatePublicService_Exec_Call) Return(v *services.Item, err error) *MockItemCreatePublicService_Exec_Call {
-	_c.Call.Return(v, err)
+func (_c *MockItemCreatePublicService_Exec_Call) Return(item *services.Item, err error) *MockItemCreatePublicService_Exec_Call {
+	_c.Call.Return(item, err)
 	return _c
 }
 
@@ -666,8 +666,8 @@ func (_c *MockItemDeletePublicService_Exec_Call) Run(run func(ctx context.Contex
 	return _c
 }
 
-func (_c *MockItemDeletePublicService_Exec_Call) Return(v *services.Item, err error) *MockItemDeletePublicService_Exec_Call {
-	_c.Call.Return(v, err)
+func (_c *MockItemDeletePublicService_Exec_Call) Return(item *services.Item, err error) *MockItemDeletePublicService_Exec_Call {
+	_c.Call.Return(item, err)
 	return _c
 }
 
@@ -761,8 +761,8 @@ func (_c *MockItemGetPublicService_Exec_Call) Run(run func(ctx context.Context, 
 	return _c
 }
 
-func (_c *MockItemGetPublicService_Exec_Call) Return(v *services.Item, err error) *MockItemGetPublicService_Exec_Call {
-	_c.Call.Return(v, err)
+func (_c *MockItemGetPublicService_Exec_Call) Return(item *services.Item, err error) *MockItemGetPublicService_Exec_Call {
+	_c.Call.Return(item, err)
 	return _c
 }
 
@@ -856,8 +856,8 @@ func (_c *MockItemListPublicService_Exec_Call) Run(run func(ctx context.Context,
 	return _c
 }
 
-func (_c *MockItemListPublicService_Exec_Call) Return(vs []*services.Item, err error) *MockItemListPublicService_Exec_Call {
-	_c.Call.Return(vs, err)
+func (_c *MockItemListPublicService_Exec_Call) Return(items []*services.Item, err error) *MockItemListPublicService_Exec_Call {
+	_c.Call.Return(items, err)
 	return _c
 }
 
@@ -951,8 +951,8 @@ func (_c *MockItemUpdatePublicService_Exec_Call) Run(run func(ctx context.Contex
 	return _c
 }
 
-func (_c *MockItemUpdatePublicService_Exec_Call) Return(v *services.Item, err error) *MockItemUpdatePublicService_Exec_Call {
-	_c.Call.Return(v, err)
+func (_c *MockItemUpdatePublicService_Exec_Call) Return(item *services.Item, err error) *MockItemUpdatePublicService_Exec_Call {
+	_c.Call.Return(item, err)
 	return _c
 }
 

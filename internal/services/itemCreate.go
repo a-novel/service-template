@@ -2,6 +2,7 @@ package services
 
 import (
 	"context"
+	"errors"
 	"fmt"
 	"time"
 
@@ -39,7 +40,7 @@ func (service *ItemCreate) Exec(ctx context.Context, request *ItemCreateRequest)
 
 	err := validate.Struct(request)
 	if err != nil {
-		return nil, otel.ReportError(span, fmt.Errorf("%w: %w", ErrInvalidRequest, err))
+		return nil, otel.ReportError(span, errors.Join(err, ErrInvalidRequest))
 	}
 
 	entity, err := service.repository.Exec(ctx, &dao.ItemCreateRequest{
