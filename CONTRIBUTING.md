@@ -184,7 +184,7 @@ The published API reference is hosted at [GitHub Pages](https://a-novel.github.i
 
 ### JavaScript Client Package
 
-Frontend or Node.js consumers can use `@a-novel/service-template-rest` (`pkg/rest-js/`) to call the REST API:
+Frontend or Node.js consumers can use `@a-novel/service-template-rest` (`pkg/js/rest/`) to call the REST API:
 
 ```typescript
 import { TemplateApi, itemCreate, itemDelete, itemGet, itemList, itemUpdate } from "@a-novel/service-template-rest";
@@ -202,7 +202,7 @@ const updated = await itemUpdate(api, "<item-id>", "Updated Name");
 const deleted = await itemDelete(api, "<item-id>");
 ```
 
-Integration tests for the JS client live in `pkg/test/rest-js/`. Run them locally with:
+Integration tests for the JS client live in `pkg/js/test/rest/`. Run them locally with:
 
 ```bash
 make test-pkg-js
