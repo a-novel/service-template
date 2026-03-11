@@ -2,6 +2,7 @@ package services
 
 import (
 	"context"
+	"errors"
 	"fmt"
 
 	"go.opentelemetry.io/otel/attribute"
@@ -43,7 +44,7 @@ func (service *ItemList) Exec(ctx context.Context, request *ItemListRequest) ([]
 
 	err := validate.Struct(request)
 	if err != nil {
-		return nil, otel.ReportError(span, fmt.Errorf("%w: %w", ErrInvalidRequest, err))
+		return nil, otel.ReportError(span, errors.Join(err, ErrInvalidRequest))
 	}
 
 	entities, err := service.repository.Exec(ctx, &dao.ItemListRequest{
