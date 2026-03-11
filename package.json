@@ -9,7 +9,9 @@
   "license": "AGPL-3.0",
   "type": "module",
   "workspaces": [
-    "."
+    ".",
+    "pkg/js/rest",
+    "pkg/js/test/rest"
   ],
   "scripts": {
     "build": "pnpm build:rest && pnpm types:rest && pnpm types:rest-test",
