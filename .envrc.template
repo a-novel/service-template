@@ -1,5 +1,0 @@
-# Postgres.
-export POSTGRES_USER="postgres"
-export POSTGRES_PASSWORD="postgres"
-export POSTGRES_DB="json-keys"
-export POSTGRES_HOST="0.0.0.0"
