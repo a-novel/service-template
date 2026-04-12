@@ -8,7 +8,7 @@ tool (
 )
 
 require (
-	github.com/a-novel-kit/golib v0.20.23
+	github.com/a-novel-kit/golib v0.20.24
 	github.com/go-chi/chi/v5 v5.2.5
 	github.com/go-chi/cors v1.2.2
 	github.com/go-playground/validator/v10 v10.30.2
@@ -81,8 +81,8 @@ require (
 	github.com/felixge/httpsnoop v1.0.4 // indirect
 	github.com/fsnotify/fsnotify v1.9.0 // indirect
 	github.com/gabriel-vasile/mimetype v1.4.13 // indirect
-	github.com/getsentry/sentry-go v0.44.1 // indirect
-	github.com/getsentry/sentry-go/otel v0.44.1 // indirect
+	github.com/getsentry/sentry-go v0.45.0 // indirect
+	github.com/getsentry/sentry-go/otel v0.45.0 // indirect
 	github.com/go-logr/logr v1.4.3 // indirect
 	github.com/go-logr/stdr v1.2.2 // indirect
 	github.com/go-playground/locales v0.14.1 // indirect
