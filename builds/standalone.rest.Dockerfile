@@ -29,7 +29,7 @@ RUN go mod download
 RUN go build -o /rest cmd/rest/main.go
 RUN go build -o /migrations cmd/migrations/main.go
 
-FROM docker.io/library/alpine:3.23.3
+FROM docker.io/library/alpine:3.23.4
 
 WORKDIR /
 
