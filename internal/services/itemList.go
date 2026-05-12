@@ -44,12 +44,15 @@ func (service *ItemList) Exec(ctx context.Context, request *ItemListRequest) ([]
 	ctx, span := otel.Tracer().Start(ctx, "service.ItemList")
 	defer span.End()
 
-	if request.Limit <= 0 {
-		request.Limit = ItemListDefaultSize
+	// Resolve the effective page size without mutating the caller's request:
+	// a zero or negative Limit means "use the default".
+	limit := request.Limit
+	if limit <= 0 {
+		limit = ItemListDefaultSize
 	}
 
 	span.SetAttributes(
-		attribute.Int("item.limit", request.Limit),
+		attribute.Int("item.limit", limit),
 		attribute.Int("item.offset", request.Offset),
 	)
 
@@ -59,7 +62,7 @@ func (service *ItemList) Exec(ctx context.Context, request *ItemListRequest) ([]
 	}
 
 	entities, err := service.repository.Exec(ctx, &dao.ItemListRequest{
-		Limit:  request.Limit,
+		Limit:  limit,
 		Offset: request.Offset,
 	})
 	if err != nil {
