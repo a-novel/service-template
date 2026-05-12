@@ -325,8 +325,8 @@ components:
       name: limit
       in: query
       description: >
-        Maximum number of items to return, between 1 and 100. Omitted or
-        non-positive values fall back to the default page size (20).
+        Maximum number of items to return, between 1 and 100. When omitted, the
+        default page size (20) is used.
       required: false
       schema:
         type: integer
