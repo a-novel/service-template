@@ -32,7 +32,7 @@ func NewItemGet(service ItemGetService) *ItemGet {
 func (handler *ItemGet) ItemGet(
 	ctx context.Context, request *protogen.ItemGetRequest,
 ) (*protogen.ItemGetResponse, error) {
-	ctx, span := otel.Tracer().Start(ctx, "handler.ItemGet")
+	ctx, span := otel.Tracer().Start(ctx, "grpc.ItemGet")
 	defer span.End()
 
 	id, err := uuid.Parse(request.GetId())

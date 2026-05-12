@@ -35,7 +35,7 @@ func NewItemUpdatePublic(service ItemUpdatePublicService, logger logging.Log) *I
 }
 
 func (handler *ItemUpdatePublic) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	ctx, span := otel.Tracer().Start(r.Context(), "handler.ItemUpdatePublic")
+	ctx, span := otel.Tracer().Start(r.Context(), "rest.ItemUpdatePublic")
 	defer span.End()
 
 	decoder := json.NewDecoder(r.Body)

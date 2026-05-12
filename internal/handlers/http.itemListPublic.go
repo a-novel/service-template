@@ -32,7 +32,7 @@ func NewItemListPublic(service ItemListPublicService, logger logging.Log) *ItemL
 }
 
 func (handler *ItemListPublic) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	ctx, span := otel.Tracer().Start(r.Context(), "handler.ItemListPublic")
+	ctx, span := otel.Tracer().Start(r.Context(), "rest.ItemListPublic")
 	defer span.End()
 
 	var request ItemListPublicRequest

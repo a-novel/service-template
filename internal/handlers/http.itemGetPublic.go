@@ -32,7 +32,7 @@ func NewItemGetPublic(service ItemGetPublicService, logger logging.Log) *ItemGet
 }
 
 func (handler *ItemGetPublic) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	ctx, span := otel.Tracer().Start(r.Context(), "handler.ItemGetPublic")
+	ctx, span := otel.Tracer().Start(r.Context(), "rest.ItemGetPublic")
 	defer span.End()
 
 	var request ItemGetPublicRequest

@@ -32,7 +32,7 @@ func NewItemDeletePublic(service ItemDeletePublicService, logger logging.Log) *I
 }
 
 func (handler *ItemDeletePublic) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	ctx, span := otel.Tracer().Start(r.Context(), "handler.ItemDeletePublic")
+	ctx, span := otel.Tracer().Start(r.Context(), "rest.ItemDeletePublic")
 	defer span.End()
 
 	var request ItemDeletePublicRequest
