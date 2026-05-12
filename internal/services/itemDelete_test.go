@@ -60,6 +60,12 @@ func TestItemDelete(t *testing.T) {
 			},
 		},
 		{
+			name: "Error/InvalidID",
+
+			request:   &services.ItemDeleteRequest{ID: uuid.Nil},
+			expectErr: services.ErrInvalidRequest,
+		},
+		{
 			name: "Error/Repository",
 
 			request: &services.ItemDeleteRequest{

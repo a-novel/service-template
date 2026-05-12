@@ -18,7 +18,9 @@ type ItemDeleteRepository interface {
 }
 
 type ItemDeleteRequest struct {
-	ID uuid.UUID
+	// ID identifies the item to remove; must be a non-nil UUID (a nil UUID is
+	// almost always a missing path/query parameter rather than a real lookup).
+	ID uuid.UUID `validate:"required"`
 }
 
 // ItemDelete removes an item by its ID.
