@@ -32,7 +32,7 @@ func NewItemUpdate(service ItemUpdateService) *ItemUpdate {
 func (handler *ItemUpdate) ItemUpdate(
 	ctx context.Context, request *protogen.ItemUpdateRequest,
 ) (*protogen.ItemUpdateResponse, error) {
-	ctx, span := otel.Tracer().Start(ctx, "handler.ItemUpdate")
+	ctx, span := otel.Tracer().Start(ctx, "grpc.ItemUpdate")
 	defer span.End()
 
 	id, err := uuid.Parse(request.GetId())

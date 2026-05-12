@@ -32,7 +32,7 @@ func NewItemDelete(service ItemDeleteService) *ItemDelete {
 func (handler *ItemDelete) ItemDelete(
 	ctx context.Context, request *protogen.ItemDeleteRequest,
 ) (*protogen.ItemDeleteResponse, error) {
-	ctx, span := otel.Tracer().Start(ctx, "handler.ItemDelete")
+	ctx, span := otel.Tracer().Start(ctx, "grpc.ItemDelete")
 	defer span.End()
 
 	id, err := uuid.Parse(request.GetId())

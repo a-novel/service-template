@@ -31,7 +31,7 @@ func NewItemCreate(service ItemCreateService) *ItemCreate {
 func (handler *ItemCreate) ItemCreate(
 	ctx context.Context, request *protogen.ItemCreateRequest,
 ) (*protogen.ItemCreateResponse, error) {
-	ctx, span := otel.Tracer().Start(ctx, "handler.ItemCreate")
+	ctx, span := otel.Tracer().Start(ctx, "grpc.ItemCreate")
 	defer span.End()
 
 	item, err := handler.service.Exec(ctx, &services.ItemCreateRequest{

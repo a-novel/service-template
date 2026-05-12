@@ -31,7 +31,7 @@ func NewItemCreatePublic(service ItemCreatePublicService, logger logging.Log) *I
 }
 
 func (handler *ItemCreatePublic) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	ctx, span := otel.Tracer().Start(r.Context(), "handler.ItemCreatePublic")
+	ctx, span := otel.Tracer().Start(r.Context(), "rest.ItemCreatePublic")
 	defer span.End()
 
 	decoder := json.NewDecoder(r.Body)

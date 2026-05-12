@@ -30,7 +30,7 @@ func NewItemList(service ItemListService) *ItemList {
 func (handler *ItemList) ItemList(
 	ctx context.Context, request *protogen.ItemListRequest,
 ) (*protogen.ItemListResponse, error) {
-	ctx, span := otel.Tracer().Start(ctx, "handler.ItemList")
+	ctx, span := otel.Tracer().Start(ctx, "grpc.ItemList")
 	defer span.End()
 
 	items, err := handler.service.Exec(ctx, &services.ItemListRequest{
