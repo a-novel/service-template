@@ -10,7 +10,7 @@ import (
 
 	"github.com/a-novel-kit/golib/postgres"
 
-	"github.com/a-novel/service-template/internal/config"
+	"github.com/a-novel/service-template/internal/config/configtest"
 	"github.com/a-novel/service-template/internal/dao"
 )
 
@@ -65,7 +65,7 @@ func TestItemGet(t *testing.T) {
 
 	for _, testCase := range testCases {
 		t.Run(testCase.name, func(t *testing.T) {
-			postgres.RunTransactionalTest(t, config.PostgresPresetTest, func(ctx context.Context, t *testing.T) {
+			postgres.RunTransactionalTest(t, configtest.PostgresPreset, func(ctx context.Context, t *testing.T) {
 				t.Helper()
 
 				db, err := postgres.GetContext(ctx)

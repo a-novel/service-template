@@ -9,7 +9,7 @@ import (
 
 	"github.com/a-novel-kit/golib/postgres"
 
-	"github.com/a-novel/service-template/internal/config"
+	"github.com/a-novel/service-template/internal/config/configtest"
 	"github.com/a-novel/service-template/internal/handlers"
 	"github.com/a-novel/service-template/internal/handlers/protogen"
 )
@@ -40,7 +40,7 @@ func TestStatus(t *testing.T) {
 
 			handler := handlers.NewGrpcStatus()
 
-			ctx, err := postgres.NewContext(t.Context(), config.PostgresPresetTest)
+			ctx, err := postgres.NewContext(t.Context(), configtest.PostgresPreset)
 			require.NoError(t, err)
 
 			res, err := handler.Status(ctx, new(protogen.StatusRequest))
