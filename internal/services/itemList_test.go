@@ -81,15 +81,24 @@ func TestItemList(t *testing.T) {
 			expect: []*services.Item{},
 		},
 		{
-			name: "Error/LimitZero",
+			name: "Success/LimitDefaulted",
 
-			request:   &services.ItemListRequest{Limit: 0, Offset: 0},
-			expectErr: services.ErrInvalidRequest,
+			request: &services.ItemListRequest{Limit: 0, Offset: 0},
+
+			repositoryMock: &repositoryMock{resp: []*dao.Item{}},
+
+			expect: []*services.Item{},
 		},
 		{
 			name: "Error/LimitTooHigh",
 
 			request:   &services.ItemListRequest{Limit: 101, Offset: 0},
+			expectErr: services.ErrInvalidRequest,
+		},
+		{
+			name: "Error/OffsetNegative",
+
+			request:   &services.ItemListRequest{Limit: 10, Offset: -1},
 			expectErr: services.ErrInvalidRequest,
 		},
 		{
@@ -109,9 +118,14 @@ func TestItemList(t *testing.T) {
 			repository := servicesmocks.NewMockItemListRepository(t)
 
 			if testCase.repositoryMock != nil {
+				expectLimit := testCase.request.Limit
+				if expectLimit <= 0 {
+					expectLimit = services.ItemListDefaultSize
+				}
+
 				repository.EXPECT().
 					Exec(mock.Anything, &dao.ItemListRequest{
-						Limit:  testCase.request.Limit,
+						Limit:  expectLimit,
 						Offset: testCase.request.Offset,
 					}).
 					Return(testCase.repositoryMock.resp, testCase.repositoryMock.err)

@@ -16,12 +16,19 @@ type ItemListRepository interface {
 	Exec(ctx context.Context, request *dao.ItemListRequest) ([]*dao.Item, error)
 }
 
-// ItemListMaxSize caps the number of items returned per page.
-const ItemListMaxSize = 100
+const (
+	// ItemListDefaultSize is applied to ItemListRequest.Limit when the caller
+	// leaves it unset (zero or negative).
+	ItemListDefaultSize = 20
+	// ItemListMaxSize caps the number of items returned per page. Keep the
+	// `max=` constraint on ItemListRequest.Limit in sync with this value.
+	ItemListMaxSize = 100
+)
 
 type ItemListRequest struct {
-	Limit  int `validate:"min=1,max=100"`
-	Offset int
+	// Limit defaults to ItemListDefaultSize when zero or negative; see Exec.
+	Limit  int `validate:"max=100"`
+	Offset int `validate:"min=0"`
 }
 
 // ItemList retrieves a paginated list of items.
@@ -37,8 +44,15 @@ func (service *ItemList) Exec(ctx context.Context, request *ItemListRequest) ([]
 	ctx, span := otel.Tracer().Start(ctx, "service.ItemList")
 	defer span.End()
 
+	// Resolve the effective page size without mutating the caller's request:
+	// a zero or negative Limit means "use the default".
+	limit := request.Limit
+	if limit <= 0 {
+		limit = ItemListDefaultSize
+	}
+
 	span.SetAttributes(
-		attribute.Int("item.limit", request.Limit),
+		attribute.Int("item.limit", limit),
 		attribute.Int("item.offset", request.Offset),
 	)
 
@@ -48,7 +62,7 @@ func (service *ItemList) Exec(ctx context.Context, request *ItemListRequest) ([]
 	}
 
 	entities, err := service.repository.Exec(ctx, &dao.ItemListRequest{
-		Limit:  request.Limit,
+		Limit:  limit,
 		Offset: request.Offset,
 	})
 	if err != nil {
