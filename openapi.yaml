@@ -324,12 +324,15 @@ components:
     limit:
       name: limit
       in: query
-      description: Maximum number of items to return. Must be between 1 and 100.
-      required: true
+      description: >
+        Maximum number of items to return, between 1 and 100. Omitted or
+        non-positive values fall back to the default page size (20).
+      required: false
       schema:
         type: integer
         minimum: 1
         maximum: 100
+        default: 20
         examples: [10]
 
     offset:
