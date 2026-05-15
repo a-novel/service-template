@@ -60,6 +60,12 @@ func TestItemGet(t *testing.T) {
 			},
 		},
 		{
+			name: "Error/InvalidID",
+
+			request:   &services.ItemGetRequest{ID: uuid.Nil},
+			expectErr: services.ErrInvalidRequest,
+		},
+		{
 			name: "Error/Repository",
 
 			request: &services.ItemGetRequest{
