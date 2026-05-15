@@ -13,7 +13,10 @@ import (
 // as the production preset; the test harness (postgres.RunTransactionalTest)
 // isolates each test in a rolled-back transaction.
 //
-// This lives in a dedicated, test-only package — not in the production `config`
-// package — so it is never compiled into a service binary. See the write-go-tests
-// skill ("Cross-Package Test Fixtures").
+// The Go toolchain has no notion of a "test-only" package (only the `_test.go`
+// file suffix is excluded from production builds, and that suffix wouldn't work
+// here because other test packages need to import this preset). The boundary is
+// a convention: production code never imports `configtest`, and a stray import
+// would be caught in review. See the write-go-tests skill, "Cross-Package Test
+// Fixtures".
 var PostgresPreset = postgrespresets.NewDefault(pgdriver.WithDSN(env.PostgresDsn))
