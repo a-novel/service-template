@@ -58,7 +58,7 @@ type App struct {
 
 	Otel       otel.Config        `json:"otel"       yaml:"otel"`
 	Log        logging.Log        `json:"log"        yaml:"log"`
-	Logger     logging.RpcConfig  `json:"logger"     yaml:"logger"`
-	HttpLogger logging.HttpConfig `json:"httpLogger" yaml:"httpLogger"`
+	Logger     logging.RPCConfig  `json:"logger"     yaml:"logger"`
+	HttpLogger logging.HTTPConfig `json:"httpLogger" yaml:"httpLogger"`
 	Postgres   postgres.Config    `json:"postgres"   yaml:"postgres"`
 }
