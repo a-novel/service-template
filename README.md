@@ -27,15 +27,16 @@ copy. Replace it with your own resource, rename the module, and you have a worki
 | What                   | Where                                                                                                                  | From → to                                                                   |
 | ---------------------- | ---------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------- |
 | Go module path         | `go.mod` (`module …`) + every import in `internal/`, `cmd/`, `pkg/go/`, `*_test.go`                                    | `github.com/a-novel/service-template` → `github.com/a-novel/<your-service>` |
-| Module path in tooling | `.mockery.yaml`, `buf.gen.yaml`, `buf.yaml`                                                                            | same rename                                                                 |
+| Module path in tooling | `.mockery.yaml`, `buf.gen.yaml`                                                                                        | same rename                                                                 |
 | Root generate file     | `generate.go` (`package …`)                                                                                            | the placeholder package name → `package <yourservice>`                      |
 | Env-var prefix         | `internal/config/env/env.go` (`os.Getenv("SERVICE_TEMPLATE_ENV_PREFIX")`)                                              | `SERVICE_TEMPLATE_ENV_PREFIX` → `<YOUR_SERVICE>_ENV_PREFIX`                 |
 | App name default       | `internal/config/env/env.go` (`AppNameDefault`)                                                                        | `"service-template"` → `"<your-service>"`                                   |
 | Repo references        | `README.md` (badges, image names, doc links), CI workflows (`image_name:`), `package.json`, `pkg/js/rest/package.json` | `service-template` → `<your-service>`                                       |
 
 A `go mod edit -module github.com/a-novel/<your-service>` followed by a project-wide find/replace
-of `service-template` → `<your-service>` and `internal/service-template` import paths covers most of
-it; then `make format` and `make generate`.
+of `service-template` → `<your-service>` covers most of it (the import paths use the
+`github.com/a-novel/service-template/internal/...` form, so the same replace catches them);
+then `make format` and `make generate`.
 
 ### 2. Replace the `item` resource
 
