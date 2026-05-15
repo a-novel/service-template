@@ -52,7 +52,7 @@ describe("itemGet", () => {
 
   it("returns 404 for non-existent item", async () => {
     const api = new TemplateApi(process.env.REST_URL!);
-    await expectStatus(itemGet(api, "00000000-0000-0000-0000-000000000000"), 404);
+    await expectStatus(itemGet(api, "00000000-0000-0000-0000-000000000001"), 404);
   });
 });
 
@@ -124,6 +124,6 @@ describe("itemDelete", () => {
 
   it("returns 404 for non-existent item", async () => {
     const api = new TemplateApi(process.env.REST_URL!);
-    await expectStatus(itemDelete(api, "00000000-0000-0000-0000-000000000000"), 404);
+    await expectStatus(itemDelete(api, "00000000-0000-0000-0000-000000000001"), 404);
   });
 });
