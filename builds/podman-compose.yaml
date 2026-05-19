@@ -16,7 +16,13 @@ services:
     volumes:
       - template-postgres-data:/var/lib/postgresql/
 
+  # Profiled so a plain `podman compose up` does NOT start it: `a-novel run`
+  # brings this file up only for the postgres dependency and runs THIS
+  # entrypoint locally (go run); a containerised copy on the same host
+  # ${GRPC_PORT} would collide ("bind: address already in use").
+  # `--profile grpc` opts into the dockerised copy instead.
   service-template-grpc:
+    profiles: ["grpc"]
     build:
       context: ..
       dockerfile: ./builds/standalone.grpc.Dockerfile
@@ -29,7 +35,11 @@ services:
     networks:
       - api
 
+  # Same rationale as grpc above; profiled out of the default `up` so the
+  # locally-run REST entrypoint owns ${REST_PORT}. `--profile rest` opts
+  # into the dockerised copy.
   service-template-rest:
+    profiles: ["rest"]
     build:
       context: ..
       dockerfile: ./builds/standalone.rest.Dockerfile
