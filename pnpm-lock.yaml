@@ -42,10 +42,10 @@ importers:
         version: 1.3.38(zod@4.4.3)
       '@a-novel-kit/nodelib-config':
         specifier: ^1.3.18
-        version: 1.3.38(57cecbbb4055157bb9448d72ee28eef7)
+        version: 1.3.38(a242745900c61a799bcc3d929a5dd323)
       '@a-novel-kit/nodelib-test':
         specifier: ^1.3.18
-        version: 1.3.38(@a-novel-kit/nodelib-browser@1.3.38(zod@4.4.3))(@msw/playwright@0.4.5(msw@2.14.6(@types/node@24.12.4)(typescript@6.0.3)))(@tanstack/react-query@5.100.10(react@19.2.6))(@testing-library/react@16.3.2(@testing-library/dom@10.4.1)(react-dom@19.2.6(react@19.2.6))(react@19.2.6))(msw@2.14.6(@types/node@24.12.4)(typescript@6.0.3))(playwright@1.59.1)(v8-to-istanbul@9.3.0)(vitest@4.1.7)(zod@4.4.3)
+        version: 1.3.38(@a-novel-kit/nodelib-browser@1.3.38(zod@4.4.3))(@msw/playwright@0.4.5(msw@2.14.6(@types/node@24.12.4)(typescript@6.0.3)))(@tanstack/react-query@5.100.10(react@19.2.7))(@testing-library/react@16.3.2(@testing-library/dom@10.4.1)(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(msw@2.14.6(@types/node@24.12.4)(typescript@6.0.3))(playwright@1.59.1)(v8-to-istanbul@9.3.0)(vitest@4.1.7)(zod@4.4.3)
       '@eslint/js':
         specifier: ^10.0.1
         version: 10.0.1(eslint@10.4.1(jiti@2.7.0))
@@ -72,7 +72,7 @@ importers:
         version: 5.5.6(eslint-config-prettier@10.1.8(eslint@10.4.1(jiti@2.7.0)))(eslint@10.4.1(jiti@2.7.0))(prettier@3.8.3)
       eslint-plugin-storybook:
         specifier: ^10.2.8
-        version: 10.4.1(eslint@10.4.1(jiti@2.7.0))(storybook@10.3.6(@testing-library/dom@10.4.1)(prettier@3.8.3)(react-dom@19.2.6(react@19.2.6))(react@19.2.6))(typescript@6.0.3)
+        version: 10.4.1(eslint@10.4.1(jiti@2.7.0))(storybook@10.3.6(@testing-library/dom@10.4.1)(prettier@3.8.3)(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(typescript@6.0.3)
       eslint-plugin-svelte:
         specifier: ^3.15.0
         version: 3.18.0(eslint@10.4.1(jiti@2.7.0))(svelte@5.55.5(@typescript-eslint/types@8.60.1))
@@ -135,7 +135,7 @@ importers:
         version: 1.3.38(zod@4.4.3)
       '@a-novel-kit/nodelib-test':
         specifier: ^1.3.18
-        version: 1.3.38(@a-novel-kit/nodelib-browser@1.3.38(zod@4.4.3))(@msw/playwright@0.4.5(msw@2.14.6(@types/node@24.12.4)(typescript@5.9.3)))(@tanstack/react-query@5.100.10(react@19.2.6))(@testing-library/react@16.3.2(@testing-library/dom@10.4.1)(react-dom@19.2.6(react@19.2.6))(react@19.2.6))(msw@2.14.6(@types/node@24.12.4)(typescript@5.9.3))(playwright@1.59.1)(v8-to-istanbul@9.3.0)(vitest@4.1.7)(zod@4.4.3)
+        version: 1.3.38(@a-novel-kit/nodelib-browser@1.3.38(zod@4.4.3))(@msw/playwright@0.4.5(msw@2.14.6(@types/node@24.12.4)(typescript@5.9.3)))(@tanstack/react-query@5.100.10(react@19.2.7))(@testing-library/react@16.3.2(@testing-library/dom@10.4.1)(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(msw@2.14.6(@types/node@24.12.4)(typescript@5.9.3))(playwright@1.59.1)(v8-to-istanbul@9.3.0)(vitest@4.1.7)(zod@4.4.3)
       '@a-novel/service-template-rest':
         specifier: workspace:*
         version: link:../../rest
@@ -1808,8 +1808,8 @@ packages:
     resolution: {integrity: sha512-sepffkT8stwnIYbsMBpoCHJuJM5l98FUF2AnE07hfvE0m/qp3R586hw4jF4uadbhvg1ooIdzuu7CsfD2jzCaNA==}
     engines: {node: '>=18'}
 
-  graphql@16.14.0:
-    resolution: {integrity: sha512-BBvQ/406p+4CZbTpCbVPSxfzrZrbnuWSP1ELYgyS6B+hNeKzgrdB4JczCa5VZUBQrDa9hUngm0KnexY6pJRN5Q==}
+  graphql@16.14.1:
+    resolution: {integrity: sha512-cQOsSMS/IrDz82PVyRDvf/Q1F/bRbBVjJlh+xYOkI1qw2bWRvWGiWc+m2O0d6l4Bt1fyY+8kzJ8JFWGJqNeDBg==}
     engines: {node: ^12.22.0 || ^14.16.0 || ^16.0.0 || >=17.0.0}
 
   handlebars@4.7.9:
@@ -2447,8 +2447,8 @@ packages:
   prop-types@15.8.1:
     resolution: {integrity: sha512-oj87CgZICdulUohogVAR7AjlC0327U4el4L6eAvOqCeudMDVU0NThNaV+b9Df4dXgSP1gXMTnPdhfe/2qDH5cg==}
 
-  protobufjs@8.4.2:
-    resolution: {integrity: sha512-64rfNzkWOZAIazXzpBFPWq6F9up6gMvTzjE2oWIzApx2N/dqVUEE7+bCn2+40780dFVtKOUab8QfxJ6KJDWbqA==}
+  protobufjs@8.5.0:
+    resolution: {integrity: sha512-df1jWDPA5VIBNRtuAHjqr09f2qN5D4Vke1wYqOQg1XJ7ZDpA7BD6L7E4tyChgGRLB5hqk2m79Zsy0WHwV9a84A==}
     engines: {node: '>=12.0.0'}
 
   punycode@2.3.1:
@@ -2468,10 +2468,10 @@ packages:
   randombytes@2.1.0:
     resolution: {integrity: sha512-vYl3iOX+4CKUWuxGi9Ukhie6fsqXqS9FE2Zaic4tNFD2N2QQaXOMFbuKK4QmDHC0JO6B1Zp41J0LpT0oR68amQ==}
 
-  react-dom@19.2.6:
-    resolution: {integrity: sha512-0prMI+hvBbPjsWnxDLxlCGyM8PN6UuWjEUCYmZhO67xIV9Xasa/r/vDnq+Xyq4Lo27g8QSbO5YzARu0D1Sps3g==}
+  react-dom@19.2.7:
+    resolution: {integrity: sha512-t0BRVXvbiE/o20Hfw669rLbMCDWtYZLvmJigy2f0MxsXF+71pxhR3xOkspmsO8h3ZlNzyibAmtCa3l4lYKk6gQ==}
     peerDependencies:
-      react: ^19.2.6
+      react: ^19.2.7
 
   react-is@16.13.1:
     resolution: {integrity: sha512-24e6ynE2H+OKt4kqsOvNd8kBpV65zoxbA4BVsEOB3ARVWQki/DHzaUoC5KuON/BiccDaCCTZBuOcfZs70kR8bQ==}
@@ -2484,8 +2484,8 @@ packages:
     peerDependencies:
       react: ^18.0.0 || ^19.0.0
 
-  react@19.2.6:
-    resolution: {integrity: sha512-sfWGGfavi0xr8Pg0sVsyHMAOziVYKgPLNrS7ig+ivMNb3wbCBw3KxtflsGBAwD3gYQlE/AEZsTLgToRrSCjb0Q==}
+  react@19.2.7:
+    resolution: {integrity: sha512-HNe9WslTbXmFK8o8cmwgAeJFSBvt1bPdHCVKtaaV+WlAN36mpT4hcRpwbf3fY56ar2oIXzsBpOAiIRHAdY0OlQ==}
     engines: {node: '>=0.10.0'}
 
   readable-stream@3.6.2:
@@ -3118,7 +3118,7 @@ snapshots:
     dependencies:
       zod: 4.4.3
 
-  '@a-novel-kit/nodelib-config@1.3.38(57cecbbb4055157bb9448d72ee28eef7)':
+  '@a-novel-kit/nodelib-config@1.3.38(a242745900c61a799bcc3d929a5dd323)':
     dependencies:
       '@eslint/compat': 2.1.0(eslint@10.4.1(jiti@2.7.0))
       '@eslint/js': 10.0.1(eslint@10.4.1(jiti@2.7.0))
@@ -3128,24 +3128,24 @@ snapshots:
       eslint: 10.4.1(jiti@2.7.0)
       eslint-config-prettier: 10.1.8(eslint@10.4.1(jiti@2.7.0))
       eslint-plugin-prettier: 5.5.6(eslint-config-prettier@10.1.8(eslint@10.4.1(jiti@2.7.0)))(eslint@10.4.1(jiti@2.7.0))(prettier@3.8.3)
-      eslint-plugin-storybook: 10.4.1(eslint@10.4.1(jiti@2.7.0))(storybook@10.3.6(@testing-library/dom@10.4.1)(prettier@3.8.3)(react-dom@19.2.6(react@19.2.6))(react@19.2.6))(typescript@6.0.3)
+      eslint-plugin-storybook: 10.4.1(eslint@10.4.1(jiti@2.7.0))(storybook@10.3.6(@testing-library/dom@10.4.1)(prettier@3.8.3)(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(typescript@6.0.3)
       eslint-plugin-svelte: 3.18.0(eslint@10.4.1(jiti@2.7.0))(svelte@5.55.5(@typescript-eslint/types@8.60.1))
       prettier: 3.8.3
       prettier-plugin-css-order: 2.2.0(postcss@8.5.15)(prettier@3.8.3)
       prettier-plugin-packagejson: 3.0.2(prettier@3.8.3)
       prettier-plugin-sql: 0.20.0(prettier@3.8.3)
       prettier-plugin-svelte: 3.5.2(prettier@3.8.3)(svelte@5.55.5(@typescript-eslint/types@8.60.1))
-      storybook: 10.3.6(@testing-library/dom@10.4.1)(prettier@3.8.3)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
+      storybook: 10.3.6(@testing-library/dom@10.4.1)(prettier@3.8.3)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
       svelte: 5.55.5(@typescript-eslint/types@8.60.1)
       typescript: 6.0.3
       typescript-eslint: 8.60.0(eslint@10.4.1(jiti@2.7.0))(typescript@6.0.3)
 
-  '@a-novel-kit/nodelib-test@1.3.38(@a-novel-kit/nodelib-browser@1.3.38(zod@4.4.3))(@msw/playwright@0.4.5(msw@2.14.6(@types/node@24.12.4)(typescript@5.9.3)))(@tanstack/react-query@5.100.10(react@19.2.6))(@testing-library/react@16.3.2(@testing-library/dom@10.4.1)(react-dom@19.2.6(react@19.2.6))(react@19.2.6))(msw@2.14.6(@types/node@24.12.4)(typescript@5.9.3))(playwright@1.59.1)(v8-to-istanbul@9.3.0)(vitest@4.1.7)(zod@4.4.3)':
+  '@a-novel-kit/nodelib-test@1.3.38(@a-novel-kit/nodelib-browser@1.3.38(zod@4.4.3))(@msw/playwright@0.4.5(msw@2.14.6(@types/node@24.12.4)(typescript@5.9.3)))(@tanstack/react-query@5.100.10(react@19.2.7))(@testing-library/react@16.3.2(@testing-library/dom@10.4.1)(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(msw@2.14.6(@types/node@24.12.4)(typescript@5.9.3))(playwright@1.59.1)(v8-to-istanbul@9.3.0)(vitest@4.1.7)(zod@4.4.3)':
     dependencies:
       '@a-novel-kit/nodelib-browser': 1.3.38(zod@4.4.3)
       '@msw/playwright': 0.4.5(msw@2.14.6(@types/node@24.12.4)(typescript@5.9.3))
-      '@tanstack/react-query': 5.100.10(react@19.2.6)
-      '@testing-library/react': 16.3.2(@testing-library/dom@10.4.1)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
+      '@tanstack/react-query': 5.100.10(react@19.2.7)
+      '@testing-library/react': 16.3.2(@testing-library/dom@10.4.1)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
       get-port-please: 3.2.0
       globals: 16.5.0
       lodash-es: 4.18.1
@@ -3155,12 +3155,12 @@ snapshots:
       vitest: 4.1.7(@opentelemetry/api@1.9.1)(@types/node@24.12.4)(@vitest/coverage-v8@4.1.7)(jsdom@28.1.0(@noble/hashes@1.8.0))(msw@2.14.6(@types/node@24.12.4)(typescript@5.9.3))(vite@7.3.3(@types/node@24.12.4)(jiti@2.7.0)(lightningcss@1.32.0))
       zod: 4.4.3
 
-  '@a-novel-kit/nodelib-test@1.3.38(@a-novel-kit/nodelib-browser@1.3.38(zod@4.4.3))(@msw/playwright@0.4.5(msw@2.14.6(@types/node@24.12.4)(typescript@6.0.3)))(@tanstack/react-query@5.100.10(react@19.2.6))(@testing-library/react@16.3.2(@testing-library/dom@10.4.1)(react-dom@19.2.6(react@19.2.6))(react@19.2.6))(msw@2.14.6(@types/node@24.12.4)(typescript@6.0.3))(playwright@1.59.1)(v8-to-istanbul@9.3.0)(vitest@4.1.7)(zod@4.4.3)':
+  '@a-novel-kit/nodelib-test@1.3.38(@a-novel-kit/nodelib-browser@1.3.38(zod@4.4.3))(@msw/playwright@0.4.5(msw@2.14.6(@types/node@24.12.4)(typescript@6.0.3)))(@tanstack/react-query@5.100.10(react@19.2.7))(@testing-library/react@16.3.2(@testing-library/dom@10.4.1)(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(msw@2.14.6(@types/node@24.12.4)(typescript@6.0.3))(playwright@1.59.1)(v8-to-istanbul@9.3.0)(vitest@4.1.7)(zod@4.4.3)':
     dependencies:
       '@a-novel-kit/nodelib-browser': 1.3.38(zod@4.4.3)
       '@msw/playwright': 0.4.5(msw@2.14.6(@types/node@24.12.4)(typescript@6.0.3))
-      '@tanstack/react-query': 5.100.10(react@19.2.6)
-      '@testing-library/react': 16.3.2(@testing-library/dom@10.4.1)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
+      '@tanstack/react-query': 5.100.10(react@19.2.7)
+      '@testing-library/react': 16.3.2(@testing-library/dom@10.4.1)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
       get-port-please: 3.2.0
       globals: 16.5.0
       lodash-es: 4.18.1
@@ -3584,7 +3584,7 @@ snapshots:
       '@opentelemetry/sdk-logs': 0.214.0(@opentelemetry/api@1.9.1)
       '@opentelemetry/sdk-metrics': 2.6.1(@opentelemetry/api@1.9.1)
       '@opentelemetry/sdk-trace-base': 2.6.1(@opentelemetry/api@1.9.1)
-      protobufjs: 8.4.2
+      protobufjs: 8.5.0
 
   '@opentelemetry/resources@2.6.1(@opentelemetry/api@1.9.1)':
     dependencies:
@@ -3666,13 +3666,13 @@ snapshots:
       mobx: 6.15.4
       picomatch: 4.0.4
       pluralize: 8.0.0
-      react: 19.2.6
-      react-dom: 19.2.6(react@19.2.6)
-      redoc: 2.5.1(core-js@3.49.0)(mobx@6.15.4)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)(styled-components@6.4.1(react-dom@19.2.6(react@19.2.6))(react@19.2.6))
+      react: 19.2.7
+      react-dom: 19.2.7(react@19.2.7)
+      redoc: 2.5.1(core-js@3.49.0)(mobx@6.15.4)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(styled-components@6.4.1(react-dom@19.2.7(react@19.2.7))(react@19.2.7))
       semver: 7.8.1
       set-cookie-parser: 2.7.2
       simple-websocket: 9.1.0
-      styled-components: 6.4.1(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
+      styled-components: 6.4.1(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
       ulid: 3.0.2
       undici: 6.24.0
       yargs: 17.0.1
@@ -3864,10 +3864,10 @@ snapshots:
 
   '@storybook/global@5.0.0': {}
 
-  '@storybook/icons@2.0.2(react-dom@19.2.6(react@19.2.6))(react@19.2.6)':
+  '@storybook/icons@2.0.2(react-dom@19.2.7(react@19.2.7))(react@19.2.7)':
     dependencies:
-      react: 19.2.6
-      react-dom: 19.2.6(react@19.2.6)
+      react: 19.2.7
+      react-dom: 19.2.7(react@19.2.7)
 
   '@sveltejs/acorn-typescript@1.0.10(acorn@8.16.0)':
     dependencies:
@@ -3905,10 +3905,10 @@ snapshots:
 
   '@tanstack/query-core@5.100.10': {}
 
-  '@tanstack/react-query@5.100.10(react@19.2.6)':
+  '@tanstack/react-query@5.100.10(react@19.2.7)':
     dependencies:
       '@tanstack/query-core': 5.100.10
-      react: 19.2.6
+      react: 19.2.7
 
   '@testing-library/dom@10.4.1':
     dependencies:
@@ -3930,12 +3930,12 @@ snapshots:
       picocolors: 1.1.1
       redent: 3.0.0
 
-  '@testing-library/react@16.3.2(@testing-library/dom@10.4.1)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)':
+  '@testing-library/react@16.3.2(@testing-library/dom@10.4.1)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)':
     dependencies:
       '@babel/runtime': 7.29.7
       '@testing-library/dom': 10.4.1
-      react: 19.2.6
-      react-dom: 19.2.6(react@19.2.6)
+      react: 19.2.7
+      react-dom: 19.2.7(react@19.2.7)
 
   '@testing-library/user-event@14.6.1(@testing-library/dom@10.4.1)':
     dependencies:
@@ -4496,11 +4496,11 @@ snapshots:
     optionalDependencies:
       eslint-config-prettier: 10.1.8(eslint@10.4.1(jiti@2.7.0))
 
-  eslint-plugin-storybook@10.4.1(eslint@10.4.1(jiti@2.7.0))(storybook@10.3.6(@testing-library/dom@10.4.1)(prettier@3.8.3)(react-dom@19.2.6(react@19.2.6))(react@19.2.6))(typescript@6.0.3):
+  eslint-plugin-storybook@10.4.1(eslint@10.4.1(jiti@2.7.0))(storybook@10.3.6(@testing-library/dom@10.4.1)(prettier@3.8.3)(react-dom@19.2.7(react@19.2.7))(react@19.2.7))(typescript@6.0.3):
     dependencies:
       '@typescript-eslint/utils': 8.60.1(eslint@10.4.1(jiti@2.7.0))(typescript@6.0.3)
       eslint: 10.4.1(jiti@2.7.0)
-      storybook: 10.3.6(@testing-library/dom@10.4.1)(prettier@3.8.3)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
+      storybook: 10.3.6(@testing-library/dom@10.4.1)(prettier@3.8.3)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
     transitivePeerDependencies:
       - supports-color
       - typescript
@@ -4703,7 +4703,7 @@ snapshots:
 
   globals@17.6.0: {}
 
-  graphql@16.14.0: {}
+  graphql@16.14.1: {}
 
   handlebars@4.7.9:
     dependencies:
@@ -5013,21 +5013,21 @@ snapshots:
 
   minipass@7.1.3: {}
 
-  mobx-react-lite@4.1.1(mobx@6.15.4)(react-dom@19.2.6(react@19.2.6))(react@19.2.6):
+  mobx-react-lite@4.1.1(mobx@6.15.4)(react-dom@19.2.7(react@19.2.7))(react@19.2.7):
     dependencies:
       mobx: 6.15.4
-      react: 19.2.6
-      use-sync-external-store: 1.6.0(react@19.2.6)
+      react: 19.2.7
+      use-sync-external-store: 1.6.0(react@19.2.7)
     optionalDependencies:
-      react-dom: 19.2.6(react@19.2.6)
+      react-dom: 19.2.7(react@19.2.7)
 
-  mobx-react@9.2.0(mobx@6.15.4)(react-dom@19.2.6(react@19.2.6))(react@19.2.6):
+  mobx-react@9.2.0(mobx@6.15.4)(react-dom@19.2.7(react@19.2.7))(react@19.2.7):
     dependencies:
       mobx: 6.15.4
-      mobx-react-lite: 4.1.1(mobx@6.15.4)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
-      react: 19.2.6
+      mobx-react-lite: 4.1.1(mobx@6.15.4)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
+      react: 19.2.7
     optionalDependencies:
-      react-dom: 19.2.6(react@19.2.6)
+      react-dom: 19.2.7(react@19.2.7)
 
   mobx@6.15.4: {}
 
@@ -5044,7 +5044,7 @@ snapshots:
       '@open-draft/deferred-promise': 3.0.0
       '@types/statuses': 2.0.6
       cookie: 1.1.1
-      graphql: 16.14.0
+      graphql: 16.14.1
       headers-polyfill: 5.0.1
       is-node-process: 1.2.0
       outvariant: 1.4.3
@@ -5069,7 +5069,7 @@ snapshots:
       '@open-draft/deferred-promise': 3.0.0
       '@types/statuses': 2.0.6
       cookie: 1.1.1
-      graphql: 16.14.0
+      graphql: 16.14.1
       headers-polyfill: 5.0.1
       is-node-process: 1.2.0
       outvariant: 1.4.3
@@ -5317,7 +5317,7 @@ snapshots:
       object-assign: 4.1.1
       react-is: 16.13.1
 
-  protobufjs@8.4.2:
+  protobufjs@8.5.0:
     dependencies:
       long: 5.3.2
 
@@ -5336,22 +5336,22 @@ snapshots:
     dependencies:
       safe-buffer: 5.2.1
 
-  react-dom@19.2.6(react@19.2.6):
+  react-dom@19.2.7(react@19.2.7):
     dependencies:
-      react: 19.2.6
+      react: 19.2.7
       scheduler: 0.27.0
 
   react-is@16.13.1: {}
 
   react-is@17.0.2: {}
 
-  react-tabs@6.1.1(react@19.2.6):
+  react-tabs@6.1.1(react@19.2.7):
     dependencies:
       clsx: 2.1.1
       prop-types: 15.8.1
-      react: 19.2.6
+      react: 19.2.7
 
-  react@19.2.6: {}
+  react@19.2.7: {}
 
   readable-stream@3.6.2:
     dependencies:
@@ -5372,7 +5372,7 @@ snapshots:
       indent-string: 4.0.0
       strip-indent: 3.0.0
 
-  redoc@2.5.1(core-js@3.49.0)(mobx@6.15.4)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)(styled-components@6.4.1(react-dom@19.2.6(react@19.2.6))(react@19.2.6)):
+  redoc@2.5.1(core-js@3.49.0)(mobx@6.15.4)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)(styled-components@6.4.1(react-dom@19.2.7(react@19.2.7))(react@19.2.7)):
     dependencies:
       '@redocly/openapi-core': 1.34.15
       classnames: 2.5.1
@@ -5385,19 +5385,19 @@ snapshots:
       mark.js: 8.11.1
       marked: 4.3.0
       mobx: 6.15.4
-      mobx-react: 9.2.0(mobx@6.15.4)(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
+      mobx-react: 9.2.0(mobx@6.15.4)(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
       openapi-sampler: 1.7.4
       path-browserify: 1.0.1
       perfect-scrollbar: 1.5.6
       polished: 4.3.1
       prismjs: 1.30.0
       prop-types: 15.8.1
-      react: 19.2.6
-      react-dom: 19.2.6(react@19.2.6)
-      react-tabs: 6.1.1(react@19.2.6)
+      react: 19.2.7
+      react-dom: 19.2.7(react@19.2.7)
+      react-tabs: 6.1.1(react@19.2.7)
       slugify: 1.4.7
       stickyfill: 1.1.1
-      styled-components: 6.4.1(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
+      styled-components: 6.4.1(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
       swagger2openapi: 7.0.8
       url-template: 2.0.8
     transitivePeerDependencies:
@@ -5568,10 +5568,10 @@ snapshots:
 
   stickyfill@1.1.1: {}
 
-  storybook@10.3.6(@testing-library/dom@10.4.1)(prettier@3.8.3)(react-dom@19.2.6(react@19.2.6))(react@19.2.6):
+  storybook@10.3.6(@testing-library/dom@10.4.1)(prettier@3.8.3)(react-dom@19.2.7(react@19.2.7))(react@19.2.7):
     dependencies:
       '@storybook/global': 5.0.0
-      '@storybook/icons': 2.0.2(react-dom@19.2.6(react@19.2.6))(react@19.2.6)
+      '@storybook/icons': 2.0.2(react-dom@19.2.7(react@19.2.7))(react@19.2.7)
       '@testing-library/jest-dom': 6.9.1
       '@testing-library/user-event': 14.6.1(@testing-library/dom@10.4.1)
       '@vitest/expect': 3.2.4
@@ -5581,7 +5581,7 @@ snapshots:
       open: 10.2.0
       recast: 0.23.11
       semver: 7.8.1
-      use-sync-external-store: 1.6.0(react@19.2.6)
+      use-sync-external-store: 1.6.0(react@19.2.7)
       ws: 8.21.0
     optionalDependencies:
       prettier: 3.8.3
@@ -5614,14 +5614,14 @@ snapshots:
 
   strnum@2.3.0: {}
 
-  styled-components@6.4.1(react-dom@19.2.6(react@19.2.6))(react@19.2.6):
+  styled-components@6.4.1(react-dom@19.2.7(react@19.2.7))(react@19.2.7):
     dependencies:
       '@emotion/is-prop-valid': 1.4.0
       csstype: 3.2.3
-      react: 19.2.6
+      react: 19.2.7
       stylis: 4.3.6
     optionalDependencies:
-      react-dom: 19.2.6(react@19.2.6)
+      react-dom: 19.2.7(react@19.2.7)
 
   stylis@4.3.6: {}
 
@@ -5777,9 +5777,9 @@ snapshots:
 
   url-template@2.0.8: {}
 
-  use-sync-external-store@1.6.0(react@19.2.6):
+  use-sync-external-store@1.6.0(react@19.2.7):
     dependencies:
-      react: 19.2.6
+      react: 19.2.7
 
   util-deprecate@1.0.2: {}
 
