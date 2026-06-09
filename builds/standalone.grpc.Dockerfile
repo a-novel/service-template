@@ -32,7 +32,7 @@ RUN go build -o /migrations cmd/migrations/main.go
 # Used for healthcheck.
 RUN GOBIN=/grpcurl go install github.com/fullstorydev/grpcurl/cmd/grpcurl@latest
 
-FROM docker.io/library/alpine:3.23.4
+FROM docker.io/library/alpine:3.24.0
 
 WORKDIR /
 
