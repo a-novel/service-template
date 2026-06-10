@@ -36,18 +36,18 @@ copy. Replace it with your own resource, rename the module, and you have a worki
 A `go mod edit -module github.com/a-novel/<your-service>` followed by a project-wide find/replace
 of `service-template` → `<your-service>` covers most of it (the import paths use the
 `github.com/a-novel/service-template/internal/...` form, so the same replace catches them);
-then `make format` and `make generate`.
+then `pnpm format:go` and `pnpm generate`.
 
 ### 2. Replace the `item` resource
 
 Swap `item` for your own resource (call it `widget`, say) — touch each of these, renaming
 `item`/`Item` → `widget`/`Widget` and adjusting fields:
 
-- **Migration** — `internal/models/migrations/20250306000000_items_table.{up,down}.sql` (and `make migrations` / `date '+%Y%m%d%H%M%S'` for a fresh timestamp if you'd rather start over).
+- **Migration** — `internal/models/migrations/20250306000000_items_table.{up,down}.sql` (use `date '+%Y%m%d%H%M%S'` for a fresh timestamp if you'd rather start over).
 - **DAO** — `internal/dao/pg.item.go` (the bun model), `pg.itemCreate.go` / `.sql` and the `Get` / `List` / `Update` / `Delete` siblings, plus the `*_test.go` files.
 - **Services** — `internal/services/item.go`, `itemCreate.go` … `itemDelete.go`, the `*_test.go` files, and `internal/services/validate.go` if your fields need different custom validators (it currently only registers `notblank`).
 - **Handlers** — REST: `internal/handlers/http.item.go`, `http.itemCreatePublic.go` … `http.itemDeletePublic.go`; gRPC: `internal/handlers/grpc.itemCreate.go` … `grpc.itemDelete.go`; plus the `*_test.go` files.
-- **Proto** — `internal/models/proto/item*.proto` (then `make generate` to refresh `internal/handlers/protogen/`).
+- **Proto** — `internal/models/proto/item*.proto` (then `pnpm generate` to refresh `internal/handlers/protogen/`).
 - **API surface** — `openapi.yaml` (+ regenerate `openapi.html`), `pkg/go/client.go`, `pkg/js/rest/src/item.ts` and `pkg/js/rest/src/index.ts`, and the integration tests under `pkg/js/test/`.
 - **Wiring** — the constructor calls and route registrations in `cmd/rest/main.go` and `cmd/grpc/main.go`.
 
@@ -58,14 +58,15 @@ These are not dummy code — leave them in place (adjusting only as your service
 - `internal/config/` (env loading, presets), the `cmd/*/main.go` startup shape (config → otel → DB
   context → DAOs → services → handlers → routes → graceful shutdown), `internal/handlers/http.ping.go`
   / `http.health.go` / `http.decoder.go` / `grpc.status.go`, `internal/models/migrations/migrations.go`.
-- `Makefile`, `builds/`, `scripts/`, `.github/workflows/`, the `*.mod` tool-dep files, `renovate.json`,
+- `builds/`, `.github/workflows/`, the `*.mod` tool-dep files, `renovate.json`,
   `buf.*`, the prettier/pnpm config — all org-standard, shared with the other services.
 - `LICENSE`, `SECURITY.md`, `CODE_OF_CONDUCT.md`, `CONTRIBUTING.md` — update only the bits that name
   the service.
 
 ### 4. Verify
 
-`make generate` → `make format` → `make lint` → `make test`. Then refresh `openapi.html`, update
+`pnpm generate` → `pnpm format:go && pnpm format` → `pnpm lint:go && pnpm lint:proto && pnpm lint` →
+`a-novel test -y`. Then refresh `openapi.html`, update
 this README (delete this section, fix the badges/links/Docker image names), and you have a service.
 
 Conventions for writing the Go (layering, naming, error handling, telemetry, tests) are governed by
