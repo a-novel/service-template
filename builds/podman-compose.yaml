@@ -12,10 +12,9 @@ services:
     networks:
       - api
     environment:
-      # Spec §12.1: inline test-default credentials. The new a-novel
-      # daemon owns dynamic env (ports, derived URLs, cross-service refs)
-      # but NOT constants — those live in the service's compose. This
-      # mirrors what every service's CI workflow already hardcodes.
+      # Inline test-default credentials. The daemon owns dynamic env (ports,
+      # derived URLs, cross-service refs); constants like these belong to the
+      # service's compose. Mirrors what every service's CI workflow hardcodes.
       POSTGRES_PASSWORD: postgres
       POSTGRES_USER: postgres
       POSTGRES_DB: postgres
@@ -29,8 +28,8 @@ services:
   # ====================================================================================================================
 
   # migrations: applies the schema. Idempotent — safe to re-run every
-  # infra-up. No healthcheck — that's the daemon's classifier for
-  # one-shot vs long-runner (spec §4.2).
+  # infra-up. No healthcheck — its absence is what marks a compose service as
+  # a one-shot rather than a long-runner.
   service-template-migrations:
     profiles: ["migrations"]
     build:
@@ -48,9 +47,9 @@ services:
   # LONG-RUNNER TARGETS (rest, grpc)
   # ====================================================================================================================
 
-  # Profiled so a plain `podman compose up` does NOT start it: `a-novel run`
+  # Profiled so a plain `podman compose up` does not start it: `a-novel run`
   # brings this file up only for the postgres dependency (+ the migrations
-  # one-shot) and runs THIS entrypoint locally (go run); a containerised
+  # one-shot) and runs this entrypoint locally (go run); a containerised
   # copy on the same host ${GRPC_PORT} would collide ("bind: address
   # already in use"). `--profile grpc` opts into the dockerised copy.
   service-template-grpc:
