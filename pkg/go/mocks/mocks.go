@@ -116,9 +116,9 @@ type MockClient_ItemCreate_Call struct {
 //   - ctx context.Context
 //   - req *servicetemplate.ItemCreateRequest
 //   - opts ...grpc.CallOption
-func (_e *MockClient_Expecter) ItemCreate(ctx interface{}, req interface{}, opts ...interface{}) *MockClient_ItemCreate_Call {
+func (_e *MockClient_Expecter) ItemCreate(ctx any, req any, opts ...any) *MockClient_ItemCreate_Call {
 	return &MockClient_ItemCreate_Call{Call: _e.mock.On("ItemCreate",
-		append([]interface{}{ctx, req}, opts...)...)}
+		append([]any{ctx, req}, opts...)...)}
 }
 
 func (_c *MockClient_ItemCreate_Call) Run(run func(ctx context.Context, req *servicetemplate.ItemCreateRequest, opts ...grpc.CallOption)) *MockClient_ItemCreate_Call {
@@ -199,9 +199,9 @@ type MockClient_ItemDelete_Call struct {
 //   - ctx context.Context
 //   - req *servicetemplate.ItemDeleteRequest
 //   - opts ...grpc.CallOption
-func (_e *MockClient_Expecter) ItemDelete(ctx interface{}, req interface{}, opts ...interface{}) *MockClient_ItemDelete_Call {
+func (_e *MockClient_Expecter) ItemDelete(ctx any, req any, opts ...any) *MockClient_ItemDelete_Call {
 	return &MockClient_ItemDelete_Call{Call: _e.mock.On("ItemDelete",
-		append([]interface{}{ctx, req}, opts...)...)}
+		append([]any{ctx, req}, opts...)...)}
 }
 
 func (_c *MockClient_ItemDelete_Call) Run(run func(ctx context.Context, req *servicetemplate.ItemDeleteRequest, opts ...grpc.CallOption)) *MockClient_ItemDelete_Call {
@@ -282,9 +282,9 @@ type MockClient_ItemGet_Call struct {
 //   - ctx context.Context
 //   - req *servicetemplate.ItemGetRequest
 //   - opts ...grpc.CallOption
-func (_e *MockClient_Expecter) ItemGet(ctx interface{}, req interface{}, opts ...interface{}) *MockClient_ItemGet_Call {
+func (_e *MockClient_Expecter) ItemGet(ctx any, req any, opts ...any) *MockClient_ItemGet_Call {
 	return &MockClient_ItemGet_Call{Call: _e.mock.On("ItemGet",
-		append([]interface{}{ctx, req}, opts...)...)}
+		append([]any{ctx, req}, opts...)...)}
 }
 
 func (_c *MockClient_ItemGet_Call) Run(run func(ctx context.Context, req *servicetemplate.ItemGetRequest, opts ...grpc.CallOption)) *MockClient_ItemGet_Call {
@@ -365,9 +365,9 @@ type MockClient_ItemList_Call struct {
 //   - ctx context.Context
 //   - req *servicetemplate.ItemListRequest
 //   - opts ...grpc.CallOption
-func (_e *MockClient_Expecter) ItemList(ctx interface{}, req interface{}, opts ...interface{}) *MockClient_ItemList_Call {
+func (_e *MockClient_Expecter) ItemList(ctx any, req any, opts ...any) *MockClient_ItemList_Call {
 	return &MockClient_ItemList_Call{Call: _e.mock.On("ItemList",
-		append([]interface{}{ctx, req}, opts...)...)}
+		append([]any{ctx, req}, opts...)...)}
 }
 
 func (_c *MockClient_ItemList_Call) Run(run func(ctx context.Context, req *servicetemplate.ItemListRequest, opts ...grpc.CallOption)) *MockClient_ItemList_Call {
@@ -448,9 +448,9 @@ type MockClient_ItemUpdate_Call struct {
 //   - ctx context.Context
 //   - req *servicetemplate.ItemUpdateRequest
 //   - opts ...grpc.CallOption
-func (_e *MockClient_Expecter) ItemUpdate(ctx interface{}, req interface{}, opts ...interface{}) *MockClient_ItemUpdate_Call {
+func (_e *MockClient_Expecter) ItemUpdate(ctx any, req any, opts ...any) *MockClient_ItemUpdate_Call {
 	return &MockClient_ItemUpdate_Call{Call: _e.mock.On("ItemUpdate",
-		append([]interface{}{ctx, req}, opts...)...)}
+		append([]any{ctx, req}, opts...)...)}
 }
 
 func (_c *MockClient_ItemUpdate_Call) Run(run func(ctx context.Context, req *servicetemplate.ItemUpdateRequest, opts ...grpc.CallOption)) *MockClient_ItemUpdate_Call {
@@ -531,9 +531,9 @@ type MockClient_Status_Call struct {
 //   - ctx context.Context
 //   - req *servicetemplate.StatusRequest
 //   - opts ...grpc.CallOption
-func (_e *MockClient_Expecter) Status(ctx interface{}, req interface{}, opts ...interface{}) *MockClient_Status_Call {
+func (_e *MockClient_Expecter) Status(ctx any, req any, opts ...any) *MockClient_Status_Call {
 	return &MockClient_Status_Call{Call: _e.mock.On("Status",
-		append([]interface{}{ctx, req}, opts...)...)}
+		append([]any{ctx, req}, opts...)...)}
 }
 
 func (_c *MockClient_Status_Call) Run(run func(ctx context.Context, req *servicetemplate.StatusRequest, opts ...grpc.CallOption)) *MockClient_Status_Call {
@@ -614,9 +614,9 @@ type MockClient_UnaryEcho_Call struct {
 //   - ctx context.Context
 //   - req *golibproto.UnaryEchoRequest
 //   - opts ...grpc.CallOption
-func (_e *MockClient_Expecter) UnaryEcho(ctx interface{}, req interface{}, opts ...interface{}) *MockClient_UnaryEcho_Call {
+func (_e *MockClient_Expecter) UnaryEcho(ctx any, req any, opts ...any) *MockClient_UnaryEcho_Call {
 	return &MockClient_UnaryEcho_Call{Call: _e.mock.On("UnaryEcho",
-		append([]interface{}{ctx, req}, opts...)...)}
+		append([]any{ctx, req}, opts...)...)}
 }
 
 func (_c *MockClient_UnaryEcho_Call) Run(run func(ctx context.Context, req *golibproto.UnaryEchoRequest, opts ...grpc.CallOption)) *MockClient_UnaryEcho_Call {
