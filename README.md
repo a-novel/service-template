@@ -11,9 +11,9 @@
 
 ![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/a-novel/service-template/main.yaml)
 [![Go Report Card](https://goreportcard.com/badge/github.com/a-novel/service-template)](https://goreportcard.com/report/github.com/a-novel/service-template)
-[![codecov](https://codecov.io/gh/a-novel/service-template/graph/badge.svg?token=XK5D0l728E)](https://codecov.io/gh/a-novel/service-template)
+[![codecov](https://codecov.io/gh/a-novel/service-template/graph/badge.svg)](https://codecov.io/gh/a-novel/service-template)
 
-![Coverage graph](https://codecov.io/gh/a-novel/service-template/graphs/sunburst.svg?token=XK5D0l728E)
+![Coverage graph](https://codecov.io/gh/a-novel/service-template/graphs/sunburst.svg)
 
 ## Using this template
 
