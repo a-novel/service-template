@@ -41,7 +41,7 @@ This repository is a starting point for a new Agora backend service, not a servi
 
 **3. Keep the scaffolding.** Leave these in place (adjust only as your service needs): `internal/config/`, the `cmd/*/main.go` startup shape, `internal/handlers/http.ping.go` / `http.health.go` / `http.decoder.go` / `grpc.status.go`, `internal/models/migrations/migrations.go`, `builds/`, `.github/workflows/`, the `*.mod` tool files, `renovate.json`, `buf.*`, and the prettier/pnpm config. Update only the service-naming bits of `LICENSE`, `SECURITY.md`, `CODE_OF_CONDUCT.md`, and `CONTRIBUTING.md`.
 
-**4. Verify.** `pnpm generate` → `pnpm format:go && pnpm format` → `pnpm lint:go && pnpm lint:proto && pnpm lint` → `a-novel test -y`. Refresh `openapi.html`, then delete this section and finish updating this README for the new service.
+**4. Verify.** `pnpm generate` → `pnpm format` → `pnpm lint` → `a-novel test -y` (`format` and `lint` already cover Go, proto, and JS). Refresh `openapi.html`, then delete this section and finish updating this README for the new service.
 
 Go conventions (layering, naming, errors, telemetry, tests) are governed by the `write-go` / `write-go-service` / `write-go-tests` skills; `write-sql`, `write-proto`, `write-openapi`, `write-dockerfiles` cover the rest.
 
@@ -95,7 +95,7 @@ services:
 
   service-template:
     image: ghcr.io/a-novel/service-template/grpc:v0.0.0 # or .../rest:v0.0.0 for the public surface
-    ports: ["${SERVICE_TEMPLATE_GRPC_PORT}:8080"]
+    ports: ["${SERVICE_TEMPLATE_GRPC_PORT}:8080"] # the container always listens on 8080; map ${SERVICE_TEMPLATE_REST_PORT} for the rest image
     depends_on:
       postgres-template: { condition: service_healthy }
       migrations-template: { condition: service_completed_successfully }
@@ -243,7 +243,7 @@ services:
 
   service-template:
     image: ghcr.io/a-novel/service-template/standalone-grpc:v0.0.0 # or standalone-rest
-    ports: ["${SERVICE_TEMPLATE_GRPC_PORT}:8080"]
+    ports: ["${SERVICE_TEMPLATE_GRPC_PORT}:8080"] # map ${SERVICE_TEMPLATE_REST_PORT} for the standalone-rest image
     depends_on:
       postgres-template: { condition: service_healthy }
     environment:

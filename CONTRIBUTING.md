@@ -44,7 +44,7 @@ curl -X PUT "http://localhost:${SERVICE_TEMPLATE_REST_PORT}/item" \
   -d '{"id": "<item-uuid>", "name": "Updated Name", "description": "Updated description."}'
 curl -X DELETE "http://localhost:${SERVICE_TEMPLATE_REST_PORT}/item?id=<item-uuid>"
 grpcurl -plaintext -d '{"id": "<item-uuid>"}' localhost:${SERVICE_TEMPLATE_GRPC_PORT} ItemGetService/ItemGet
-grpcurl -plaintext -d '{"id": "<item-uuid>", "name": "Updated Name"}' \
+grpcurl -plaintext -d '{"id": "<item-uuid>", "name": "Updated Name", "description": "Updated description."}' \
   localhost:${SERVICE_TEMPLATE_GRPC_PORT} ItemUpdateService/ItemUpdate
 grpcurl -plaintext -d '{"id": "<item-uuid>"}' localhost:${SERVICE_TEMPLATE_GRPC_PORT} ItemDeleteService/ItemDelete
 ```
