@@ -1,5 +1,7 @@
 # Service Template
 
+A scaffold for new A-Novel backend services: fork it, rename the Go module, and replace the example `item` resource with your own. It ships one trivial CRUD entity wired end to end (DB → DAO → service → REST + gRPC handlers → Go/JS clients → OpenAPI) so every layer has a working example to copy.
+
 [![X (formerly Twitter) Follow](https://img.shields.io/twitter/follow/agorastoryverse)](https://twitter.com/agorastoryverse)
 [![Discord](https://img.shields.io/discord/1315240114691248138?logo=discord)](https://discord.gg/rp4Qr8cA)
 
@@ -17,116 +19,63 @@
 
 ## Using this template
 
-This repository is a starting point for a new Agora backend service, not a service you deploy as
-is. It ships one dummy resource — `item`, a trivial CRUD entity — wired end to end (DB → DAO →
-service → REST + gRPC handlers → Go/JS clients → OpenAPI) so every layer has a working example to
-copy. Replace it with your own resource, rename the module, and you have a working service.
+This repository is a starting point for a new Agora backend service, not a service you deploy as is. The rest of this README demonstrates the standard service-README structure your fork inherits — using the placeholder `item` resource. Fork it, then:
 
-### 1. Rename the module and the service identity
+**1. Rename the module and service identity.** Run `go mod edit -module github.com/a-novel/<your-service>`, then a project-wide find/replace of `service-template` → `<your-service>` (the import paths are `github.com/a-novel/service-template/internal/...`, so the same replace catches them). This also covers the badges, image names, and doc links in this README, the CI `image_name:` fields, `package.json`, and `pkg/js/rest/package.json`. Then update:
 
-| What                   | Where                                                                                                                  | From → to                                                                   |
-| ---------------------- | ---------------------------------------------------------------------------------------------------------------------- | --------------------------------------------------------------------------- |
-| Go module path         | `go.mod` (`module …`) + every import in `internal/`, `cmd/`, `pkg/go/`, `*_test.go`                                    | `github.com/a-novel/service-template` → `github.com/a-novel/<your-service>` |
-| Module path in tooling | `.mockery.yaml`, `buf.gen.yaml`                                                                                        | same rename                                                                 |
-| Root generate file     | `generate.go` (`package …`)                                                                                            | the placeholder package name → `package <yourservice>`                      |
-| Env-var prefix         | `internal/config/env/env.go` (`os.Getenv("SERVICE_TEMPLATE_ENV_PREFIX")`)                                              | `SERVICE_TEMPLATE_ENV_PREFIX` → `<YOUR_SERVICE>_ENV_PREFIX`                 |
-| App name default       | `internal/config/env/env.go` (`AppNameDefault`)                                                                        | `"service-template"` → `"<your-service>"`                                   |
-| Repo references        | `README.md` (badges, image names, doc links), CI workflows (`image_name:`), `package.json`, `pkg/js/rest/package.json` | `service-template` → `<your-service>`                                       |
+| What             | Where                                           | From → to                                          |
+| ---------------- | ----------------------------------------------- | -------------------------------------------------- |
+| Root package     | `generate.go` (`package …`)                     | placeholder package name → `package <yourservice>` |
+| Env-var prefix   | `internal/config/env/env.go`                    | `SERVICE_TEMPLATE_ENV_PREFIX` → `<YOUR_SERVICE>_…` |
+| App name default | `internal/config/env/env.go` (`AppNameDefault`) | `"service-template"` → `"<your-service>"`          |
 
-A `go mod edit -module github.com/a-novel/<your-service>` followed by a project-wide find/replace
-of `service-template` → `<your-service>` covers most of it (the import paths use the
-`github.com/a-novel/service-template/internal/...` form, so the same replace catches them);
-then `pnpm format:go` and `pnpm generate`.
+**2. Replace the `item` resource.** Swap `item`/`Item` for your own resource across each layer, renaming and adjusting fields:
 
-### 2. Replace the `item` resource
-
-Swap `item` for your own resource (call it `widget`, say) — touch each of these, renaming
-`item`/`Item` → `widget`/`Widget` and adjusting fields:
-
-- **Migration** — `internal/models/migrations/20250306000000_items_table.{up,down}.sql` (use `date '+%Y%m%d%H%M%S'` for a fresh timestamp if you'd rather start over).
-- **DAO** — `internal/dao/pg.item.go` (the bun model), `pg.itemCreate.go` / `.sql` and the `Get` / `List` / `Update` / `Delete` siblings, plus the `*_test.go` files.
-- **Services** — `internal/services/item.go`, `itemCreate.go` … `itemDelete.go`, the `*_test.go` files, and `internal/services/validate.go` if your fields need different custom validators (it currently only registers `notblank`).
-- **Handlers** — REST: `internal/handlers/http.item.go`, `http.itemCreatePublic.go` … `http.itemDeletePublic.go`; gRPC: `internal/handlers/grpc.itemCreate.go` … `grpc.itemDelete.go`; plus the `*_test.go` files.
+- **Migration** — `internal/models/migrations/20250306000000_items_table.{up,down}.sql` (use `date '+%Y%m%d%H%M%S'` for a fresh timestamp).
+- **DAO** — `internal/dao/pg.item.go` (bun model), `pg.itemCreate.{go,sql}` and the `Get`/`List`/`Update`/`Delete` siblings, plus their `*_test.go`.
+- **Services** — `internal/services/item*.go` and tests; `internal/services/validate.go` only if your fields need validators beyond the registered `notblank`.
+- **Handlers** — REST `internal/handlers/http.item*.go`, gRPC `internal/handlers/grpc.item*.go`, plus tests.
 - **Proto** — `internal/models/proto/item*.proto` (then `pnpm generate` to refresh `internal/handlers/protogen/`).
-- **API surface** — `openapi.yaml` (+ regenerate `openapi.html`), `pkg/go/client.go`, `pkg/js/rest/src/item.ts` and `pkg/js/rest/src/index.ts`, and the integration tests under `pkg/js/test/`.
-- **Wiring** — the constructor calls and route registrations in `cmd/rest/main.go` and `cmd/grpc/main.go`.
+- **API surface** — `openapi.yaml` (+ regenerate `openapi.html`), `pkg/go/client.go`, `pkg/js/rest/src/item.ts` + `index.ts`, and `pkg/js/test/`.
+- **Wiring** — constructor calls and route registrations in `cmd/rest/main.go` and `cmd/grpc/main.go`.
 
-### 3. Keep the scaffolding
+**3. Keep the scaffolding.** Leave these in place (adjust only as your service needs): `internal/config/`, the `cmd/*/main.go` startup shape, `internal/handlers/http.ping.go` / `http.health.go` / `http.decoder.go` / `grpc.status.go`, `internal/models/migrations/migrations.go`, `builds/`, `.github/workflows/`, the `*.mod` tool files, `renovate.json`, `buf.*`, and the prettier/pnpm config. Update only the service-naming bits of `LICENSE`, `SECURITY.md`, `CODE_OF_CONDUCT.md`, and `CONTRIBUTING.md`.
 
-These are not dummy code — leave them in place (adjusting only as your service needs):
+**4. Verify.** `pnpm generate` → `pnpm format` → `pnpm lint` → `a-novel test -y` (`format` and `lint` already cover Go, proto, and JS). Refresh `openapi.html`, then delete this section and finish updating this README for the new service.
 
-- `internal/config/` (env loading, presets), the `cmd/*/main.go` startup shape (config → otel → DB
-  context → DAOs → services → handlers → routes → graceful shutdown), `internal/handlers/http.ping.go`
-  / `http.health.go` / `http.decoder.go` / `grpc.status.go`, `internal/models/migrations/migrations.go`.
-- `builds/`, `.github/workflows/`, the `*.mod` tool-dep files, `renovate.json`,
-  `buf.*`, the prettier/pnpm config — all org-standard, shared with the other services.
-- `LICENSE`, `SECURITY.md`, `CODE_OF_CONDUCT.md`, `CONTRIBUTING.md` — update only the bits that name
-  the service.
+Go conventions (layering, naming, errors, telemetry, tests) are governed by the `write-go` / `write-go-service` / `write-go-tests` skills; `write-sql`, `write-proto`, `write-openapi`, `write-dockerfiles` cover the rest.
 
-### 4. Verify
+## What it does
 
-`pnpm generate` → `pnpm format:go && pnpm format` → `pnpm lint:go && pnpm lint:proto && pnpm lint` →
-`a-novel test -y`. Then refresh `openapi.html`, update
-this README (delete this section, fix the badges/links/Docker image names), and you have a service.
+This is an example service whose only domain object is `item` — a named entity with an optional description — exposed through full CRUD. It exists to be replaced: it demonstrates the layer split (DAO → service → handler), the dual REST/gRPC surface, and the client packages a real service inherits.
 
-Conventions for writing the Go (layering, naming, error handling, telemetry, tests) are governed by
-the `write-go` / `write-go-service` / `write-go-tests` skills in the agora `stack` repo; `write-sql`,
-`write-proto`, `write-openapi`, `write-dockerfiles` cover the rest.
+The service ships two surfaces:
 
-## Usage
+- A **private gRPC API** (`cmd/grpc`) — `StatusService` plus the `Item{Create,Get,List,Update,Delete}Service` RPCs — for internal, private-network service-to-service traffic. The server implements no application-layer authentication: access control is enforced externally (network policy, ingress, service mesh).
+- A **public REST API** (`cmd/rest`) — `/ping`, `/healthcheck`, and the `/items` + `/item` CRUD routes — for any HTTP client.
 
-### Docker
+## Deploying
 
-Run the service as a containerized application (the below examples use docker-compose syntax).
+The service runs as published OCI images plus a PostgreSQL database. Both surfaces are stateless, so each scales to as many replicas as you need behind a load balancer; all state lives in Postgres.
 
-#### gRPC
+> **OpenTofu modules are the planned canonical deployment path.** Until they land, deploy the images with any container orchestrator — the composition below is the reference for which images to run, how they wire together, and the environment they expect.
 
-> Set the SERVICE_TEMPLATE_GRPC_PORT env variable to whatever port you want to use for the service.
+| Image                              | Role                                                                        |
+| ---------------------------------- | --------------------------------------------------------------------------- |
+| `service-template/grpc`            | Private item CRUD + status API. Internal network only.                      |
+| `service-template/rest`            | Public item CRUD + health API.                                              |
+| `service-template/jobs/migrations` | One-shot schema migration job; runs to completion before the servers start. |
+| `service-template/database`        | Pre-tuned PostgreSQL image — or bring your own Postgres.                    |
 
-```yaml
-services:
-  postgres-template:
-    image: ghcr.io/a-novel/service-template/database:v0.0.0
-    networks:
-      - api
-    environment:
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_USER: postgres
-      POSTGRES_DB: postgres
-      POSTGRES_HOST_AUTH_METHOD: scram-sha-256
-      POSTGRES_INITDB_ARGS: --auth=scram-sha-256
-    volumes:
-      - template-postgres-data:/var/lib/postgresql/
+Pin every image to the same release tag. A production deployment runs `database`, then `migrations` to completion, then any number of `grpc` and/or `rest` replicas:
 
-  service-template:
-    image: ghcr.io/a-novel/service-template/standalone-grpc:v0.0.0
-    ports:
-      - "${SERVICE_TEMPLATE_GRPC_PORT}:8080"
-    depends_on:
-      postgres-template:
-        condition: service_healthy
-    environment:
-      POSTGRES_DSN: "postgres://postgres:postgres@postgres-template:5432/postgres?sslmode=disable"
-    networks:
-      - api
-
-networks:
-  api:
-
-volumes:
-  template-postgres-data:
-```
-
-Note the standalone image is an all-in-one initializer for the application; however, it runs heavy operations such
-as migrations on every launch. Thus, while it comes in handy for local development, it is NOT RECOMMENDED for
-production deployments. Instead, consider using the separate, optimized images for that purpose.
+<!-- TODO(project-docs): replace v0.0.0 with the new service's release tag -->
 
 ```yaml
 services:
   postgres-template:
     image: ghcr.io/a-novel/service-template/database:v0.0.0
-    networks:
-      - api
+    networks: [api]
     environment:
       POSTGRES_PASSWORD: postgres
       POSTGRES_USER: postgres
@@ -139,26 +88,20 @@ services:
   migrations-template:
     image: ghcr.io/a-novel/service-template/jobs/migrations:v0.0.0
     depends_on:
-      postgres-template:
-        condition: service_healthy
+      postgres-template: { condition: service_healthy }
     environment:
       POSTGRES_DSN: "postgres://postgres:postgres@postgres-template:5432/postgres?sslmode=disable"
-    networks:
-      - api
+    networks: [api]
 
   service-template:
-    image: ghcr.io/a-novel/service-template/grpc:v0.0.0
-    ports:
-      - "${SERVICE_TEMPLATE_GRPC_PORT}:8080"
+    image: ghcr.io/a-novel/service-template/grpc:v0.0.0 # or .../rest:v0.0.0 for the public surface
+    ports: ["${SERVICE_TEMPLATE_GRPC_PORT}:8080"] # the container always listens on 8080; map ${SERVICE_TEMPLATE_REST_PORT} for the rest image
     depends_on:
-      postgres-template:
-        condition: service_healthy
-      migrations-template:
-        condition: service_completed_successfully
+      postgres-template: { condition: service_healthy }
+      migrations-template: { condition: service_completed_successfully }
     environment:
       POSTGRES_DSN: "postgres://postgres:postgres@postgres-template:5432/postgres?sslmode=disable"
-    networks:
-      - api
+    networks: [api]
 
 networks:
   api:
@@ -167,141 +110,99 @@ volumes:
   template-postgres-data:
 ```
 
-#### REST
+Run both surfaces by adding a second service that reuses the same database and migrations with the `rest` image.
 
-> Set the SERVICE_TEMPLATE_REST_PORT env variable to whatever port you want to use for the service.
+### Configuration
 
-```yaml
-services:
-  postgres-template:
-    image: ghcr.io/a-novel/service-template/database:v0.0.0
-    networks:
-      - api
-    environment:
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_USER: postgres
-      POSTGRES_DB: postgres
-      POSTGRES_HOST_AUTH_METHOD: scram-sha-256
-      POSTGRES_INITDB_ARGS: --auth=scram-sha-256
-    volumes:
-      - template-postgres-data:/var/lib/postgresql/
+Every variable is read from the process environment. Env-var names can be globally prefixed via `SERVICE_TEMPLATE_ENV_PREFIX` (rename this when forking — see [Using this template](#using-this-template)).
 
-  service-template:
-    image: ghcr.io/a-novel/service-template/standalone-rest:v0.0.0
-    ports:
-      - "${SERVICE_TEMPLATE_REST_PORT}:8080"
-    depends_on:
-      postgres-template:
-        condition: service_healthy
-    environment:
-      POSTGRES_DSN: "postgres://postgres:postgres@postgres-template:5432/postgres?sslmode=disable"
-    networks:
-      - api
+| Name           | Description                                 | Images |
+| -------------- | ------------------------------------------- | ------ |
+| `POSTGRES_DSN` | PostgreSQL connection string. **Required.** | all    |
 
-networks:
-  api:
+<details>
+<summary>Optional configuration (REST tuning, OpenTelemetry)</summary>
 
-volumes:
-  template-postgres-data:
+REST tuning (images `rest`, `standalone-rest`):
+
+| Name                          | Description                          | Default          |
+| ----------------------------- | ------------------------------------ | ---------------- |
+| `REST_MAX_REQUEST_SIZE`       | Maximum request body size, in bytes. | `2097152` (2MiB) |
+| `REST_TIMEOUT_READ`           | Read timeout.                        | `15s`            |
+| `REST_TIMEOUT_READ_HEADER`    | Header read timeout.                 | `3s`             |
+| `REST_TIMEOUT_WRITE`          | Write timeout.                       | `30s`            |
+| `REST_TIMEOUT_IDLE`           | Idle keep-alive timeout.             | `60s`            |
+| `REST_TIMEOUT_REQUEST`        | Per-request timeout.                 | `60s`            |
+| `REST_CORS_ALLOWED_ORIGINS`   | CORS allowed origins.                | `*`              |
+| `REST_CORS_ALLOWED_HEADERS`   | CORS allowed headers.                | `*`              |
+| `REST_CORS_ALLOW_CREDENTIALS` | CORS allow-credentials flag.         | `false`          |
+| `REST_CORS_MAX_AGE`           | CORS max-age, in seconds.            | `3600`           |
+
+Logs and tracing — OpenTelemetry supports a stdout and a Google Cloud exporter (all server images):
+
+| Name                | Description                                                           | Default            |
+| ------------------- | --------------------------------------------------------------------- | ------------------ |
+| `OTEL`              | Enable OTel tracing; the variables below pick the exporter.           | `false`            |
+| `GCLOUD_PROJECT_ID` | Google Cloud project ID. When set, switches the OTel exporter to GCP. |                    |
+| `APP_NAME`          | Application name attached to traces and logs.                         | `service-template` |
+
+</details>
+
+## Using the client packages
+
+Two clients ship with the service. Each snippet is the **minimum viable call**; the full surface is what your editor's intellisense, [pkg.go.dev](https://pkg.go.dev/github.com/a-novel/service-template), and the [API reference](https://a-novel.github.io/service-template) are for.
+
+- **Go** talks gRPC — use it from a backend service.
+- **JavaScript / TypeScript** talks REST — use it from a frontend or Node service.
+
+### Go (gRPC)
+
+```bash
+go get github.com/a-novel/service-template
 ```
 
-Note the standalone image is an all-in-one initializer for the application; however, it runs heavy operations such
-as migrations on every launch. Thus, while it comes in handy for local development, it is NOT RECOMMENDED for
-production deployments. Instead, consider using the separate, optimized images for that purpose.
+```go
+package main
 
-```yaml
-services:
-  postgres-template:
-    image: ghcr.io/a-novel/service-template/database:v0.0.0
-    networks:
-      - api
-    environment:
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_USER: postgres
-      POSTGRES_DB: postgres
-      POSTGRES_HOST_AUTH_METHOD: scram-sha-256
-      POSTGRES_INITDB_ARGS: --auth=scram-sha-256
-    volumes:
-      - template-postgres-data:/var/lib/postgresql/
+import (
+	"context"
+	"log"
 
-  migrations-template:
-    image: ghcr.io/a-novel/service-template/jobs/migrations:v0.0.0
-    depends_on:
-      postgres-template:
-        condition: service_healthy
-    environment:
-      POSTGRES_DSN: "postgres://postgres:postgres@postgres-template:5432/postgres?sslmode=disable"
-    networks:
-      - api
+	"google.golang.org/grpc"
+	"google.golang.org/grpc/credentials/insecure"
 
-  service-template:
-    image: ghcr.io/a-novel/service-template/rest:v0.0.0
-    ports:
-      - "${SERVICE_TEMPLATE_REST_PORT}:8080"
-    depends_on:
-      postgres-template:
-        condition: service_healthy
-      migrations-template:
-        condition: service_completed_successfully
-    environment:
-      POSTGRES_DSN: "postgres://postgres:postgres@postgres-template:5432/postgres?sslmode=disable"
-    networks:
-      - api
+	servicetemplate "github.com/a-novel/service-template/pkg/go"
+)
 
-networks:
-  api:
+func main() {
+	ctx := context.Background()
 
-volumes:
-  template-postgres-data:
+	// In production, swap insecure.NewCredentials() for a TLS or mTLS credential — the
+	// server has no application-layer auth, so transport security is the only thing
+	// protecting the private gRPC surface from a network adversary.
+	client, err := servicetemplate.NewClient(
+		"service-template:8080",
+		grpc.WithTransportCredentials(insecure.NewCredentials()),
+	)
+	if err != nil {
+		log.Fatal(err)
+	}
+	defer client.Close()
+
+	created, err := client.ItemCreate(ctx, &servicetemplate.ItemCreateRequest{
+		Name:        "My Item",
+		Description: "An optional description.",
+	})
+	if err != nil {
+		log.Fatal(err)
+	}
+	log.Printf("created item %s", created.GetItem().GetId())
+}
 ```
 
-Above are the minimal required configuration to run the service locally. Configuration is done through environment
-variables. Below is a list of available configurations:
+### JavaScript / TypeScript (REST)
 
-**Required variables**
-
-| Name         | Description                                                          | Images                                                                         |
-| ------------ | -------------------------------------------------------------------- | ------------------------------------------------------------------------------ |
-| POSTGRES_DSN | The Postgres Data Source Name (DSN) used to connect to the database. | `standalone-grpc`<br/>`standalone-rest`<br/>`grpc`<br/>`rest`<br/>`migrations` |
-
-**REST API**
-
-While you should not need to change these values in most cases, the following variables allow you to
-customize the REST API behavior.
-
-| Name                        | Description                                 | Default value    | Images                       |
-| --------------------------- | ------------------------------------------- | ---------------- | ---------------------------- |
-| REST_MAX_REQUEST_SIZE       | Maximum size of incoming requests in bytes  | `2097152` (2MiB) | `standalone-rest`<br/>`rest` |
-| REST_TIMEOUT_READ           | Timeout for read operations                 | `15s`            | `standalone-rest`<br/>`rest` |
-| REST_TIMEOUT_READ_HEADER    | Timeout for header reading operations       | `3s`             | `standalone-rest`<br/>`rest` |
-| REST_TIMEOUT_WRITE          | Timeout for write operations                | `30s`            | `standalone-rest`<br/>`rest` |
-| REST_TIMEOUT_IDLE           | Idle timeout                                | `60s`            | `standalone-rest`<br/>`rest` |
-| REST_TIMEOUT_REQUEST        | Timeout for api requests                    | `60s`            | `standalone-rest`<br/>`rest` |
-| REST_CORS_ALLOWED_ORIGINS   | CORS allowed origins (allow all by default) | `*`              | `standalone-rest`<br/>`rest` |
-| REST_CORS_ALLOWED_HEADERS   | CORS allowed headers (allow all by default) | `*`              | `standalone-rest`<br/>`rest` |
-| REST_CORS_ALLOW_CREDENTIALS | CORS allow credentials                      | `false`          | `standalone-rest`<br/>`rest` |
-| REST_CORS_MAX_AGE           | CORS max age                                | `3600`           | `standalone-rest`<br/>`rest` |
-
-**Logs & Tracing**
-
-For now, OTEL is only provided using 2 exporters: stdout and Google Cloud. Other integrations may come
-in the future.
-
-| Name              | Description                                                                             | Default value      | Images                                                        |
-| ----------------- | --------------------------------------------------------------------------------------- | ------------------ | ------------------------------------------------------------- |
-| OTEL              | Activate OTEL tracing (use options below to switch between exporters)                   | `false`            | `standalone-grpc`<br/>`standalone-rest`<br/>`grpc`<br/>`rest` |
-| GCLOUD_PROJECT_ID | Google Cloud project id for the OTEL exporter. Switch to Google Cloud exporter when set |                    | `standalone-grpc`<br/>`standalone-rest`<br/>`grpc`<br/>`rest` |
-| APP_NAME          | Application name to be used in traces                                                   | `service-template` | `standalone-grpc`<br/>`standalone-rest`<br/>`grpc`<br/>`rest` |
-
-### Javascript (npm)
-
-To interact with a running REST instance of the service, you can use the integrated package.
-
-> ⚠️ **Warning**: Even though the package is public, GitHub registry requires you to have a Personal Access Token
-> with `repo` and `read:packages` scopes to pull it in your project. See
-> [this issue](https://github.com/orgs/community/discussions/23386#discussioncomment-3240193) for more information.
-
-Make sure you have a `.npmrc` with the following content (in your project or in your home directory):
+The package is published to GitHub Packages, which requires a Personal Access Token with the `read:packages` scope even for public packages ([why](https://github.com/orgs/community/discussions/23386#discussioncomment-3240193)). Add to `.npmrc` (project root or `$HOME`):
 
 ```ini
 @a-novel:registry=https://npm.pkg.github.com
@@ -309,91 +210,52 @@ Make sure you have a `.npmrc` with the following content (in your project or in 
 //npm.pkg.github.com/:_authToken=${YOUR_PERSONAL_ACCESS_TOKEN}
 ```
 
-Then, install the package using pnpm:
-
 ```bash
-# pnpm config set auto-install-peers true
-#  Or
-# pnpm config set auto-install-peers true --location project
 pnpm add @a-novel/service-template-rest
 ```
 
-To use it, create a `TemplateApi` instance. A single instance can be shared across your client.
-
 ```typescript
-import { TemplateApi, itemCreate, itemDelete, itemGet, itemList, itemUpdate } from "@a-novel/service-template-rest";
+import { TemplateApi, itemCreate, itemList } from "@a-novel/service-template-rest";
 
-export const templateApi = new TemplateApi("<base_api_url>");
+const api = new TemplateApi("http://service-template:8080");
 
-// (optional) check the status of the api connection.
-await templateApi.ping();
-await templateApi.health();
+const created = await itemCreate(api, "My Item", "An optional description.");
+const items = await itemList(api, 10, 0);
 ```
 
-Manage items:
+API reference: [a-novel.github.io/service-template](https://a-novel.github.io/service-template).
 
-```typescript
-// Create a new item.
-const created = await itemCreate(templateApi, "My Item", "An optional description.");
+## Running locally
 
-// List items (paginated).
-const items = await itemList(templateApi, 10, 0);
+For a throwaway instance without the dev toolchain, the **standalone** images bundle the server and migrations in one container. They run migrations on every boot — handy for a quick spin-up, unsafe under multi-replica production restarts.
 
-// Get a specific item by ID.
-const item = await itemGet(templateApi, "<item-id>");
+```yaml
+services:
+  postgres-template:
+    image: ghcr.io/a-novel/service-template/database:v0.0.0
+    networks: [api]
+    environment:
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_USER: postgres
+      POSTGRES_DB: postgres
+      POSTGRES_HOST_AUTH_METHOD: scram-sha-256
+      POSTGRES_INITDB_ARGS: --auth=scram-sha-256
 
-// Update an item.
-const updated = await itemUpdate(templateApi, "<item-id>", "Updated Name", "Updated description.");
+  service-template:
+    image: ghcr.io/a-novel/service-template/standalone-grpc:v0.0.0 # or standalone-rest
+    ports: ["${SERVICE_TEMPLATE_GRPC_PORT}:8080"] # map ${SERVICE_TEMPLATE_REST_PORT} for the standalone-rest image
+    depends_on:
+      postgres-template: { condition: service_healthy }
+    environment:
+      POSTGRES_DSN: "postgres://postgres:postgres@postgres-template:5432/postgres?sslmode=disable"
+    networks: [api]
 
-// Delete an item.
-const deleted = await itemDelete(templateApi, "<item-id>");
+networks:
+  api:
 ```
 
-The API reference is available at [GitHub Pages](https://a-novel.github.io/service-template).
+Working on the service itself? Use the `a-novel` CLI (`a-novel run start service-template/rest`) instead — see [CONTRIBUTING](./CONTRIBUTING.md).
 
-### Go module
+## Contributing
 
-You can integrate the service capabilities directly into your Go services by using the provided
-Go module. It requires a connection to a running gRPC instance of this service.
-
-```bash
-go get -u github.com/a-novel/service-template
-```
-
-```go
-package main
-
-import (
-  "context"
-  "fmt"
-
-  "google.golang.org/grpc"
-  "google.golang.org/grpc/credentials/insecure"
-
-  pkg "github.com/a-novel/service-template/pkg"
-)
-
-func main() {
-  ctx := context.Background()
-
-  client, _ := pkg.NewClient(
-    "<service-template-grpc-url>",
-    grpc.WithTransportCredentials(insecure.NewCredentials()),
-  )
-  defer client.Close()
-
-  // Create an item.
-  res, _ := client.ItemCreate(ctx, &pkg.ItemCreateRequest{
-    Name:        "My Item",
-    Description: "An optional description.",
-  })
-
-  fmt.Println(res.GetItem().GetId())
-
-  // List items.
-  list, _ := client.ItemList(ctx, &pkg.ItemListRequest{Limit: 10})
-  for _, item := range list.GetItems() {
-    fmt.Println(item.GetName())
-  }
-}
-```
+Platform setup and the day-to-day commands live in the [developer onboarding guide](https://github.com/a-novel-kit/.github/blob/master/README.md). Service-specific concepts and local interactions are in [CONTRIBUTING.md](./CONTRIBUTING.md).
