@@ -1,8 +1,8 @@
 # Contributing to service-template
 
-For platform-wide setup (Go, Node, Podman, the `a-novel` CLI) and the day-to-day `a-novel` / `pnpm` commands, see the [developer onboarding guide](https://github.com/a-novel-kit/.github/blob/master/README.md). This file documents what is specific to the template.
+Platform setup and day-to-day commands are in the [developer onboarding guide](https://github.com/a-novel-kit/.github/blob/master/README.md). This file covers what's specific to the template.
 
-For deployment, configuration, and client-package integration — and for how to fork this template into a real service — read the [README](./README.md) first.
+Read the [README](./README.md) first — including how to fork the template into a real service.
 
 ---
 
@@ -84,6 +84,4 @@ The gRPC server implements no application-layer authentication — access contro
 
 ## Questions?
 
-- Open an issue at https://github.com/a-novel/service-template/issues
-- Check existing issues for similar problems
-- Include relevant logs and environment details
+[Open an issue](https://github.com/a-novel/service-template/issues) — include logs and environment details.
