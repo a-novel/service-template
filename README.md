@@ -1,6 +1,6 @@
 # Service Template
 
-A scaffold for new A-Novel backend services: fork it, rename the Go module, and replace the example `item` resource with your own. It ships one trivial CRUD entity wired end to end (DB → DAO → core → REST + gRPC handlers → Go/JS clients → OpenAPI) so every layer has a working example to copy.
+A scaffold for new A-Novel backend services: fork it, rename the Go module, and replace the example `item` resource with your own. It implements the platform's common service contracts through a dummy `item` implementation, so a fork starts from a complete, working example of every layer.
 
 [![X (formerly Twitter) Follow](https://img.shields.io/twitter/follow/agorastoryverse)](https://twitter.com/agorastoryverse)
 [![Discord](https://img.shields.io/discord/1315240114691248138?logo=discord)](https://discord.gg/rp4Qr8cA)
