@@ -9,11 +9,11 @@ import (
 	"github.com/a-novel-kit/golib/logging"
 	"github.com/a-novel-kit/golib/otel"
 
-	"github.com/a-novel/service-template/internal/services"
+	"github.com/a-novel/service-template/internal/core"
 )
 
 type ItemCreatePublicService interface {
-	Exec(ctx context.Context, request *services.ItemCreateRequest) (*services.Item, error)
+	Exec(ctx context.Context, request *core.ItemCreateRequest) (*core.Item, error)
 }
 
 type ItemCreatePublicRequest struct {
@@ -45,13 +45,13 @@ func (handler *ItemCreatePublic) ServeHTTP(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	item, err := handler.service.Exec(ctx, &services.ItemCreateRequest{
+	item, err := handler.service.Exec(ctx, &core.ItemCreateRequest{
 		Name:        request.Name,
 		Description: request.Description,
 	})
 	if err != nil {
 		httpf.HandleError(ctx, handler.logger, w, span, httpf.ErrMap{
-			services.ErrInvalidRequest: http.StatusBadRequest,
+			core.ErrInvalidRequest: http.StatusBadRequest,
 		}, err)
 
 		return

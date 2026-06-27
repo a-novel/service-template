@@ -14,10 +14,10 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/a-novel/service-template/internal/config"
+	"github.com/a-novel/service-template/internal/core"
 	"github.com/a-novel/service-template/internal/dao"
 	"github.com/a-novel/service-template/internal/handlers"
 	handlersmocks "github.com/a-novel/service-template/internal/handlers/mocks"
-	"github.com/a-novel/service-template/internal/services"
 )
 
 func TestRestItemDeletePublic(t *testing.T) {
@@ -26,8 +26,8 @@ func TestRestItemDeletePublic(t *testing.T) {
 	errFoo := errors.New("foo")
 
 	type serviceMock struct {
-		req  *services.ItemDeleteRequest
-		resp *services.Item
+		req  *core.ItemDeleteRequest
+		resp *core.Item
 		err  error
 	}
 
@@ -52,10 +52,10 @@ func TestRestItemDeletePublic(t *testing.T) {
 			),
 
 			serviceMock: &serviceMock{
-				req: &services.ItemDeleteRequest{
+				req: &core.ItemDeleteRequest{
 					ID: uuid.MustParse("00000000-0000-0000-0000-000000000001"),
 				},
-				resp: &services.Item{
+				resp: &core.Item{
 					ID:          uuid.MustParse("00000000-0000-0000-0000-000000000001"),
 					Name:        "test item",
 					Description: "test description",
@@ -96,7 +96,7 @@ func TestRestItemDeletePublic(t *testing.T) {
 			),
 
 			serviceMock: &serviceMock{
-				req: &services.ItemDeleteRequest{
+				req: &core.ItemDeleteRequest{
 					ID: uuid.MustParse("00000000-0000-0000-0000-000000000001"),
 				},
 				err: dao.ErrItemDeleteNotFound,
@@ -115,7 +115,7 @@ func TestRestItemDeletePublic(t *testing.T) {
 			),
 
 			serviceMock: &serviceMock{
-				req: &services.ItemDeleteRequest{
+				req: &core.ItemDeleteRequest{
 					ID: uuid.MustParse("00000000-0000-0000-0000-000000000001"),
 				},
 				err: errFoo,

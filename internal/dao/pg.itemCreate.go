@@ -30,7 +30,7 @@ func NewItemCreate() *ItemCreate {
 	return new(ItemCreate)
 }
 
-func (repository *ItemCreate) Exec(ctx context.Context, request *ItemCreateRequest) (*Item, error) {
+func (dao *ItemCreate) Exec(ctx context.Context, request *ItemCreateRequest) (*Item, error) {
 	ctx, span := otel.Tracer().Start(ctx, "dao.ItemCreate")
 	defer span.End()
 

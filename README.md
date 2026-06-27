@@ -1,6 +1,6 @@
 # Service Template
 
-A scaffold for new A-Novel backend services: fork it, rename the Go module, and replace the example `item` resource with your own. It ships one trivial CRUD entity wired end to end (DB → DAO → service → REST + gRPC handlers → Go/JS clients → OpenAPI) so every layer has a working example to copy.
+A scaffold for new A-Novel backend services: fork it, rename the Go module, and replace the example `item` resource with your own. It implements the platform's common service contracts through a dummy `item` implementation, so a fork starts from a complete, working example of every layer.
 
 [![X (formerly Twitter) Follow](https://img.shields.io/twitter/follow/agorastoryverse)](https://twitter.com/agorastoryverse)
 [![Discord](https://img.shields.io/discord/1315240114691248138?logo=discord)](https://discord.gg/rp4Qr8cA)
@@ -33,7 +33,7 @@ This repository is a starting point for a new Agora backend service, not a servi
 
 - **Migration** — `internal/models/migrations/20250306000000_items_table.{up,down}.sql` (use `date '+%Y%m%d%H%M%S'` for a fresh timestamp).
 - **DAO** — `internal/dao/pg.item.go` (bun model), `pg.itemCreate.{go,sql}` and the `Get`/`List`/`Update`/`Delete` siblings, plus their `*_test.go`.
-- **Services** — `internal/services/item*.go` and tests; `internal/services/validate.go` only if your fields need validators beyond the registered `notblank`.
+- **Core** — `internal/core/item*.go` and tests; `internal/core/validate.go` only if your fields need validators beyond the registered `notblank`.
 - **Handlers** — REST `internal/handlers/http.item*.go`, gRPC `internal/handlers/grpc.item*.go`, plus tests.
 - **Proto** — `internal/models/proto/item*.proto` (then `pnpm generate` to refresh `internal/handlers/protogen/`).
 - **API surface** — `openapi.yaml` (+ regenerate `openapi.html`), `pkg/go/client.go`, `pkg/js/rest/src/item.ts` + `index.ts`, and `pkg/js/test/`.
@@ -47,9 +47,9 @@ Go conventions (layering, naming, errors, telemetry, tests) are governed by the 
 
 ## What it does
 
-This is an example service whose only domain object is `item` — a named entity with an optional description — exposed through full CRUD. It exists to be replaced: it demonstrates the layer split (DAO → service → handler), the dual REST/gRPC surface, and the client packages a real service inherits.
+This is an example service whose only domain object is `item` — a named entity with an optional description — exposed through full CRUD. It exists to be replaced: it demonstrates the [layered architecture](https://github.com/a-novel/.github/blob/master/CONTRIBUTING.md) (DAO → core → handler), the dual REST/gRPC API, and the client packages a real service inherits.
 
-The service ships two surfaces:
+The service ships two APIs:
 
 - A **private gRPC API** (`cmd/grpc`) — `StatusService` plus the `Item{Create,Get,List,Update,Delete}Service` RPCs — for internal, private-network service-to-service traffic. The server implements no application-layer authentication: access control is enforced externally (network policy, ingress, service mesh).
 - A **public REST API** (`cmd/rest`) — `/ping`, `/healthcheck`, and the `/items` + `/item` CRUD routes — for any HTTP client.
@@ -258,4 +258,4 @@ Working on the service itself? Use the `a-novel` CLI (`a-novel run start service
 
 ## Contributing
 
-Platform setup and the day-to-day commands live in the [developer onboarding guide](https://github.com/a-novel-kit/.github/blob/master/README.md). Service-specific concepts and local interactions are in [CONTRIBUTING.md](./CONTRIBUTING.md).
+Platform setup and the day-to-day commands live in the [developer onboarding guide](https://github.com/a-novel-kit/.github/blob/master/README.md). Template-specific concepts and local interactions are in [CONTRIBUTING.md](./CONTRIBUTING.md).

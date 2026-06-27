@@ -1,4 +1,4 @@
-package services_test
+package core_test
 
 import (
 	"errors"
@@ -9,9 +9,9 @@ import (
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 
+	"github.com/a-novel/service-template/internal/core"
+	coremocks "github.com/a-novel/service-template/internal/core/mocks"
 	"github.com/a-novel/service-template/internal/dao"
-	"github.com/a-novel/service-template/internal/services"
-	servicesmocks "github.com/a-novel/service-template/internal/services/mocks"
 )
 
 func TestItemList(t *testing.T) {
@@ -19,7 +19,7 @@ func TestItemList(t *testing.T) {
 
 	errFoo := errors.New("foo")
 
-	type repositoryMock struct {
+	type daoMock struct {
 		resp []*dao.Item
 		err  error
 	}
@@ -27,19 +27,19 @@ func TestItemList(t *testing.T) {
 	testCases := []struct {
 		name string
 
-		request *services.ItemListRequest
+		request *core.ItemListRequest
 
-		repositoryMock *repositoryMock
+		daoMock *daoMock
 
-		expect    []*services.Item
+		expect    []*core.Item
 		expectErr error
 	}{
 		{
 			name: "Success",
 
-			request: &services.ItemListRequest{Limit: 10, Offset: 0},
+			request: &core.ItemListRequest{Limit: 10, Offset: 0},
 
-			repositoryMock: &repositoryMock{
+			daoMock: &daoMock{
 				resp: []*dao.Item{
 					{
 						ID:        uuid.MustParse("00000000-0000-0000-0000-000000000003"),
@@ -56,7 +56,7 @@ func TestItemList(t *testing.T) {
 				},
 			},
 
-			expect: []*services.Item{
+			expect: []*core.Item{
 				{
 					ID:        uuid.MustParse("00000000-0000-0000-0000-000000000003"),
 					Name:      "item three",
@@ -74,40 +74,40 @@ func TestItemList(t *testing.T) {
 		{
 			name: "Success/Empty",
 
-			request: &services.ItemListRequest{Limit: 10, Offset: 0},
+			request: &core.ItemListRequest{Limit: 10, Offset: 0},
 
-			repositoryMock: &repositoryMock{resp: []*dao.Item{}},
+			daoMock: &daoMock{resp: []*dao.Item{}},
 
-			expect: []*services.Item{},
+			expect: []*core.Item{},
 		},
 		{
 			name: "Success/LimitDefaulted",
 
-			request: &services.ItemListRequest{Limit: 0, Offset: 0},
+			request: &core.ItemListRequest{Limit: 0, Offset: 0},
 
-			repositoryMock: &repositoryMock{resp: []*dao.Item{}},
+			daoMock: &daoMock{resp: []*dao.Item{}},
 
-			expect: []*services.Item{},
+			expect: []*core.Item{},
 		},
 		{
 			name: "Error/LimitTooHigh",
 
-			request:   &services.ItemListRequest{Limit: 101, Offset: 0},
-			expectErr: services.ErrInvalidRequest,
+			request:   &core.ItemListRequest{Limit: 101, Offset: 0},
+			expectErr: core.ErrInvalidRequest,
 		},
 		{
 			name: "Error/OffsetNegative",
 
-			request:   &services.ItemListRequest{Limit: 10, Offset: -1},
-			expectErr: services.ErrInvalidRequest,
+			request:   &core.ItemListRequest{Limit: 10, Offset: -1},
+			expectErr: core.ErrInvalidRequest,
 		},
 		{
-			name: "Error/Repository",
+			name: "Error/Dao",
 
-			request: &services.ItemListRequest{Limit: 10, Offset: 0},
+			request: &core.ItemListRequest{Limit: 10, Offset: 0},
 
-			repositoryMock: &repositoryMock{err: errFoo},
-			expectErr:      errFoo,
+			daoMock:   &daoMock{err: errFoo},
+			expectErr: errFoo,
 		},
 	}
 
@@ -115,29 +115,29 @@ func TestItemList(t *testing.T) {
 		t.Run(testCase.name, func(t *testing.T) {
 			t.Parallel()
 
-			repository := servicesmocks.NewMockItemListRepository(t)
+			mockDao := coremocks.NewMockItemListDao(t)
 
-			if testCase.repositoryMock != nil {
+			if testCase.daoMock != nil {
 				expectLimit := testCase.request.Limit
 				if expectLimit <= 0 {
-					expectLimit = services.ItemListDefaultSize
+					expectLimit = core.ItemListDefaultSize
 				}
 
-				repository.EXPECT().
+				mockDao.EXPECT().
 					Exec(mock.Anything, &dao.ItemListRequest{
 						Limit:  expectLimit,
 						Offset: testCase.request.Offset,
 					}).
-					Return(testCase.repositoryMock.resp, testCase.repositoryMock.err)
+					Return(testCase.daoMock.resp, testCase.daoMock.err)
 			}
 
-			service := services.NewItemList(repository)
+			service := core.NewItemList(mockDao)
 
 			resp, err := service.Exec(t.Context(), testCase.request)
 			require.ErrorIs(t, err, testCase.expectErr)
 			require.Equal(t, testCase.expect, resp)
 
-			repository.AssertExpectations(t)
+			mockDao.AssertExpectations(t)
 		})
 	}
 }

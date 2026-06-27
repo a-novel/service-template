@@ -5,7 +5,7 @@ import (
 
 	"github.com/google/uuid"
 
-	"github.com/a-novel/service-template/internal/services"
+	"github.com/a-novel/service-template/internal/core"
 )
 
 type Item struct {
@@ -16,7 +16,7 @@ type Item struct {
 	UpdatedAt   time.Time `json:"updatedAt"`
 }
 
-func loadItem(s *services.Item) Item {
+func loadItem(s *core.Item) Item {
 	return Item{
 		ID:          s.ID,
 		Name:        s.Name,
@@ -26,6 +26,6 @@ func loadItem(s *services.Item) Item {
 	}
 }
 
-func loadItemMap(item *services.Item, _ int) Item {
+func loadItemMap(item *core.Item, _ int) Item {
 	return loadItem(item)
 }

@@ -10,12 +10,12 @@ import (
 	"github.com/a-novel-kit/golib/logging"
 	"github.com/a-novel-kit/golib/otel"
 
+	"github.com/a-novel/service-template/internal/core"
 	"github.com/a-novel/service-template/internal/dao"
-	"github.com/a-novel/service-template/internal/services"
 )
 
 type ItemDeletePublicService interface {
-	Exec(ctx context.Context, request *services.ItemDeleteRequest) (*services.Item, error)
+	Exec(ctx context.Context, request *core.ItemDeleteRequest) (*core.Item, error)
 }
 
 type ItemDeletePublicRequest struct {
@@ -44,11 +44,11 @@ func (handler *ItemDeletePublic) ServeHTTP(w http.ResponseWriter, r *http.Reques
 		return
 	}
 
-	item, err := handler.service.Exec(ctx, &services.ItemDeleteRequest{ID: request.ID})
+	item, err := handler.service.Exec(ctx, &core.ItemDeleteRequest{ID: request.ID})
 	if err != nil {
 		httpf.HandleError(ctx, handler.logger, w, span, httpf.ErrMap{
-			dao.ErrItemDeleteNotFound:  http.StatusNotFound,
-			services.ErrInvalidRequest: http.StatusBadRequest,
+			dao.ErrItemDeleteNotFound: http.StatusNotFound,
+			core.ErrInvalidRequest:    http.StatusBadRequest,
 		}, err)
 
 		return

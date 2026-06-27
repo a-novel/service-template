@@ -15,9 +15,9 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/a-novel/service-template/internal/config"
+	"github.com/a-novel/service-template/internal/core"
 	"github.com/a-novel/service-template/internal/handlers"
 	handlersmocks "github.com/a-novel/service-template/internal/handlers/mocks"
-	"github.com/a-novel/service-template/internal/services"
 )
 
 func TestRestItemCreatePublic(t *testing.T) {
@@ -26,8 +26,8 @@ func TestRestItemCreatePublic(t *testing.T) {
 	errFoo := errors.New("foo")
 
 	type serviceMock struct {
-		req  *services.ItemCreateRequest
-		resp *services.Item
+		req  *core.ItemCreateRequest
+		resp *core.Item
 		err  error
 	}
 
@@ -50,11 +50,11 @@ func TestRestItemCreatePublic(t *testing.T) {
 			}`)),
 
 			serviceMock: &serviceMock{
-				req: &services.ItemCreateRequest{
+				req: &core.ItemCreateRequest{
 					Name:        "test item",
 					Description: "test description",
 				},
-				resp: &services.Item{
+				resp: &core.Item{
 					ID:          uuid.MustParse("00000000-0000-0000-0000-000000000001"),
 					Name:        "test item",
 					Description: "test description",
@@ -87,8 +87,8 @@ func TestRestItemCreatePublic(t *testing.T) {
 			}`)),
 
 			serviceMock: &serviceMock{
-				req: &services.ItemCreateRequest{Name: ""},
-				err: services.ErrInvalidRequest,
+				req: &core.ItemCreateRequest{Name: ""},
+				err: core.ErrInvalidRequest,
 			},
 
 			expectStatus: http.StatusBadRequest,
@@ -101,7 +101,7 @@ func TestRestItemCreatePublic(t *testing.T) {
 			}`)),
 
 			serviceMock: &serviceMock{
-				req: &services.ItemCreateRequest{Name: "test item"},
+				req: &core.ItemCreateRequest{Name: "test item"},
 				err: errFoo,
 			},
 

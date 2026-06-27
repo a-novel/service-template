@@ -10,11 +10,11 @@ import (
 	"github.com/a-novel-kit/golib/logging"
 	"github.com/a-novel-kit/golib/otel"
 
-	"github.com/a-novel/service-template/internal/services"
+	"github.com/a-novel/service-template/internal/core"
 )
 
 type ItemListPublicService interface {
-	Exec(ctx context.Context, request *services.ItemListRequest) ([]*services.Item, error)
+	Exec(ctx context.Context, request *core.ItemListRequest) ([]*core.Item, error)
 }
 
 type ItemListPublicRequest struct {
@@ -44,13 +44,13 @@ func (handler *ItemListPublic) ServeHTTP(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	items, err := handler.service.Exec(ctx, &services.ItemListRequest{
+	items, err := handler.service.Exec(ctx, &core.ItemListRequest{
 		Limit:  request.Limit,
 		Offset: request.Offset,
 	})
 	if err != nil {
 		httpf.HandleError(ctx, handler.logger, w, span, httpf.ErrMap{
-			services.ErrInvalidRequest: http.StatusBadRequest,
+			core.ErrInvalidRequest: http.StatusBadRequest,
 		}, err)
 
 		return

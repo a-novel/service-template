@@ -26,7 +26,7 @@ func NewItemList() *ItemList {
 	return new(ItemList)
 }
 
-func (repository *ItemList) Exec(ctx context.Context, request *ItemListRequest) ([]*Item, error) {
+func (dao *ItemList) Exec(ctx context.Context, request *ItemListRequest) ([]*Item, error) {
 	ctx, span := otel.Tracer().Start(ctx, "dao.ItemList")
 	defer span.End()
 

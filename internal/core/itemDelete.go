@@ -1,4 +1,4 @@
-package services
+package core
 
 import (
 	"context"
@@ -13,7 +13,7 @@ import (
 	"github.com/a-novel/service-template/internal/dao"
 )
 
-type ItemDeleteRepository interface {
+type ItemDeleteDao interface {
 	Exec(ctx context.Context, request *dao.ItemDeleteRequest) (*dao.Item, error)
 }
 
@@ -26,11 +26,11 @@ type ItemDeleteRequest struct {
 
 // ItemDelete removes an item by its ID.
 type ItemDelete struct {
-	repository ItemDeleteRepository
+	dao ItemDeleteDao
 }
 
-func NewItemDelete(repository ItemDeleteRepository) *ItemDelete {
-	return &ItemDelete{repository: repository}
+func NewItemDelete(dao ItemDeleteDao) *ItemDelete {
+	return &ItemDelete{dao: dao}
 }
 
 func (service *ItemDelete) Exec(ctx context.Context, request *ItemDeleteRequest) (*Item, error) {
@@ -44,7 +44,7 @@ func (service *ItemDelete) Exec(ctx context.Context, request *ItemDeleteRequest)
 		return nil, otel.ReportError(span, errors.Join(err, ErrInvalidRequest))
 	}
 
-	entity, err := service.repository.Exec(ctx, &dao.ItemDeleteRequest{ID: request.ID})
+	entity, err := service.dao.Exec(ctx, &dao.ItemDeleteRequest{ID: request.ID})
 	if err != nil {
 		return nil, otel.ReportError(span, fmt.Errorf("delete item: %w", err))
 	}

@@ -15,10 +15,10 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/a-novel/service-template/internal/config"
+	"github.com/a-novel/service-template/internal/core"
 	"github.com/a-novel/service-template/internal/dao"
 	"github.com/a-novel/service-template/internal/handlers"
 	handlersmocks "github.com/a-novel/service-template/internal/handlers/mocks"
-	"github.com/a-novel/service-template/internal/services"
 )
 
 func TestRestItemUpdatePublic(t *testing.T) {
@@ -27,8 +27,8 @@ func TestRestItemUpdatePublic(t *testing.T) {
 	errFoo := errors.New("foo")
 
 	type serviceMock struct {
-		req  *services.ItemUpdateRequest
-		resp *services.Item
+		req  *core.ItemUpdateRequest
+		resp *core.Item
 		err  error
 	}
 
@@ -52,12 +52,12 @@ func TestRestItemUpdatePublic(t *testing.T) {
 			}`)),
 
 			serviceMock: &serviceMock{
-				req: &services.ItemUpdateRequest{
+				req: &core.ItemUpdateRequest{
 					ID:          uuid.MustParse("00000000-0000-0000-0000-000000000001"),
 					Name:        "updated item",
 					Description: "updated description",
 				},
-				resp: &services.Item{
+				resp: &core.Item{
 					ID:          uuid.MustParse("00000000-0000-0000-0000-000000000001"),
 					Name:        "updated item",
 					Description: "updated description",
@@ -101,11 +101,11 @@ func TestRestItemUpdatePublic(t *testing.T) {
 			}`)),
 
 			serviceMock: &serviceMock{
-				req: &services.ItemUpdateRequest{
+				req: &core.ItemUpdateRequest{
 					ID:   uuid.MustParse("00000000-0000-0000-0000-000000000001"),
 					Name: "",
 				},
-				err: services.ErrInvalidRequest,
+				err: core.ErrInvalidRequest,
 			},
 
 			expectStatus: http.StatusBadRequest,
@@ -119,7 +119,7 @@ func TestRestItemUpdatePublic(t *testing.T) {
 			}`)),
 
 			serviceMock: &serviceMock{
-				req: &services.ItemUpdateRequest{
+				req: &core.ItemUpdateRequest{
 					ID:   uuid.MustParse("00000000-0000-0000-0000-000000000001"),
 					Name: "updated item",
 				},
@@ -137,7 +137,7 @@ func TestRestItemUpdatePublic(t *testing.T) {
 			}`)),
 
 			serviceMock: &serviceMock{
-				req: &services.ItemUpdateRequest{
+				req: &core.ItemUpdateRequest{
 					ID:   uuid.MustParse("00000000-0000-0000-0000-000000000001"),
 					Name: "updated item",
 				},

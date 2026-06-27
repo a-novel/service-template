@@ -10,13 +10,13 @@ import (
 
 	"github.com/a-novel-kit/golib/otel"
 
+	"github.com/a-novel/service-template/internal/core"
 	"github.com/a-novel/service-template/internal/dao"
 	"github.com/a-novel/service-template/internal/handlers/protogen"
-	"github.com/a-novel/service-template/internal/services"
 )
 
 type ItemDeleteService interface {
-	Exec(ctx context.Context, request *services.ItemDeleteRequest) (*services.Item, error)
+	Exec(ctx context.Context, request *core.ItemDeleteRequest) (*core.Item, error)
 }
 
 type ItemDelete struct {
@@ -42,8 +42,8 @@ func (handler *ItemDelete) ItemDelete(
 		return nil, status.Error(codes.InvalidArgument, "invalid item id")
 	}
 
-	item, err := handler.service.Exec(ctx, &services.ItemDeleteRequest{ID: id})
-	if errors.Is(err, services.ErrInvalidRequest) {
+	item, err := handler.service.Exec(ctx, &core.ItemDeleteRequest{ID: id})
+	if errors.Is(err, core.ErrInvalidRequest) {
 		_ = otel.ReportError(span, err)
 
 		return nil, status.Error(codes.InvalidArgument, "invalid request")

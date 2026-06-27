@@ -34,7 +34,7 @@ func NewItemUpdate() *ItemUpdate {
 	return new(ItemUpdate)
 }
 
-func (repository *ItemUpdate) Exec(ctx context.Context, request *ItemUpdateRequest) (*Item, error) {
+func (dao *ItemUpdate) Exec(ctx context.Context, request *ItemUpdateRequest) (*Item, error) {
 	ctx, span := otel.Tracer().Start(ctx, "dao.ItemUpdate")
 	defer span.End()
 

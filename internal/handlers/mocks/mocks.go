@@ -7,7 +7,7 @@ package handlersmocks
 import (
 	"context"
 
-	"github.com/a-novel/service-template/internal/services"
+	"github.com/a-novel/service-template/internal/core"
 	mock "github.com/stretchr/testify/mock"
 )
 
@@ -39,26 +39,26 @@ func (_m *MockItemCreateService) EXPECT() *MockItemCreateService_Expecter {
 }
 
 // Exec provides a mock function for the type MockItemCreateService
-func (_mock *MockItemCreateService) Exec(ctx context.Context, request *services.ItemCreateRequest) (*services.Item, error) {
+func (_mock *MockItemCreateService) Exec(ctx context.Context, request *core.ItemCreateRequest) (*core.Item, error) {
 	ret := _mock.Called(ctx, request)
 
 	if len(ret) == 0 {
 		panic("no return value specified for Exec")
 	}
 
-	var r0 *services.Item
+	var r0 *core.Item
 	var r1 error
-	if returnFunc, ok := ret.Get(0).(func(context.Context, *services.ItemCreateRequest) (*services.Item, error)); ok {
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *core.ItemCreateRequest) (*core.Item, error)); ok {
 		return returnFunc(ctx, request)
 	}
-	if returnFunc, ok := ret.Get(0).(func(context.Context, *services.ItemCreateRequest) *services.Item); ok {
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *core.ItemCreateRequest) *core.Item); ok {
 		r0 = returnFunc(ctx, request)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*services.Item)
+			r0 = ret.Get(0).(*core.Item)
 		}
 	}
-	if returnFunc, ok := ret.Get(1).(func(context.Context, *services.ItemCreateRequest) error); ok {
+	if returnFunc, ok := ret.Get(1).(func(context.Context, *core.ItemCreateRequest) error); ok {
 		r1 = returnFunc(ctx, request)
 	} else {
 		r1 = ret.Error(1)
@@ -73,20 +73,20 @@ type MockItemCreateService_Exec_Call struct {
 
 // Exec is a helper method to define mock.On call
 //   - ctx context.Context
-//   - request *services.ItemCreateRequest
+//   - request *core.ItemCreateRequest
 func (_e *MockItemCreateService_Expecter) Exec(ctx any, request any) *MockItemCreateService_Exec_Call {
 	return &MockItemCreateService_Exec_Call{Call: _e.mock.On("Exec", ctx, request)}
 }
 
-func (_c *MockItemCreateService_Exec_Call) Run(run func(ctx context.Context, request *services.ItemCreateRequest)) *MockItemCreateService_Exec_Call {
+func (_c *MockItemCreateService_Exec_Call) Run(run func(ctx context.Context, request *core.ItemCreateRequest)) *MockItemCreateService_Exec_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		var arg0 context.Context
 		if args[0] != nil {
 			arg0 = args[0].(context.Context)
 		}
-		var arg1 *services.ItemCreateRequest
+		var arg1 *core.ItemCreateRequest
 		if args[1] != nil {
-			arg1 = args[1].(*services.ItemCreateRequest)
+			arg1 = args[1].(*core.ItemCreateRequest)
 		}
 		run(
 			arg0,
@@ -96,12 +96,12 @@ func (_c *MockItemCreateService_Exec_Call) Run(run func(ctx context.Context, req
 	return _c
 }
 
-func (_c *MockItemCreateService_Exec_Call) Return(item *services.Item, err error) *MockItemCreateService_Exec_Call {
+func (_c *MockItemCreateService_Exec_Call) Return(item *core.Item, err error) *MockItemCreateService_Exec_Call {
 	_c.Call.Return(item, err)
 	return _c
 }
 
-func (_c *MockItemCreateService_Exec_Call) RunAndReturn(run func(ctx context.Context, request *services.ItemCreateRequest) (*services.Item, error)) *MockItemCreateService_Exec_Call {
+func (_c *MockItemCreateService_Exec_Call) RunAndReturn(run func(ctx context.Context, request *core.ItemCreateRequest) (*core.Item, error)) *MockItemCreateService_Exec_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -134,26 +134,26 @@ func (_m *MockItemDeleteService) EXPECT() *MockItemDeleteService_Expecter {
 }
 
 // Exec provides a mock function for the type MockItemDeleteService
-func (_mock *MockItemDeleteService) Exec(ctx context.Context, request *services.ItemDeleteRequest) (*services.Item, error) {
+func (_mock *MockItemDeleteService) Exec(ctx context.Context, request *core.ItemDeleteRequest) (*core.Item, error) {
 	ret := _mock.Called(ctx, request)
 
 	if len(ret) == 0 {
 		panic("no return value specified for Exec")
 	}
 
-	var r0 *services.Item
+	var r0 *core.Item
 	var r1 error
-	if returnFunc, ok := ret.Get(0).(func(context.Context, *services.ItemDeleteRequest) (*services.Item, error)); ok {
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *core.ItemDeleteRequest) (*core.Item, error)); ok {
 		return returnFunc(ctx, request)
 	}
-	if returnFunc, ok := ret.Get(0).(func(context.Context, *services.ItemDeleteRequest) *services.Item); ok {
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *core.ItemDeleteRequest) *core.Item); ok {
 		r0 = returnFunc(ctx, request)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*services.Item)
+			r0 = ret.Get(0).(*core.Item)
 		}
 	}
-	if returnFunc, ok := ret.Get(1).(func(context.Context, *services.ItemDeleteRequest) error); ok {
+	if returnFunc, ok := ret.Get(1).(func(context.Context, *core.ItemDeleteRequest) error); ok {
 		r1 = returnFunc(ctx, request)
 	} else {
 		r1 = ret.Error(1)
@@ -168,20 +168,20 @@ type MockItemDeleteService_Exec_Call struct {
 
 // Exec is a helper method to define mock.On call
 //   - ctx context.Context
-//   - request *services.ItemDeleteRequest
+//   - request *core.ItemDeleteRequest
 func (_e *MockItemDeleteService_Expecter) Exec(ctx any, request any) *MockItemDeleteService_Exec_Call {
 	return &MockItemDeleteService_Exec_Call{Call: _e.mock.On("Exec", ctx, request)}
 }
 
-func (_c *MockItemDeleteService_Exec_Call) Run(run func(ctx context.Context, request *services.ItemDeleteRequest)) *MockItemDeleteService_Exec_Call {
+func (_c *MockItemDeleteService_Exec_Call) Run(run func(ctx context.Context, request *core.ItemDeleteRequest)) *MockItemDeleteService_Exec_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		var arg0 context.Context
 		if args[0] != nil {
 			arg0 = args[0].(context.Context)
 		}
-		var arg1 *services.ItemDeleteRequest
+		var arg1 *core.ItemDeleteRequest
 		if args[1] != nil {
-			arg1 = args[1].(*services.ItemDeleteRequest)
+			arg1 = args[1].(*core.ItemDeleteRequest)
 		}
 		run(
 			arg0,
@@ -191,12 +191,12 @@ func (_c *MockItemDeleteService_Exec_Call) Run(run func(ctx context.Context, req
 	return _c
 }
 
-func (_c *MockItemDeleteService_Exec_Call) Return(item *services.Item, err error) *MockItemDeleteService_Exec_Call {
+func (_c *MockItemDeleteService_Exec_Call) Return(item *core.Item, err error) *MockItemDeleteService_Exec_Call {
 	_c.Call.Return(item, err)
 	return _c
 }
 
-func (_c *MockItemDeleteService_Exec_Call) RunAndReturn(run func(ctx context.Context, request *services.ItemDeleteRequest) (*services.Item, error)) *MockItemDeleteService_Exec_Call {
+func (_c *MockItemDeleteService_Exec_Call) RunAndReturn(run func(ctx context.Context, request *core.ItemDeleteRequest) (*core.Item, error)) *MockItemDeleteService_Exec_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -229,26 +229,26 @@ func (_m *MockItemGetService) EXPECT() *MockItemGetService_Expecter {
 }
 
 // Exec provides a mock function for the type MockItemGetService
-func (_mock *MockItemGetService) Exec(ctx context.Context, request *services.ItemGetRequest) (*services.Item, error) {
+func (_mock *MockItemGetService) Exec(ctx context.Context, request *core.ItemGetRequest) (*core.Item, error) {
 	ret := _mock.Called(ctx, request)
 
 	if len(ret) == 0 {
 		panic("no return value specified for Exec")
 	}
 
-	var r0 *services.Item
+	var r0 *core.Item
 	var r1 error
-	if returnFunc, ok := ret.Get(0).(func(context.Context, *services.ItemGetRequest) (*services.Item, error)); ok {
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *core.ItemGetRequest) (*core.Item, error)); ok {
 		return returnFunc(ctx, request)
 	}
-	if returnFunc, ok := ret.Get(0).(func(context.Context, *services.ItemGetRequest) *services.Item); ok {
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *core.ItemGetRequest) *core.Item); ok {
 		r0 = returnFunc(ctx, request)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*services.Item)
+			r0 = ret.Get(0).(*core.Item)
 		}
 	}
-	if returnFunc, ok := ret.Get(1).(func(context.Context, *services.ItemGetRequest) error); ok {
+	if returnFunc, ok := ret.Get(1).(func(context.Context, *core.ItemGetRequest) error); ok {
 		r1 = returnFunc(ctx, request)
 	} else {
 		r1 = ret.Error(1)
@@ -263,20 +263,20 @@ type MockItemGetService_Exec_Call struct {
 
 // Exec is a helper method to define mock.On call
 //   - ctx context.Context
-//   - request *services.ItemGetRequest
+//   - request *core.ItemGetRequest
 func (_e *MockItemGetService_Expecter) Exec(ctx any, request any) *MockItemGetService_Exec_Call {
 	return &MockItemGetService_Exec_Call{Call: _e.mock.On("Exec", ctx, request)}
 }
 
-func (_c *MockItemGetService_Exec_Call) Run(run func(ctx context.Context, request *services.ItemGetRequest)) *MockItemGetService_Exec_Call {
+func (_c *MockItemGetService_Exec_Call) Run(run func(ctx context.Context, request *core.ItemGetRequest)) *MockItemGetService_Exec_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		var arg0 context.Context
 		if args[0] != nil {
 			arg0 = args[0].(context.Context)
 		}
-		var arg1 *services.ItemGetRequest
+		var arg1 *core.ItemGetRequest
 		if args[1] != nil {
-			arg1 = args[1].(*services.ItemGetRequest)
+			arg1 = args[1].(*core.ItemGetRequest)
 		}
 		run(
 			arg0,
@@ -286,12 +286,12 @@ func (_c *MockItemGetService_Exec_Call) Run(run func(ctx context.Context, reques
 	return _c
 }
 
-func (_c *MockItemGetService_Exec_Call) Return(item *services.Item, err error) *MockItemGetService_Exec_Call {
+func (_c *MockItemGetService_Exec_Call) Return(item *core.Item, err error) *MockItemGetService_Exec_Call {
 	_c.Call.Return(item, err)
 	return _c
 }
 
-func (_c *MockItemGetService_Exec_Call) RunAndReturn(run func(ctx context.Context, request *services.ItemGetRequest) (*services.Item, error)) *MockItemGetService_Exec_Call {
+func (_c *MockItemGetService_Exec_Call) RunAndReturn(run func(ctx context.Context, request *core.ItemGetRequest) (*core.Item, error)) *MockItemGetService_Exec_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -324,26 +324,26 @@ func (_m *MockItemListService) EXPECT() *MockItemListService_Expecter {
 }
 
 // Exec provides a mock function for the type MockItemListService
-func (_mock *MockItemListService) Exec(ctx context.Context, request *services.ItemListRequest) ([]*services.Item, error) {
+func (_mock *MockItemListService) Exec(ctx context.Context, request *core.ItemListRequest) ([]*core.Item, error) {
 	ret := _mock.Called(ctx, request)
 
 	if len(ret) == 0 {
 		panic("no return value specified for Exec")
 	}
 
-	var r0 []*services.Item
+	var r0 []*core.Item
 	var r1 error
-	if returnFunc, ok := ret.Get(0).(func(context.Context, *services.ItemListRequest) ([]*services.Item, error)); ok {
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *core.ItemListRequest) ([]*core.Item, error)); ok {
 		return returnFunc(ctx, request)
 	}
-	if returnFunc, ok := ret.Get(0).(func(context.Context, *services.ItemListRequest) []*services.Item); ok {
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *core.ItemListRequest) []*core.Item); ok {
 		r0 = returnFunc(ctx, request)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).([]*services.Item)
+			r0 = ret.Get(0).([]*core.Item)
 		}
 	}
-	if returnFunc, ok := ret.Get(1).(func(context.Context, *services.ItemListRequest) error); ok {
+	if returnFunc, ok := ret.Get(1).(func(context.Context, *core.ItemListRequest) error); ok {
 		r1 = returnFunc(ctx, request)
 	} else {
 		r1 = ret.Error(1)
@@ -358,20 +358,20 @@ type MockItemListService_Exec_Call struct {
 
 // Exec is a helper method to define mock.On call
 //   - ctx context.Context
-//   - request *services.ItemListRequest
+//   - request *core.ItemListRequest
 func (_e *MockItemListService_Expecter) Exec(ctx any, request any) *MockItemListService_Exec_Call {
 	return &MockItemListService_Exec_Call{Call: _e.mock.On("Exec", ctx, request)}
 }
 
-func (_c *MockItemListService_Exec_Call) Run(run func(ctx context.Context, request *services.ItemListRequest)) *MockItemListService_Exec_Call {
+func (_c *MockItemListService_Exec_Call) Run(run func(ctx context.Context, request *core.ItemListRequest)) *MockItemListService_Exec_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		var arg0 context.Context
 		if args[0] != nil {
 			arg0 = args[0].(context.Context)
 		}
-		var arg1 *services.ItemListRequest
+		var arg1 *core.ItemListRequest
 		if args[1] != nil {
-			arg1 = args[1].(*services.ItemListRequest)
+			arg1 = args[1].(*core.ItemListRequest)
 		}
 		run(
 			arg0,
@@ -381,12 +381,12 @@ func (_c *MockItemListService_Exec_Call) Run(run func(ctx context.Context, reque
 	return _c
 }
 
-func (_c *MockItemListService_Exec_Call) Return(items []*services.Item, err error) *MockItemListService_Exec_Call {
+func (_c *MockItemListService_Exec_Call) Return(items []*core.Item, err error) *MockItemListService_Exec_Call {
 	_c.Call.Return(items, err)
 	return _c
 }
 
-func (_c *MockItemListService_Exec_Call) RunAndReturn(run func(ctx context.Context, request *services.ItemListRequest) ([]*services.Item, error)) *MockItemListService_Exec_Call {
+func (_c *MockItemListService_Exec_Call) RunAndReturn(run func(ctx context.Context, request *core.ItemListRequest) ([]*core.Item, error)) *MockItemListService_Exec_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -419,26 +419,26 @@ func (_m *MockItemUpdateService) EXPECT() *MockItemUpdateService_Expecter {
 }
 
 // Exec provides a mock function for the type MockItemUpdateService
-func (_mock *MockItemUpdateService) Exec(ctx context.Context, request *services.ItemUpdateRequest) (*services.Item, error) {
+func (_mock *MockItemUpdateService) Exec(ctx context.Context, request *core.ItemUpdateRequest) (*core.Item, error) {
 	ret := _mock.Called(ctx, request)
 
 	if len(ret) == 0 {
 		panic("no return value specified for Exec")
 	}
 
-	var r0 *services.Item
+	var r0 *core.Item
 	var r1 error
-	if returnFunc, ok := ret.Get(0).(func(context.Context, *services.ItemUpdateRequest) (*services.Item, error)); ok {
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *core.ItemUpdateRequest) (*core.Item, error)); ok {
 		return returnFunc(ctx, request)
 	}
-	if returnFunc, ok := ret.Get(0).(func(context.Context, *services.ItemUpdateRequest) *services.Item); ok {
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *core.ItemUpdateRequest) *core.Item); ok {
 		r0 = returnFunc(ctx, request)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*services.Item)
+			r0 = ret.Get(0).(*core.Item)
 		}
 	}
-	if returnFunc, ok := ret.Get(1).(func(context.Context, *services.ItemUpdateRequest) error); ok {
+	if returnFunc, ok := ret.Get(1).(func(context.Context, *core.ItemUpdateRequest) error); ok {
 		r1 = returnFunc(ctx, request)
 	} else {
 		r1 = ret.Error(1)
@@ -453,20 +453,20 @@ type MockItemUpdateService_Exec_Call struct {
 
 // Exec is a helper method to define mock.On call
 //   - ctx context.Context
-//   - request *services.ItemUpdateRequest
+//   - request *core.ItemUpdateRequest
 func (_e *MockItemUpdateService_Expecter) Exec(ctx any, request any) *MockItemUpdateService_Exec_Call {
 	return &MockItemUpdateService_Exec_Call{Call: _e.mock.On("Exec", ctx, request)}
 }
 
-func (_c *MockItemUpdateService_Exec_Call) Run(run func(ctx context.Context, request *services.ItemUpdateRequest)) *MockItemUpdateService_Exec_Call {
+func (_c *MockItemUpdateService_Exec_Call) Run(run func(ctx context.Context, request *core.ItemUpdateRequest)) *MockItemUpdateService_Exec_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		var arg0 context.Context
 		if args[0] != nil {
 			arg0 = args[0].(context.Context)
 		}
-		var arg1 *services.ItemUpdateRequest
+		var arg1 *core.ItemUpdateRequest
 		if args[1] != nil {
-			arg1 = args[1].(*services.ItemUpdateRequest)
+			arg1 = args[1].(*core.ItemUpdateRequest)
 		}
 		run(
 			arg0,
@@ -476,12 +476,12 @@ func (_c *MockItemUpdateService_Exec_Call) Run(run func(ctx context.Context, req
 	return _c
 }
 
-func (_c *MockItemUpdateService_Exec_Call) Return(item *services.Item, err error) *MockItemUpdateService_Exec_Call {
+func (_c *MockItemUpdateService_Exec_Call) Return(item *core.Item, err error) *MockItemUpdateService_Exec_Call {
 	_c.Call.Return(item, err)
 	return _c
 }
 
-func (_c *MockItemUpdateService_Exec_Call) RunAndReturn(run func(ctx context.Context, request *services.ItemUpdateRequest) (*services.Item, error)) *MockItemUpdateService_Exec_Call {
+func (_c *MockItemUpdateService_Exec_Call) RunAndReturn(run func(ctx context.Context, request *core.ItemUpdateRequest) (*core.Item, error)) *MockItemUpdateService_Exec_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -514,26 +514,26 @@ func (_m *MockItemCreatePublicService) EXPECT() *MockItemCreatePublicService_Exp
 }
 
 // Exec provides a mock function for the type MockItemCreatePublicService
-func (_mock *MockItemCreatePublicService) Exec(ctx context.Context, request *services.ItemCreateRequest) (*services.Item, error) {
+func (_mock *MockItemCreatePublicService) Exec(ctx context.Context, request *core.ItemCreateRequest) (*core.Item, error) {
 	ret := _mock.Called(ctx, request)
 
 	if len(ret) == 0 {
 		panic("no return value specified for Exec")
 	}
 
-	var r0 *services.Item
+	var r0 *core.Item
 	var r1 error
-	if returnFunc, ok := ret.Get(0).(func(context.Context, *services.ItemCreateRequest) (*services.Item, error)); ok {
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *core.ItemCreateRequest) (*core.Item, error)); ok {
 		return returnFunc(ctx, request)
 	}
-	if returnFunc, ok := ret.Get(0).(func(context.Context, *services.ItemCreateRequest) *services.Item); ok {
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *core.ItemCreateRequest) *core.Item); ok {
 		r0 = returnFunc(ctx, request)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*services.Item)
+			r0 = ret.Get(0).(*core.Item)
 		}
 	}
-	if returnFunc, ok := ret.Get(1).(func(context.Context, *services.ItemCreateRequest) error); ok {
+	if returnFunc, ok := ret.Get(1).(func(context.Context, *core.ItemCreateRequest) error); ok {
 		r1 = returnFunc(ctx, request)
 	} else {
 		r1 = ret.Error(1)
@@ -548,20 +548,20 @@ type MockItemCreatePublicService_Exec_Call struct {
 
 // Exec is a helper method to define mock.On call
 //   - ctx context.Context
-//   - request *services.ItemCreateRequest
+//   - request *core.ItemCreateRequest
 func (_e *MockItemCreatePublicService_Expecter) Exec(ctx any, request any) *MockItemCreatePublicService_Exec_Call {
 	return &MockItemCreatePublicService_Exec_Call{Call: _e.mock.On("Exec", ctx, request)}
 }
 
-func (_c *MockItemCreatePublicService_Exec_Call) Run(run func(ctx context.Context, request *services.ItemCreateRequest)) *MockItemCreatePublicService_Exec_Call {
+func (_c *MockItemCreatePublicService_Exec_Call) Run(run func(ctx context.Context, request *core.ItemCreateRequest)) *MockItemCreatePublicService_Exec_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		var arg0 context.Context
 		if args[0] != nil {
 			arg0 = args[0].(context.Context)
 		}
-		var arg1 *services.ItemCreateRequest
+		var arg1 *core.ItemCreateRequest
 		if args[1] != nil {
-			arg1 = args[1].(*services.ItemCreateRequest)
+			arg1 = args[1].(*core.ItemCreateRequest)
 		}
 		run(
 			arg0,
@@ -571,12 +571,12 @@ func (_c *MockItemCreatePublicService_Exec_Call) Run(run func(ctx context.Contex
 	return _c
 }
 
-func (_c *MockItemCreatePublicService_Exec_Call) Return(item *services.Item, err error) *MockItemCreatePublicService_Exec_Call {
+func (_c *MockItemCreatePublicService_Exec_Call) Return(item *core.Item, err error) *MockItemCreatePublicService_Exec_Call {
 	_c.Call.Return(item, err)
 	return _c
 }
 
-func (_c *MockItemCreatePublicService_Exec_Call) RunAndReturn(run func(ctx context.Context, request *services.ItemCreateRequest) (*services.Item, error)) *MockItemCreatePublicService_Exec_Call {
+func (_c *MockItemCreatePublicService_Exec_Call) RunAndReturn(run func(ctx context.Context, request *core.ItemCreateRequest) (*core.Item, error)) *MockItemCreatePublicService_Exec_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -609,26 +609,26 @@ func (_m *MockItemDeletePublicService) EXPECT() *MockItemDeletePublicService_Exp
 }
 
 // Exec provides a mock function for the type MockItemDeletePublicService
-func (_mock *MockItemDeletePublicService) Exec(ctx context.Context, request *services.ItemDeleteRequest) (*services.Item, error) {
+func (_mock *MockItemDeletePublicService) Exec(ctx context.Context, request *core.ItemDeleteRequest) (*core.Item, error) {
 	ret := _mock.Called(ctx, request)
 
 	if len(ret) == 0 {
 		panic("no return value specified for Exec")
 	}
 
-	var r0 *services.Item
+	var r0 *core.Item
 	var r1 error
-	if returnFunc, ok := ret.Get(0).(func(context.Context, *services.ItemDeleteRequest) (*services.Item, error)); ok {
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *core.ItemDeleteRequest) (*core.Item, error)); ok {
 		return returnFunc(ctx, request)
 	}
-	if returnFunc, ok := ret.Get(0).(func(context.Context, *services.ItemDeleteRequest) *services.Item); ok {
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *core.ItemDeleteRequest) *core.Item); ok {
 		r0 = returnFunc(ctx, request)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*services.Item)
+			r0 = ret.Get(0).(*core.Item)
 		}
 	}
-	if returnFunc, ok := ret.Get(1).(func(context.Context, *services.ItemDeleteRequest) error); ok {
+	if returnFunc, ok := ret.Get(1).(func(context.Context, *core.ItemDeleteRequest) error); ok {
 		r1 = returnFunc(ctx, request)
 	} else {
 		r1 = ret.Error(1)
@@ -643,20 +643,20 @@ type MockItemDeletePublicService_Exec_Call struct {
 
 // Exec is a helper method to define mock.On call
 //   - ctx context.Context
-//   - request *services.ItemDeleteRequest
+//   - request *core.ItemDeleteRequest
 func (_e *MockItemDeletePublicService_Expecter) Exec(ctx any, request any) *MockItemDeletePublicService_Exec_Call {
 	return &MockItemDeletePublicService_Exec_Call{Call: _e.mock.On("Exec", ctx, request)}
 }
 
-func (_c *MockItemDeletePublicService_Exec_Call) Run(run func(ctx context.Context, request *services.ItemDeleteRequest)) *MockItemDeletePublicService_Exec_Call {
+func (_c *MockItemDeletePublicService_Exec_Call) Run(run func(ctx context.Context, request *core.ItemDeleteRequest)) *MockItemDeletePublicService_Exec_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		var arg0 context.Context
 		if args[0] != nil {
 			arg0 = args[0].(context.Context)
 		}
-		var arg1 *services.ItemDeleteRequest
+		var arg1 *core.ItemDeleteRequest
 		if args[1] != nil {
-			arg1 = args[1].(*services.ItemDeleteRequest)
+			arg1 = args[1].(*core.ItemDeleteRequest)
 		}
 		run(
 			arg0,
@@ -666,12 +666,12 @@ func (_c *MockItemDeletePublicService_Exec_Call) Run(run func(ctx context.Contex
 	return _c
 }
 
-func (_c *MockItemDeletePublicService_Exec_Call) Return(item *services.Item, err error) *MockItemDeletePublicService_Exec_Call {
+func (_c *MockItemDeletePublicService_Exec_Call) Return(item *core.Item, err error) *MockItemDeletePublicService_Exec_Call {
 	_c.Call.Return(item, err)
 	return _c
 }
 
-func (_c *MockItemDeletePublicService_Exec_Call) RunAndReturn(run func(ctx context.Context, request *services.ItemDeleteRequest) (*services.Item, error)) *MockItemDeletePublicService_Exec_Call {
+func (_c *MockItemDeletePublicService_Exec_Call) RunAndReturn(run func(ctx context.Context, request *core.ItemDeleteRequest) (*core.Item, error)) *MockItemDeletePublicService_Exec_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -704,26 +704,26 @@ func (_m *MockItemGetPublicService) EXPECT() *MockItemGetPublicService_Expecter 
 }
 
 // Exec provides a mock function for the type MockItemGetPublicService
-func (_mock *MockItemGetPublicService) Exec(ctx context.Context, request *services.ItemGetRequest) (*services.Item, error) {
+func (_mock *MockItemGetPublicService) Exec(ctx context.Context, request *core.ItemGetRequest) (*core.Item, error) {
 	ret := _mock.Called(ctx, request)
 
 	if len(ret) == 0 {
 		panic("no return value specified for Exec")
 	}
 
-	var r0 *services.Item
+	var r0 *core.Item
 	var r1 error
-	if returnFunc, ok := ret.Get(0).(func(context.Context, *services.ItemGetRequest) (*services.Item, error)); ok {
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *core.ItemGetRequest) (*core.Item, error)); ok {
 		return returnFunc(ctx, request)
 	}
-	if returnFunc, ok := ret.Get(0).(func(context.Context, *services.ItemGetRequest) *services.Item); ok {
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *core.ItemGetRequest) *core.Item); ok {
 		r0 = returnFunc(ctx, request)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*services.Item)
+			r0 = ret.Get(0).(*core.Item)
 		}
 	}
-	if returnFunc, ok := ret.Get(1).(func(context.Context, *services.ItemGetRequest) error); ok {
+	if returnFunc, ok := ret.Get(1).(func(context.Context, *core.ItemGetRequest) error); ok {
 		r1 = returnFunc(ctx, request)
 	} else {
 		r1 = ret.Error(1)
@@ -738,20 +738,20 @@ type MockItemGetPublicService_Exec_Call struct {
 
 // Exec is a helper method to define mock.On call
 //   - ctx context.Context
-//   - request *services.ItemGetRequest
+//   - request *core.ItemGetRequest
 func (_e *MockItemGetPublicService_Expecter) Exec(ctx any, request any) *MockItemGetPublicService_Exec_Call {
 	return &MockItemGetPublicService_Exec_Call{Call: _e.mock.On("Exec", ctx, request)}
 }
 
-func (_c *MockItemGetPublicService_Exec_Call) Run(run func(ctx context.Context, request *services.ItemGetRequest)) *MockItemGetPublicService_Exec_Call {
+func (_c *MockItemGetPublicService_Exec_Call) Run(run func(ctx context.Context, request *core.ItemGetRequest)) *MockItemGetPublicService_Exec_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		var arg0 context.Context
 		if args[0] != nil {
 			arg0 = args[0].(context.Context)
 		}
-		var arg1 *services.ItemGetRequest
+		var arg1 *core.ItemGetRequest
 		if args[1] != nil {
-			arg1 = args[1].(*services.ItemGetRequest)
+			arg1 = args[1].(*core.ItemGetRequest)
 		}
 		run(
 			arg0,
@@ -761,12 +761,12 @@ func (_c *MockItemGetPublicService_Exec_Call) Run(run func(ctx context.Context, 
 	return _c
 }
 
-func (_c *MockItemGetPublicService_Exec_Call) Return(item *services.Item, err error) *MockItemGetPublicService_Exec_Call {
+func (_c *MockItemGetPublicService_Exec_Call) Return(item *core.Item, err error) *MockItemGetPublicService_Exec_Call {
 	_c.Call.Return(item, err)
 	return _c
 }
 
-func (_c *MockItemGetPublicService_Exec_Call) RunAndReturn(run func(ctx context.Context, request *services.ItemGetRequest) (*services.Item, error)) *MockItemGetPublicService_Exec_Call {
+func (_c *MockItemGetPublicService_Exec_Call) RunAndReturn(run func(ctx context.Context, request *core.ItemGetRequest) (*core.Item, error)) *MockItemGetPublicService_Exec_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -799,26 +799,26 @@ func (_m *MockItemListPublicService) EXPECT() *MockItemListPublicService_Expecte
 }
 
 // Exec provides a mock function for the type MockItemListPublicService
-func (_mock *MockItemListPublicService) Exec(ctx context.Context, request *services.ItemListRequest) ([]*services.Item, error) {
+func (_mock *MockItemListPublicService) Exec(ctx context.Context, request *core.ItemListRequest) ([]*core.Item, error) {
 	ret := _mock.Called(ctx, request)
 
 	if len(ret) == 0 {
 		panic("no return value specified for Exec")
 	}
 
-	var r0 []*services.Item
+	var r0 []*core.Item
 	var r1 error
-	if returnFunc, ok := ret.Get(0).(func(context.Context, *services.ItemListRequest) ([]*services.Item, error)); ok {
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *core.ItemListRequest) ([]*core.Item, error)); ok {
 		return returnFunc(ctx, request)
 	}
-	if returnFunc, ok := ret.Get(0).(func(context.Context, *services.ItemListRequest) []*services.Item); ok {
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *core.ItemListRequest) []*core.Item); ok {
 		r0 = returnFunc(ctx, request)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).([]*services.Item)
+			r0 = ret.Get(0).([]*core.Item)
 		}
 	}
-	if returnFunc, ok := ret.Get(1).(func(context.Context, *services.ItemListRequest) error); ok {
+	if returnFunc, ok := ret.Get(1).(func(context.Context, *core.ItemListRequest) error); ok {
 		r1 = returnFunc(ctx, request)
 	} else {
 		r1 = ret.Error(1)
@@ -833,20 +833,20 @@ type MockItemListPublicService_Exec_Call struct {
 
 // Exec is a helper method to define mock.On call
 //   - ctx context.Context
-//   - request *services.ItemListRequest
+//   - request *core.ItemListRequest
 func (_e *MockItemListPublicService_Expecter) Exec(ctx any, request any) *MockItemListPublicService_Exec_Call {
 	return &MockItemListPublicService_Exec_Call{Call: _e.mock.On("Exec", ctx, request)}
 }
 
-func (_c *MockItemListPublicService_Exec_Call) Run(run func(ctx context.Context, request *services.ItemListRequest)) *MockItemListPublicService_Exec_Call {
+func (_c *MockItemListPublicService_Exec_Call) Run(run func(ctx context.Context, request *core.ItemListRequest)) *MockItemListPublicService_Exec_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		var arg0 context.Context
 		if args[0] != nil {
 			arg0 = args[0].(context.Context)
 		}
-		var arg1 *services.ItemListRequest
+		var arg1 *core.ItemListRequest
 		if args[1] != nil {
-			arg1 = args[1].(*services.ItemListRequest)
+			arg1 = args[1].(*core.ItemListRequest)
 		}
 		run(
 			arg0,
@@ -856,12 +856,12 @@ func (_c *MockItemListPublicService_Exec_Call) Run(run func(ctx context.Context,
 	return _c
 }
 
-func (_c *MockItemListPublicService_Exec_Call) Return(items []*services.Item, err error) *MockItemListPublicService_Exec_Call {
+func (_c *MockItemListPublicService_Exec_Call) Return(items []*core.Item, err error) *MockItemListPublicService_Exec_Call {
 	_c.Call.Return(items, err)
 	return _c
 }
 
-func (_c *MockItemListPublicService_Exec_Call) RunAndReturn(run func(ctx context.Context, request *services.ItemListRequest) ([]*services.Item, error)) *MockItemListPublicService_Exec_Call {
+func (_c *MockItemListPublicService_Exec_Call) RunAndReturn(run func(ctx context.Context, request *core.ItemListRequest) ([]*core.Item, error)) *MockItemListPublicService_Exec_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -894,26 +894,26 @@ func (_m *MockItemUpdatePublicService) EXPECT() *MockItemUpdatePublicService_Exp
 }
 
 // Exec provides a mock function for the type MockItemUpdatePublicService
-func (_mock *MockItemUpdatePublicService) Exec(ctx context.Context, request *services.ItemUpdateRequest) (*services.Item, error) {
+func (_mock *MockItemUpdatePublicService) Exec(ctx context.Context, request *core.ItemUpdateRequest) (*core.Item, error) {
 	ret := _mock.Called(ctx, request)
 
 	if len(ret) == 0 {
 		panic("no return value specified for Exec")
 	}
 
-	var r0 *services.Item
+	var r0 *core.Item
 	var r1 error
-	if returnFunc, ok := ret.Get(0).(func(context.Context, *services.ItemUpdateRequest) (*services.Item, error)); ok {
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *core.ItemUpdateRequest) (*core.Item, error)); ok {
 		return returnFunc(ctx, request)
 	}
-	if returnFunc, ok := ret.Get(0).(func(context.Context, *services.ItemUpdateRequest) *services.Item); ok {
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *core.ItemUpdateRequest) *core.Item); ok {
 		r0 = returnFunc(ctx, request)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).(*services.Item)
+			r0 = ret.Get(0).(*core.Item)
 		}
 	}
-	if returnFunc, ok := ret.Get(1).(func(context.Context, *services.ItemUpdateRequest) error); ok {
+	if returnFunc, ok := ret.Get(1).(func(context.Context, *core.ItemUpdateRequest) error); ok {
 		r1 = returnFunc(ctx, request)
 	} else {
 		r1 = ret.Error(1)
@@ -928,20 +928,20 @@ type MockItemUpdatePublicService_Exec_Call struct {
 
 // Exec is a helper method to define mock.On call
 //   - ctx context.Context
-//   - request *services.ItemUpdateRequest
+//   - request *core.ItemUpdateRequest
 func (_e *MockItemUpdatePublicService_Expecter) Exec(ctx any, request any) *MockItemUpdatePublicService_Exec_Call {
 	return &MockItemUpdatePublicService_Exec_Call{Call: _e.mock.On("Exec", ctx, request)}
 }
 
-func (_c *MockItemUpdatePublicService_Exec_Call) Run(run func(ctx context.Context, request *services.ItemUpdateRequest)) *MockItemUpdatePublicService_Exec_Call {
+func (_c *MockItemUpdatePublicService_Exec_Call) Run(run func(ctx context.Context, request *core.ItemUpdateRequest)) *MockItemUpdatePublicService_Exec_Call {
 	_c.Call.Run(func(args mock.Arguments) {
 		var arg0 context.Context
 		if args[0] != nil {
 			arg0 = args[0].(context.Context)
 		}
-		var arg1 *services.ItemUpdateRequest
+		var arg1 *core.ItemUpdateRequest
 		if args[1] != nil {
-			arg1 = args[1].(*services.ItemUpdateRequest)
+			arg1 = args[1].(*core.ItemUpdateRequest)
 		}
 		run(
 			arg0,
@@ -951,12 +951,12 @@ func (_c *MockItemUpdatePublicService_Exec_Call) Run(run func(ctx context.Contex
 	return _c
 }
 
-func (_c *MockItemUpdatePublicService_Exec_Call) Return(item *services.Item, err error) *MockItemUpdatePublicService_Exec_Call {
+func (_c *MockItemUpdatePublicService_Exec_Call) Return(item *core.Item, err error) *MockItemUpdatePublicService_Exec_Call {
 	_c.Call.Return(item, err)
 	return _c
 }
 
-func (_c *MockItemUpdatePublicService_Exec_Call) RunAndReturn(run func(ctx context.Context, request *services.ItemUpdateRequest) (*services.Item, error)) *MockItemUpdatePublicService_Exec_Call {
+func (_c *MockItemUpdatePublicService_Exec_Call) RunAndReturn(run func(ctx context.Context, request *core.ItemUpdateRequest) (*core.Item, error)) *MockItemUpdatePublicService_Exec_Call {
 	_c.Call.Return(run)
 	return _c
 }

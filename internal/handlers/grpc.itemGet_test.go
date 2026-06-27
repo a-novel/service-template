@@ -11,11 +11,11 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
+	"github.com/a-novel/service-template/internal/core"
 	"github.com/a-novel/service-template/internal/dao"
 	"github.com/a-novel/service-template/internal/handlers"
 	handlersmocks "github.com/a-novel/service-template/internal/handlers/mocks"
 	"github.com/a-novel/service-template/internal/handlers/protogen"
-	"github.com/a-novel/service-template/internal/services"
 )
 
 func TestGrpcItemGet(t *testing.T) {
@@ -24,7 +24,7 @@ func TestGrpcItemGet(t *testing.T) {
 	errFoo := errors.New("foo")
 
 	type serviceMock struct {
-		resp *services.Item
+		resp *core.Item
 		err  error
 	}
 
@@ -46,7 +46,7 @@ func TestGrpcItemGet(t *testing.T) {
 			},
 
 			serviceMock: &serviceMock{
-				resp: &services.Item{
+				resp: &core.Item{
 					ID:          uuid.MustParse("00000000-0000-0000-0000-000000000001"),
 					Name:        "test item",
 					Description: "test description",
@@ -111,7 +111,7 @@ func TestGrpcItemGet(t *testing.T) {
 
 			if testCase.serviceMock != nil {
 				service.EXPECT().
-					Exec(mock.Anything, &services.ItemGetRequest{
+					Exec(mock.Anything, &core.ItemGetRequest{
 						ID: uuid.MustParse(testCase.request.GetId()),
 					}).
 					Return(testCase.serviceMock.resp, testCase.serviceMock.err)

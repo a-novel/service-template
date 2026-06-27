@@ -64,7 +64,7 @@ func TestItemGet(t *testing.T) {
 		},
 	}
 
-	repository := dao.NewItemGet()
+	dao := dao.NewItemGet()
 
 	for _, testCase := range testCases {
 		t.Run(testCase.name, func(t *testing.T) {
@@ -81,7 +81,7 @@ func TestItemGet(t *testing.T) {
 					require.NoError(t, err)
 				}
 
-				result, err := repository.Exec(ctx, testCase.request)
+				result, err := dao.Exec(ctx, testCase.request)
 				require.ErrorIs(t, err, testCase.expectErr)
 				require.Equal(t, testCase.expect, result)
 			})

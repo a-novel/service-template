@@ -21,10 +21,10 @@ import (
 
 	"github.com/a-novel/service-template/internal/config"
 	"github.com/a-novel/service-template/internal/config/env"
+	"github.com/a-novel/service-template/internal/core"
 	"github.com/a-novel/service-template/internal/dao"
 	"github.com/a-novel/service-template/internal/handlers"
 	"github.com/a-novel/service-template/internal/handlers/protogen"
-	"github.com/a-novel/service-template/internal/services"
 )
 
 // Runs the main gRPC server.
@@ -47,21 +47,21 @@ func main() {
 	// DAO
 	// =================================================================================================================
 
-	repositoryItemCreate := dao.NewItemCreate()
-	repositoryItemGet := dao.NewItemGet()
-	repositoryItemList := dao.NewItemList()
-	repositoryItemUpdate := dao.NewItemUpdate()
-	repositoryItemDelete := dao.NewItemDelete()
+	daoItemCreate := dao.NewItemCreate()
+	daoItemGet := dao.NewItemGet()
+	daoItemList := dao.NewItemList()
+	daoItemUpdate := dao.NewItemUpdate()
+	daoItemDelete := dao.NewItemDelete()
 
 	// =================================================================================================================
 	// SERVICES
 	// =================================================================================================================
 
-	serviceItemCreate := services.NewItemCreate(repositoryItemCreate)
-	serviceItemGet := services.NewItemGet(repositoryItemGet)
-	serviceItemList := services.NewItemList(repositoryItemList)
-	serviceItemUpdate := services.NewItemUpdate(repositoryItemUpdate)
-	serviceItemDelete := services.NewItemDelete(repositoryItemDelete)
+	serviceItemCreate := core.NewItemCreate(daoItemCreate)
+	serviceItemGet := core.NewItemGet(daoItemGet)
+	serviceItemList := core.NewItemList(daoItemList)
+	serviceItemUpdate := core.NewItemUpdate(daoItemUpdate)
+	serviceItemDelete := core.NewItemDelete(daoItemDelete)
 
 	// =================================================================================================================
 	// HANDLERS
