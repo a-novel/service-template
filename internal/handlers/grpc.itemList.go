@@ -9,12 +9,12 @@ import (
 
 	"github.com/a-novel-kit/golib/otel"
 
+	"github.com/a-novel/service-template/internal/core"
 	"github.com/a-novel/service-template/internal/handlers/protogen"
-	"github.com/a-novel/service-template/internal/services"
 )
 
 type ItemListService interface {
-	Exec(ctx context.Context, request *services.ItemListRequest) ([]*services.Item, error)
+	Exec(ctx context.Context, request *core.ItemListRequest) ([]*core.Item, error)
 }
 
 type ItemList struct {
@@ -33,11 +33,11 @@ func (handler *ItemList) ItemList(
 	ctx, span := otel.Tracer().Start(ctx, "grpc.ItemList")
 	defer span.End()
 
-	items, err := handler.service.Exec(ctx, &services.ItemListRequest{
+	items, err := handler.service.Exec(ctx, &core.ItemListRequest{
 		Limit:  int(request.GetLimit()),
 		Offset: int(request.GetOffset()),
 	})
-	if errors.Is(err, services.ErrInvalidRequest) {
+	if errors.Is(err, core.ErrInvalidRequest) {
 		_ = otel.ReportError(span, err)
 
 		return nil, status.Error(codes.InvalidArgument, "invalid request")

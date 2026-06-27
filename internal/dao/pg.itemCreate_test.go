@@ -62,7 +62,7 @@ func TestItemCreate(t *testing.T) {
 		},
 	}
 
-	repository := dao.NewItemCreate()
+	dao := dao.NewItemCreate()
 
 	for _, testCase := range testCases {
 		t.Run(testCase.name, func(t *testing.T) {
@@ -71,7 +71,7 @@ func TestItemCreate(t *testing.T) {
 			postgres.RunDBTest(t, configtest.PostgresPreset, migrations.Migrations, func(ctx context.Context, t *testing.T) {
 				t.Helper()
 
-				result, err := repository.Exec(ctx, testCase.request)
+				result, err := dao.Exec(ctx, testCase.request)
 				require.ErrorIs(t, err, testCase.expectErr)
 				require.Equal(t, testCase.expect, result)
 			})

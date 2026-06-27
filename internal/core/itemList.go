@@ -1,4 +1,4 @@
-package services
+package core
 
 import (
 	"context"
@@ -12,7 +12,7 @@ import (
 	"github.com/a-novel/service-template/internal/dao"
 )
 
-type ItemListRepository interface {
+type ItemListDao interface {
 	Exec(ctx context.Context, request *dao.ItemListRequest) ([]*dao.Item, error)
 }
 
@@ -33,11 +33,11 @@ type ItemListRequest struct {
 
 // ItemList retrieves a paginated list of items.
 type ItemList struct {
-	repository ItemListRepository
+	dao ItemListDao
 }
 
-func NewItemList(repository ItemListRepository) *ItemList {
-	return &ItemList{repository: repository}
+func NewItemList(dao ItemListDao) *ItemList {
+	return &ItemList{dao: dao}
 }
 
 func (service *ItemList) Exec(ctx context.Context, request *ItemListRequest) ([]*Item, error) {
@@ -61,7 +61,7 @@ func (service *ItemList) Exec(ctx context.Context, request *ItemListRequest) ([]
 		return nil, otel.ReportError(span, errors.Join(err, ErrInvalidRequest))
 	}
 
-	entities, err := service.repository.Exec(ctx, &dao.ItemListRequest{
+	entities, err := service.dao.Exec(ctx, &dao.ItemListRequest{
 		Limit:  limit,
 		Offset: request.Offset,
 	})

@@ -1,4 +1,4 @@
-package services_test
+package core_test
 
 import (
 	"errors"
@@ -9,9 +9,9 @@ import (
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 
+	"github.com/a-novel/service-template/internal/core"
+	coremocks "github.com/a-novel/service-template/internal/core/mocks"
 	"github.com/a-novel/service-template/internal/dao"
-	"github.com/a-novel/service-template/internal/services"
-	servicesmocks "github.com/a-novel/service-template/internal/services/mocks"
 )
 
 func TestItemDelete(t *testing.T) {
@@ -19,7 +19,7 @@ func TestItemDelete(t *testing.T) {
 
 	errFoo := errors.New("foo")
 
-	type repositoryMock struct {
+	type daoMock struct {
 		resp *dao.Item
 		err  error
 	}
@@ -27,21 +27,21 @@ func TestItemDelete(t *testing.T) {
 	testCases := []struct {
 		name string
 
-		request *services.ItemDeleteRequest
+		request *core.ItemDeleteRequest
 
-		repositoryMock *repositoryMock
+		daoMock *daoMock
 
-		expect    *services.Item
+		expect    *core.Item
 		expectErr error
 	}{
 		{
 			name: "Success",
 
-			request: &services.ItemDeleteRequest{
+			request: &core.ItemDeleteRequest{
 				ID: uuid.MustParse("00000000-0000-0000-0000-000000000001"),
 			},
 
-			repositoryMock: &repositoryMock{
+			daoMock: &daoMock{
 				resp: &dao.Item{
 					ID:          uuid.MustParse("00000000-0000-0000-0000-000000000001"),
 					Name:        "test item",
@@ -51,7 +51,7 @@ func TestItemDelete(t *testing.T) {
 				},
 			},
 
-			expect: &services.Item{
+			expect: &core.Item{
 				ID:          uuid.MustParse("00000000-0000-0000-0000-000000000001"),
 				Name:        "test item",
 				Description: "test description",
@@ -62,18 +62,18 @@ func TestItemDelete(t *testing.T) {
 		{
 			name: "Error/InvalidID",
 
-			request:   &services.ItemDeleteRequest{ID: uuid.Nil},
-			expectErr: services.ErrInvalidRequest,
+			request:   &core.ItemDeleteRequest{ID: uuid.Nil},
+			expectErr: core.ErrInvalidRequest,
 		},
 		{
-			name: "Error/Repository",
+			name: "Error/Dao",
 
-			request: &services.ItemDeleteRequest{
+			request: &core.ItemDeleteRequest{
 				ID: uuid.MustParse("00000000-0000-0000-0000-000000000001"),
 			},
 
-			repositoryMock: &repositoryMock{err: errFoo},
-			expectErr:      errFoo,
+			daoMock:   &daoMock{err: errFoo},
+			expectErr: errFoo,
 		},
 	}
 
@@ -81,23 +81,23 @@ func TestItemDelete(t *testing.T) {
 		t.Run(testCase.name, func(t *testing.T) {
 			t.Parallel()
 
-			repository := servicesmocks.NewMockItemDeleteRepository(t)
+			mockDao := coremocks.NewMockItemDeleteDao(t)
 
-			if testCase.repositoryMock != nil {
-				repository.EXPECT().
+			if testCase.daoMock != nil {
+				mockDao.EXPECT().
 					Exec(mock.Anything, &dao.ItemDeleteRequest{
 						ID: testCase.request.ID,
 					}).
-					Return(testCase.repositoryMock.resp, testCase.repositoryMock.err)
+					Return(testCase.daoMock.resp, testCase.daoMock.err)
 			}
 
-			service := services.NewItemDelete(repository)
+			service := core.NewItemDelete(mockDao)
 
 			resp, err := service.Exec(t.Context(), testCase.request)
 			require.ErrorIs(t, err, testCase.expectErr)
 			require.Equal(t, testCase.expect, resp)
 
-			repository.AssertExpectations(t)
+			mockDao.AssertExpectations(t)
 		})
 	}
 }

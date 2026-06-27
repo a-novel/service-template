@@ -14,9 +14,9 @@ import (
 	"github.com/stretchr/testify/require"
 
 	"github.com/a-novel/service-template/internal/config"
+	"github.com/a-novel/service-template/internal/core"
 	"github.com/a-novel/service-template/internal/handlers"
 	handlersmocks "github.com/a-novel/service-template/internal/handlers/mocks"
-	"github.com/a-novel/service-template/internal/services"
 )
 
 func TestRestItemListPublic(t *testing.T) {
@@ -25,8 +25,8 @@ func TestRestItemListPublic(t *testing.T) {
 	errFoo := errors.New("foo")
 
 	type serviceMock struct {
-		req  *services.ItemListRequest
-		resp []*services.Item
+		req  *core.ItemListRequest
+		resp []*core.Item
 		err  error
 	}
 
@@ -46,8 +46,8 @@ func TestRestItemListPublic(t *testing.T) {
 			request: httptest.NewRequestWithContext(t.Context(), http.MethodGet, "/items?limit=10&offset=0", nil),
 
 			serviceMock: &serviceMock{
-				req: &services.ItemListRequest{Limit: 10, Offset: 0},
-				resp: []*services.Item{
+				req: &core.ItemListRequest{Limit: 10, Offset: 0},
+				resp: []*core.Item{
 					{
 						ID:        uuid.MustParse("00000000-0000-0000-0000-000000000002"),
 						Name:      "item two",
@@ -85,7 +85,7 @@ func TestRestItemListPublic(t *testing.T) {
 			request: httptest.NewRequestWithContext(t.Context(), http.MethodGet, "/items?limit=10&offset=0", nil),
 
 			serviceMock: &serviceMock{
-				req: &services.ItemListRequest{Limit: 10, Offset: 0},
+				req: &core.ItemListRequest{Limit: 10, Offset: 0},
 				err: errFoo,
 			},
 

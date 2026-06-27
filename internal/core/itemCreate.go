@@ -1,4 +1,4 @@
-package services
+package core
 
 import (
 	"context"
@@ -14,7 +14,7 @@ import (
 	"github.com/a-novel/service-template/internal/dao"
 )
 
-type ItemCreateRepository interface {
+type ItemCreateDao interface {
 	Exec(ctx context.Context, request *dao.ItemCreateRequest) (*dao.Item, error)
 }
 
@@ -25,11 +25,11 @@ type ItemCreateRequest struct {
 
 // ItemCreate validates and inserts a new item.
 type ItemCreate struct {
-	repository ItemCreateRepository
+	dao ItemCreateDao
 }
 
-func NewItemCreate(repository ItemCreateRepository) *ItemCreate {
-	return &ItemCreate{repository: repository}
+func NewItemCreate(dao ItemCreateDao) *ItemCreate {
+	return &ItemCreate{dao: dao}
 }
 
 func (service *ItemCreate) Exec(ctx context.Context, request *ItemCreateRequest) (*Item, error) {
@@ -43,7 +43,7 @@ func (service *ItemCreate) Exec(ctx context.Context, request *ItemCreateRequest)
 		return nil, otel.ReportError(span, errors.Join(err, ErrInvalidRequest))
 	}
 
-	entity, err := service.repository.Exec(ctx, &dao.ItemCreateRequest{
+	entity, err := service.dao.Exec(ctx, &dao.ItemCreateRequest{
 		ID:          uuid.New(),
 		Name:        request.Name,
 		Description: request.Description,

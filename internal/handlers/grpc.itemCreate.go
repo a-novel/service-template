@@ -10,12 +10,12 @@ import (
 
 	"github.com/a-novel-kit/golib/otel"
 
+	"github.com/a-novel/service-template/internal/core"
 	"github.com/a-novel/service-template/internal/handlers/protogen"
-	"github.com/a-novel/service-template/internal/services"
 )
 
 type ItemCreateService interface {
-	Exec(ctx context.Context, request *services.ItemCreateRequest) (*services.Item, error)
+	Exec(ctx context.Context, request *core.ItemCreateRequest) (*core.Item, error)
 }
 
 type ItemCreate struct {
@@ -34,11 +34,11 @@ func (handler *ItemCreate) ItemCreate(
 	ctx, span := otel.Tracer().Start(ctx, "grpc.ItemCreate")
 	defer span.End()
 
-	item, err := handler.service.Exec(ctx, &services.ItemCreateRequest{
+	item, err := handler.service.Exec(ctx, &core.ItemCreateRequest{
 		Name:        request.GetName(),
 		Description: request.GetDescription(),
 	})
-	if errors.Is(err, services.ErrInvalidRequest) {
+	if errors.Is(err, core.ErrInvalidRequest) {
 		_ = otel.ReportError(span, err)
 
 		return nil, status.Error(codes.InvalidArgument, "invalid request")
@@ -53,7 +53,7 @@ func (handler *ItemCreate) ItemCreate(
 	return &protogen.ItemCreateResponse{Item: itemToProto(item)}, nil
 }
 
-func itemToProto(item *services.Item) *protogen.Item {
+func itemToProto(item *core.Item) *protogen.Item {
 	return &protogen.Item{
 		Id:          item.ID.String(),
 		Name:        item.Name,

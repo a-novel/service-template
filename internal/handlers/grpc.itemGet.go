@@ -10,13 +10,13 @@ import (
 
 	"github.com/a-novel-kit/golib/otel"
 
+	"github.com/a-novel/service-template/internal/core"
 	"github.com/a-novel/service-template/internal/dao"
 	"github.com/a-novel/service-template/internal/handlers/protogen"
-	"github.com/a-novel/service-template/internal/services"
 )
 
 type ItemGetService interface {
-	Exec(ctx context.Context, request *services.ItemGetRequest) (*services.Item, error)
+	Exec(ctx context.Context, request *core.ItemGetRequest) (*core.Item, error)
 }
 
 type ItemGet struct {
@@ -42,8 +42,8 @@ func (handler *ItemGet) ItemGet(
 		return nil, status.Error(codes.InvalidArgument, "invalid item id")
 	}
 
-	item, err := handler.service.Exec(ctx, &services.ItemGetRequest{ID: id})
-	if errors.Is(err, services.ErrInvalidRequest) {
+	item, err := handler.service.Exec(ctx, &core.ItemGetRequest{ID: id})
+	if errors.Is(err, core.ErrInvalidRequest) {
 		_ = otel.ReportError(span, err)
 
 		return nil, status.Error(codes.InvalidArgument, "invalid request")

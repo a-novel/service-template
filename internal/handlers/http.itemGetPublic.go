@@ -10,12 +10,12 @@ import (
 	"github.com/a-novel-kit/golib/logging"
 	"github.com/a-novel-kit/golib/otel"
 
+	"github.com/a-novel/service-template/internal/core"
 	"github.com/a-novel/service-template/internal/dao"
-	"github.com/a-novel/service-template/internal/services"
 )
 
 type ItemGetPublicService interface {
-	Exec(ctx context.Context, request *services.ItemGetRequest) (*services.Item, error)
+	Exec(ctx context.Context, request *core.ItemGetRequest) (*core.Item, error)
 }
 
 type ItemGetPublicRequest struct {
@@ -44,11 +44,11 @@ func (handler *ItemGetPublic) ServeHTTP(w http.ResponseWriter, r *http.Request) 
 		return
 	}
 
-	item, err := handler.service.Exec(ctx, &services.ItemGetRequest{ID: request.ID})
+	item, err := handler.service.Exec(ctx, &core.ItemGetRequest{ID: request.ID})
 	if err != nil {
 		httpf.HandleError(ctx, handler.logger, w, span, httpf.ErrMap{
-			dao.ErrItemGetNotFound:     http.StatusNotFound,
-			services.ErrInvalidRequest: http.StatusBadRequest,
+			dao.ErrItemGetNotFound: http.StatusNotFound,
+			core.ErrInvalidRequest: http.StatusBadRequest,
 		}, err)
 
 		return

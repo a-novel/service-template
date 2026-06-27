@@ -11,11 +11,11 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
+	"github.com/a-novel/service-template/internal/core"
 	"github.com/a-novel/service-template/internal/dao"
 	"github.com/a-novel/service-template/internal/handlers"
 	handlersmocks "github.com/a-novel/service-template/internal/handlers/mocks"
 	"github.com/a-novel/service-template/internal/handlers/protogen"
-	"github.com/a-novel/service-template/internal/services"
 )
 
 func TestGrpcItemUpdate(t *testing.T) {
@@ -24,7 +24,7 @@ func TestGrpcItemUpdate(t *testing.T) {
 	errFoo := errors.New("foo")
 
 	type serviceMock struct {
-		resp *services.Item
+		resp *core.Item
 		err  error
 	}
 
@@ -48,7 +48,7 @@ func TestGrpcItemUpdate(t *testing.T) {
 			},
 
 			serviceMock: &serviceMock{
-				resp: &services.Item{
+				resp: &core.Item{
 					ID:          uuid.MustParse("00000000-0000-0000-0000-000000000001"),
 					Name:        "updated item",
 					Description: "updated description",
@@ -87,7 +87,7 @@ func TestGrpcItemUpdate(t *testing.T) {
 			},
 
 			serviceMock: &serviceMock{
-				err: services.ErrInvalidRequest,
+				err: core.ErrInvalidRequest,
 			},
 
 			expectStatus: codes.InvalidArgument,
@@ -130,7 +130,7 @@ func TestGrpcItemUpdate(t *testing.T) {
 
 			if testCase.serviceMock != nil {
 				service.EXPECT().
-					Exec(mock.Anything, &services.ItemUpdateRequest{
+					Exec(mock.Anything, &core.ItemUpdateRequest{
 						ID:          uuid.MustParse(testCase.request.GetId()),
 						Name:        testCase.request.GetName(),
 						Description: testCase.request.GetDescription(),

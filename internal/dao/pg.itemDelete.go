@@ -30,7 +30,7 @@ func NewItemDelete() *ItemDelete {
 	return new(ItemDelete)
 }
 
-func (repository *ItemDelete) Exec(ctx context.Context, request *ItemDeleteRequest) (*Item, error) {
+func (dao *ItemDelete) Exec(ctx context.Context, request *ItemDeleteRequest) (*Item, error) {
 	ctx, span := otel.Tracer().Start(ctx, "dao.ItemDelete")
 	defer span.End()
 

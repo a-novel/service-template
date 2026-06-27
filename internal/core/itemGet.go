@@ -1,4 +1,4 @@
-package services
+package core
 
 import (
 	"context"
@@ -13,7 +13,7 @@ import (
 	"github.com/a-novel/service-template/internal/dao"
 )
 
-type ItemGetRepository interface {
+type ItemGetDao interface {
 	Exec(ctx context.Context, request *dao.ItemGetRequest) (*dao.Item, error)
 }
 
@@ -26,11 +26,11 @@ type ItemGetRequest struct {
 
 // ItemGet retrieves an item by its ID.
 type ItemGet struct {
-	repository ItemGetRepository
+	dao ItemGetDao
 }
 
-func NewItemGet(repository ItemGetRepository) *ItemGet {
-	return &ItemGet{repository: repository}
+func NewItemGet(dao ItemGetDao) *ItemGet {
+	return &ItemGet{dao: dao}
 }
 
 func (service *ItemGet) Exec(ctx context.Context, request *ItemGetRequest) (*Item, error) {
@@ -44,7 +44,7 @@ func (service *ItemGet) Exec(ctx context.Context, request *ItemGetRequest) (*Ite
 		return nil, otel.ReportError(span, errors.Join(err, ErrInvalidRequest))
 	}
 
-	entity, err := service.repository.Exec(ctx, &dao.ItemGetRequest{ID: request.ID})
+	entity, err := service.dao.Exec(ctx, &dao.ItemGetRequest{ID: request.ID})
 	if err != nil {
 		return nil, otel.ReportError(span, fmt.Errorf("get item: %w", err))
 	}

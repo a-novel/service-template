@@ -158,7 +158,7 @@ func TestItemList(t *testing.T) {
 		},
 	}
 
-	repository := dao.NewItemList()
+	dao := dao.NewItemList()
 
 	for _, testCase := range testCases {
 		t.Run(testCase.name, func(t *testing.T) {
@@ -175,7 +175,7 @@ func TestItemList(t *testing.T) {
 					require.NoError(t, err)
 				}
 
-				result, err := repository.Exec(ctx, testCase.request)
+				result, err := dao.Exec(ctx, testCase.request)
 				require.ErrorIs(t, err, testCase.expectErr)
 				require.Equal(t, testCase.expect, result)
 			})

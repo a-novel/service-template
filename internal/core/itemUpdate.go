@@ -1,4 +1,4 @@
-package services
+package core
 
 import (
 	"context"
@@ -14,7 +14,7 @@ import (
 	"github.com/a-novel/service-template/internal/dao"
 )
 
-type ItemUpdateRepository interface {
+type ItemUpdateDao interface {
 	Exec(ctx context.Context, request *dao.ItemUpdateRequest) (*dao.Item, error)
 }
 
@@ -26,11 +26,11 @@ type ItemUpdateRequest struct {
 
 // ItemUpdate validates and updates an existing item's fields.
 type ItemUpdate struct {
-	repository ItemUpdateRepository
+	dao ItemUpdateDao
 }
 
-func NewItemUpdate(repository ItemUpdateRepository) *ItemUpdate {
-	return &ItemUpdate{repository: repository}
+func NewItemUpdate(dao ItemUpdateDao) *ItemUpdate {
+	return &ItemUpdate{dao: dao}
 }
 
 func (service *ItemUpdate) Exec(ctx context.Context, request *ItemUpdateRequest) (*Item, error) {
@@ -47,7 +47,7 @@ func (service *ItemUpdate) Exec(ctx context.Context, request *ItemUpdateRequest)
 		return nil, otel.ReportError(span, errors.Join(err, ErrInvalidRequest))
 	}
 
-	entity, err := service.repository.Exec(ctx, &dao.ItemUpdateRequest{
+	entity, err := service.dao.Exec(ctx, &dao.ItemUpdateRequest{
 		ID:          request.ID,
 		Name:        request.Name,
 		Description: request.Description,
