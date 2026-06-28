@@ -56,7 +56,7 @@ The service ships two APIs:
 
 ## Deploying
 
-The service runs as published OCI images plus a PostgreSQL database. Both surfaces are stateless, so each scales to as many replicas as you need behind a load balancer; all state lives in Postgres.
+The service runs as published OCI images plus a PostgreSQL database. Both servers are stateless, so each scales to as many replicas as you need behind a load balancer; all state lives in Postgres.
 
 > **OpenTofu modules are the planned canonical deployment path.** Until they land, deploy the images with any container orchestrator — the composition below is the reference for which images to run, how they wire together, and the environment they expect.
 
@@ -94,7 +94,7 @@ services:
     networks: [api]
 
   service-template:
-    image: ghcr.io/a-novel/service-template/grpc:v0.0.0 # or .../rest:v0.0.0 for the public surface
+    image: ghcr.io/a-novel/service-template/grpc:v0.0.0 # or .../rest:v0.0.0 for the public REST API
     ports: ["${SERVICE_TEMPLATE_GRPC_PORT}:8080"] # the container always listens on 8080; map ${SERVICE_TEMPLATE_REST_PORT} for the rest image
     depends_on:
       postgres-template: { condition: service_healthy }
@@ -110,7 +110,7 @@ volumes:
   template-postgres-data:
 ```
 
-Run both surfaces by adding a second service that reuses the same database and migrations with the `rest` image.
+Run both servers by adding a second service that reuses the same database and migrations with the `rest` image.
 
 ### Configuration
 
@@ -179,7 +179,7 @@ func main() {
 
 	// In production, swap insecure.NewCredentials() for a TLS or mTLS credential — the
 	// server has no application-layer auth, so transport security is the only thing
-	// protecting the private gRPC surface from a network adversary.
+	// protecting the private gRPC server from a network adversary.
 	client, err := servicetemplate.NewClient(
 		"service-template:8080",
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
