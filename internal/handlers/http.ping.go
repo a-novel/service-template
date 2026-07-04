@@ -6,6 +6,8 @@ import (
 	"github.com/a-novel-kit/golib/otel"
 )
 
+// Ping is the HTTP handler for the liveness endpoint. It answers "pong" so
+// callers can confirm the service is running without touching any dependency.
 type Ping struct{}
 
 func NewPing() *Ping {

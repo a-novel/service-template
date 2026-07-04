@@ -14,6 +14,7 @@ import (
 //go:embed pg.itemList.sql
 var itemListQuery string
 
+// ItemListRequest is the input to [ItemList.Exec].
 type ItemListRequest struct {
 	Limit  int
 	Offset int

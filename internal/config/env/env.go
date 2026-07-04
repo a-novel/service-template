@@ -1,3 +1,5 @@
+// Package env reads and parses the service's configuration from environment
+// variables, exposing each setting as a typed, ready-to-use value.
 package env
 
 import (
@@ -7,16 +9,16 @@ import (
 	"github.com/a-novel-kit/golib/config"
 )
 
-// Prefix allows to set a custom prefix to all configuration environment variables.
-// This is useful when importing the package in another project, when env variable names
-// might conflict with the source project.
+// prefix is prepended to every configuration variable name that this package reads.
+// Set SERVICE_TEMPLATE_ENV_PREFIX when embedding the service in another project,
+// where unprefixed variable names could collide with the host project's own.
 var prefix = os.Getenv("SERVICE_TEMPLATE_ENV_PREFIX")
 
 func getEnv(name string) string {
 	return os.Getenv(prefix + name)
 }
 
-// Default values for environment variables, if applicable.
+// Default values applied when an environment variable is unset.
 const (
 	AppNameDefault = "service-template"
 
@@ -34,7 +36,7 @@ const (
 	CorsMaxAgeDefault            = 3600
 )
 
-// Default values for environment variables, if applicable.
+// Default values applied when an environment variable is unset.
 var (
 	CorsAllowedOriginsDefault = []string{"*"}
 	CorsAllowedHeadersDefault = []string{"*"}
@@ -68,26 +70,26 @@ var (
 )
 
 var (
-	// PostgresDsn is the url used to connect to the postgres database instance.
+	// PostgresDsn is the URL used to connect to the PostgreSQL database instance.
 	// Typically formatted as:
 	//	postgres://<user>:<password>@<host>:<port>/<database>
 	PostgresDsn = postgresDsn
 
-	// AppName is the name of the application, as it will appear in logs and tracing.
+	// AppName is the name of the application, as it appears in logs and tracing.
 	AppName = config.LoadEnv(appName, AppNameDefault, config.StringParser)
-	// Otel flag configures whether to use Open Telemetry or not.
+	// Otel enables OpenTelemetry instrumentation.
 	//
 	// See: https://opentelemetry.io/
 	Otel = config.LoadEnv(otel, false, config.BoolParser)
 
-	// GrpcPort is the port on which the Grpc server will listen for incoming requests.
+	// GrpcPort is the port on which the gRPC server listens for incoming requests.
 	GrpcPort = config.LoadEnv(grpcPort, GrpcPortDefault, config.IntParser)
-	// GrpcUrl is the url of the Grpc service, typically <host>:<port>.
+	// GrpcUrl is the URL of the gRPC service, typically <host>:<port>.
 	GrpcUrl = grpcUrl
-	// GrpcPing configures the refresh interval for the Grpc server internal healthcheck.
+	// GrpcPing is the refresh interval for the gRPC server's internal health check.
 	GrpcPing = config.LoadEnv(grpcPing, GrpcDefaultPing, config.DurationParser)
 
-	// RestPort is the port on which the REST server will listen for incoming requests.
+	// RestPort is the port on which the REST server listens for incoming requests.
 	RestPort = config.LoadEnv(restPort, RestPortDefault, config.IntParser)
 	// RestTimeoutRead is the maximum duration for reading an incoming REST request.
 	RestTimeoutRead = config.LoadEnv(restTimeoutRead, RestTimeoutReadDefault, config.DurationParser)
@@ -115,7 +117,8 @@ var (
 	// CorsMaxAge sets the maximum age (in seconds) for CORS preflight cache.
 	CorsMaxAge = config.LoadEnv(corsMaxAge, CorsMaxAgeDefault, config.IntParser)
 
-	// GcloudProjectId configures the server for Google Cloud environment.
+	// GcloudProjectId names the Google Cloud project the service runs in. When set,
+	// logging and tracing target Google Cloud rather than the local console.
 	//
 	// See: https://docs.cloud.google.com/resource-manager/docs/creating-managing-projects
 	GcloudProjectId = gcloudProjectId

@@ -26,7 +26,7 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 //
-// ItemListService lists items with pagination.
+// ItemListService returns a page of items.
 type ItemListServiceClient interface {
 	ItemList(ctx context.Context, in *ItemListRequest, opts ...grpc.CallOption) (*ItemListResponse, error)
 }
@@ -53,7 +53,7 @@ func (c *itemListServiceClient) ItemList(ctx context.Context, in *ItemListReques
 // All implementations must embed UnimplementedItemListServiceServer
 // for forward compatibility.
 //
-// ItemListService lists items with pagination.
+// ItemListService returns a page of items.
 type ItemListServiceServer interface {
 	ItemList(context.Context, *ItemListRequest) (*ItemListResponse, error)
 	mustEmbedUnimplementedItemListServiceServer()

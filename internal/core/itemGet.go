@@ -13,14 +13,15 @@ import (
 	"github.com/a-novel/service-template/internal/dao"
 )
 
+// ItemGetDao is the persistence dependency ItemGet uses to read an item.
 type ItemGetDao interface {
 	Exec(ctx context.Context, request *dao.ItemGetRequest) (*dao.Item, error)
 }
 
+// ItemGetRequest identifies the item to fetch.
 type ItemGetRequest struct {
-	// ID identifies the item to fetch; must be a non-zero UUID. `uuid.Nil`
-	// (the all-zero UUID) is almost always a missing path/query parameter
-	// rather than a real lookup.
+	// ID must be a non-zero UUID; uuid.Nil is rejected as an unset identifier,
+	// typically a missing request parameter rather than a real lookup.
 	ID uuid.UUID `validate:"required"`
 }
 

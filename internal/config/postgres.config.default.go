@@ -8,4 +8,6 @@ import (
 	"github.com/a-novel/service-template/internal/config/env"
 )
 
+// PostgresPresetDefault is the default PostgreSQL connection configuration,
+// built from the POSTGRES_DSN environment variable.
 var PostgresPresetDefault = postgrespresets.NewDefault(pgdriver.WithDSN(env.PostgresDsn))

@@ -17,8 +17,12 @@ import (
 //go:embed pg.itemDelete.sql
 var itemDeleteQuery string
 
+// ErrItemDeleteNotFound is returned by [ItemDelete.Exec] when no item matches the
+// requested ID. It is joined onto the underlying sql.ErrNoRows so callers can branch
+// on it with errors.Is.
 var ErrItemDeleteNotFound = errors.New("item not found")
 
+// ItemDeleteRequest is the input to [ItemDelete.Exec].
 type ItemDeleteRequest struct {
 	ID uuid.UUID
 }

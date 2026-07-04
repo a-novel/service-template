@@ -11,6 +11,9 @@ import (
 	"github.com/a-novel/service-template/internal/handlers/protogen"
 )
 
+// Request, response, and entity types are re-exported from the service's
+// generated protobuf definitions so callers can use the client without
+// importing the service's internal packages.
 type (
 	StatusRequest  = protogen.StatusRequest
 	StatusResponse = protogen.StatusResponse
@@ -29,7 +32,8 @@ type (
 	Item = protogen.Item
 )
 
-// Client is the gRPC client interface for the service.
+// A Client issues the service's gRPC calls, one method per RPC. Construct one
+// with [NewClient] and call Close when finished to release the connection.
 type Client interface {
 	UnaryEcho(
 		ctx context.Context, req *golibproto.UnaryEchoRequest, opts ...grpc.CallOption,
@@ -42,6 +46,8 @@ type Client interface {
 	ItemUpdate(ctx context.Context, req *ItemUpdateRequest, opts ...grpc.CallOption) (*ItemUpdateResponse, error)
 	ItemDelete(ctx context.Context, req *ItemDeleteRequest, opts ...grpc.CallOption) (*ItemDeleteResponse, error)
 
+	// Close releases the underlying gRPC connection. Call it once the client is
+	// no longer needed.
 	Close()
 }
 
@@ -61,6 +67,9 @@ func (c *client) Close() {
 	_ = c.conn.Close()
 }
 
+// NewClient creates a [Client] for the service reachable at addr. The
+// connection is established lazily on the first RPC. Dial options are forwarded
+// to the underlying gRPC connection.
 func NewClient(addr string, opts ...grpc.DialOption) (Client, error) {
 	conn, err := grpc.NewClient(addr, opts...)
 	if err != nil {

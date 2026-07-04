@@ -26,7 +26,7 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 //
-// ItemGetService retrieves an item by ID.
+// ItemGetService retrieves a single item by its ID.
 type ItemGetServiceClient interface {
 	ItemGet(ctx context.Context, in *ItemGetRequest, opts ...grpc.CallOption) (*ItemGetResponse, error)
 }
@@ -53,7 +53,7 @@ func (c *itemGetServiceClient) ItemGet(ctx context.Context, in *ItemGetRequest, 
 // All implementations must embed UnimplementedItemGetServiceServer
 // for forward compatibility.
 //
-// ItemGetService retrieves an item by ID.
+// ItemGetService retrieves a single item by its ID.
 type ItemGetServiceServer interface {
 	ItemGet(context.Context, *ItemGetRequest) (*ItemGetResponse, error)
 	mustEmbedUnimplementedItemGetServiceServer()

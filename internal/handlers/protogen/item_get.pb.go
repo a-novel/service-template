@@ -21,6 +21,7 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
+// ItemGetRequest identifies the item to retrieve.
 type ItemGetRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
@@ -65,6 +66,7 @@ func (x *ItemGetRequest) GetId() string {
 	return ""
 }
 
+// ItemGetResponse returns the requested item.
 type ItemGetResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Item          *Item                  `protobuf:"bytes,1,opt,name=item,proto3" json:"item,omitempty"`

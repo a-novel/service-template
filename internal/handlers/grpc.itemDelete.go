@@ -15,10 +15,14 @@ import (
 	"github.com/a-novel/service-template/internal/handlers/protogen"
 )
 
+// ItemDeleteService deletes the item identified by the request and returns the
+// removed record. [ItemDelete] delegates to it; the core layer supplies the
+// implementation.
 type ItemDeleteService interface {
 	Exec(ctx context.Context, request *core.ItemDeleteRequest) (*core.Item, error)
 }
 
+// ItemDelete is the gRPC handler for the ItemDelete RPC.
 type ItemDelete struct {
 	protogen.UnimplementedItemDeleteServiceServer
 
@@ -29,6 +33,9 @@ func NewItemDelete(service ItemDeleteService) *ItemDelete {
 	return &ItemDelete{service: service}
 }
 
+// ItemDelete deletes the item with the given ID and returns the removed record.
+// A malformed ID or rejected request maps to InvalidArgument, a missing item to
+// NotFound, and any other failure to Internal.
 func (handler *ItemDelete) ItemDelete(
 	ctx context.Context, request *protogen.ItemDeleteRequest,
 ) (*protogen.ItemDeleteResponse, error) {

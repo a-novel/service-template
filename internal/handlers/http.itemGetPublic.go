@@ -14,14 +14,17 @@ import (
 	"github.com/a-novel/service-template/internal/dao"
 )
 
+// ItemGetPublicService is the core operation the get endpoint delegates to.
 type ItemGetPublicService interface {
 	Exec(ctx context.Context, request *core.ItemGetRequest) (*core.Item, error)
 }
 
+// ItemGetPublicRequest carries the query parameters accepted by the get endpoint.
 type ItemGetPublicRequest struct {
 	ID uuid.UUID `schema:"id"`
 }
 
+// ItemGetPublic is the HTTP handler for the get-item endpoint.
 type ItemGetPublic struct {
 	service ItemGetPublicService
 	logger  logging.Log

@@ -26,7 +26,7 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 //
-// ItemDeleteService deletes an item by ID.
+// ItemDeleteService deletes an item by its ID.
 type ItemDeleteServiceClient interface {
 	ItemDelete(ctx context.Context, in *ItemDeleteRequest, opts ...grpc.CallOption) (*ItemDeleteResponse, error)
 }
@@ -53,7 +53,7 @@ func (c *itemDeleteServiceClient) ItemDelete(ctx context.Context, in *ItemDelete
 // All implementations must embed UnimplementedItemDeleteServiceServer
 // for forward compatibility.
 //
-// ItemDeleteService deletes an item by ID.
+// ItemDeleteService deletes an item by its ID.
 type ItemDeleteServiceServer interface {
 	ItemDelete(context.Context, *ItemDeleteRequest) (*ItemDeleteResponse, error)
 	mustEmbedUnimplementedItemDeleteServiceServer()

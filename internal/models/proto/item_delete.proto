@@ -2,15 +2,17 @@ syntax = "proto3";
 
 import "item.proto";
 
-// ItemDeleteService deletes an item by ID.
+// ItemDeleteService deletes an item by its ID.
 service ItemDeleteService {
   rpc ItemDelete(ItemDeleteRequest) returns (ItemDeleteResponse);
 }
 
+// ItemDeleteRequest identifies the item to delete.
 message ItemDeleteRequest {
   string id = 1;
 }
 
+// ItemDeleteResponse returns the item as it stood just before deletion.
 message ItemDeleteResponse {
   Item item = 1;
 }

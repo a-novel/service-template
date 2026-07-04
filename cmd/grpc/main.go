@@ -1,3 +1,6 @@
+// Command grpc serves the item API over gRPC. It is one of the service's
+// entrypoints; cmd/rest serves the same domain over HTTP and cmd/migrations
+// applies the database schema.
 package main
 
 import (
@@ -27,7 +30,6 @@ import (
 	"github.com/a-novel/service-template/internal/handlers/protogen"
 )
 
-// Runs the main gRPC server.
 func main() {
 	cfg := config.AppPresetDefault
 	ctx := context.Background()

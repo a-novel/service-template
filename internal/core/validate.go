@@ -9,10 +9,11 @@ import (
 
 var validate = validator.New(validator.WithRequiredStructEnabled())
 
+// ErrInvalidRequest is returned by a service Exec when its request fails struct validation.
 var ErrInvalidRequest = errors.New("invalid request")
 
-// ValidateNotBlank is a custom validator that ensures a string is not empty after trimming whitespace.
-// Use the "notblank" tag to apply it.
+// ValidateNotBlank reports whether a string holds a non-whitespace character, rejecting values that
+// are empty or whitespace-only. Register it with the "notblank" struct tag.
 func ValidateNotBlank(fl validator.FieldLevel) bool {
 	return strings.TrimSpace(fl.Field().String()) != ""
 }

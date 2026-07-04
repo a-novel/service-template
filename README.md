@@ -19,7 +19,7 @@ A scaffold for new A-Novel backend services: fork it, rename the Go module, and 
 
 ## Using this template
 
-This repository is a starting point for a new Agora backend service, not a service you deploy as is. The rest of this README demonstrates the standard service-README structure your fork inherits — using the placeholder `item` resource. Fork it, then:
+This repository is a starting point for a new A-Novel backend service, not a service you deploy as is. The rest of this README demonstrates the standard service-README structure your fork inherits — using the placeholder `item` resource. Fork it, then:
 
 **1. Rename the module and service identity.** Run `go mod edit -module github.com/a-novel/<your-service>`, then a project-wide find/replace of `service-template` → `<your-service>` (the import paths are `github.com/a-novel/service-template/internal/...`, so the same replace catches them). This also covers the badges, image names, and doc links in this README, the CI `image_name:` fields, `package.json`, and `pkg/js/rest/package.json`. Then update:
 
@@ -43,7 +43,7 @@ This repository is a starting point for a new Agora backend service, not a servi
 
 **4. Verify.** `pnpm generate` → `pnpm format` → `pnpm lint` → `a-novel test -y` (`format` and `lint` already cover Go, proto, and JS). Refresh `openapi.html`, then delete this section and finish updating this README for the new service.
 
-Go conventions (layering, naming, errors, telemetry, tests) are governed by the `write-go` / `write-go-service` / `write-go-tests` skills; `write-sql`, `write-proto`, `write-openapi`, `write-dockerfiles` cover the rest.
+The layering, naming, error, telemetry, and test conventions your fork must follow are documented in the [service & architecture concepts](https://github.com/a-novel/.github/blob/master/CONTRIBUTING.md).
 
 ## What it does
 

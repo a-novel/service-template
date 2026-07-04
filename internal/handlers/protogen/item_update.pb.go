@@ -21,6 +21,7 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
+// ItemUpdateRequest identifies the item to update and carries its new attributes.
 type ItemUpdateRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
@@ -81,6 +82,7 @@ func (x *ItemUpdateRequest) GetDescription() string {
 	return ""
 }
 
+// ItemUpdateResponse returns the item with its updated attributes.
 type ItemUpdateResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Item          *Item                  `protobuf:"bytes,1,opt,name=item,proto3" json:"item,omitempty"`
