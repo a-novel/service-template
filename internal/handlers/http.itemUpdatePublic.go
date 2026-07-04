@@ -15,16 +15,20 @@ import (
 	"github.com/a-novel/service-template/internal/dao"
 )
 
+// ItemUpdatePublicService is the core operation the update endpoint delegates to.
 type ItemUpdatePublicService interface {
 	Exec(ctx context.Context, request *core.ItemUpdateRequest) (*core.Item, error)
 }
 
+// ItemUpdatePublicRequest is the JSON body accepted by the update endpoint.
 type ItemUpdatePublicRequest struct {
 	ID          uuid.UUID `json:"id"`
 	Name        string    `json:"name"`
 	Description string    `json:"description"`
 }
 
+// ItemUpdatePublic is the HTTP handler for the update-item endpoint. It responds
+// with the updated item.
 type ItemUpdatePublic struct {
 	service ItemUpdatePublicService
 	logger  logging.Log

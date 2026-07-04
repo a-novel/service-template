@@ -15,10 +15,14 @@ import (
 	"github.com/a-novel/service-template/internal/handlers/protogen"
 )
 
+// ItemUpdateService applies the request's changes to the identified item and
+// returns the updated record. [ItemUpdate] delegates to it; the core layer
+// supplies the implementation.
 type ItemUpdateService interface {
 	Exec(ctx context.Context, request *core.ItemUpdateRequest) (*core.Item, error)
 }
 
+// ItemUpdate is the gRPC handler for the ItemUpdate RPC.
 type ItemUpdate struct {
 	protogen.UnimplementedItemUpdateServiceServer
 
@@ -29,6 +33,9 @@ func NewItemUpdate(service ItemUpdateService) *ItemUpdate {
 	return &ItemUpdate{service: service}
 }
 
+// ItemUpdate applies the requested changes to the item with the given ID and
+// returns the updated record. A malformed ID or rejected request maps to
+// InvalidArgument, a missing item to NotFound, and any other failure to Internal.
 func (handler *ItemUpdate) ItemUpdate(
 	ctx context.Context, request *protogen.ItemUpdateRequest,
 ) (*protogen.ItemUpdateResponse, error) {

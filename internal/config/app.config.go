@@ -1,3 +1,6 @@
+// Package config assembles the runtime configuration for the service: the typed
+// structs the application reads, and the default preset that populates them from
+// the environment.
 package config
 
 import (
@@ -16,17 +19,17 @@ type RestCors struct {
 	MaxAge           int      `json:"maxAge"           yaml:"maxAge"`
 }
 
-// Main application configuration.
+// Main holds the top-level application settings.
 type Main struct {
-	// Name of the application, as it will appear in logs and tracing.
+	// Name of the application, as it appears in logs and tracing.
 	Name string `json:"name" yaml:"name"`
 }
 
-// Grpc server configuration.
+// Grpc holds the gRPC server configuration.
 type Grpc struct {
-	// Port on which the Grpc server will listen for incoming requests.
+	// Port on which the gRPC server listens for incoming requests.
 	Port int `json:"port" yaml:"port"`
-	// Ping configures the refresh interval for the Grpc server internal healthcheck.
+	// Ping is the refresh interval for the gRPC server's internal health check.
 	Ping time.Duration `json:"ping" yaml:"ping"`
 }
 
@@ -39,18 +42,20 @@ type RestTimeouts struct {
 	Request    time.Duration `json:"request"    yaml:"request"`
 }
 
-// Rest server configuration.
+// Rest holds the REST server configuration.
 type Rest struct {
-	// Port on which the REST server will listen for incoming requests.
+	// Port on which the REST server listens for incoming requests.
 	Port int `json:"port" yaml:"port"`
-	// Timeouts holds the various timeout settings for the REST server.
+	// Timeouts bounds the lifecycle of a REST request.
 	Timeouts RestTimeouts `json:"timeouts" yaml:"timeouts"`
-	// MaxRequestSize is the maximum size of an incoming request body.
+	// MaxRequestSize is the maximum size of an incoming request body, in bytes.
 	MaxRequestSize int64 `json:"maxRequestSize" yaml:"maxRequestSize"`
 	// Cors holds the CORS configuration.
 	Cors RestCors `json:"cors" yaml:"cors"`
 }
 
+// App is the complete configuration consumed by the service at startup, grouping
+// the server, observability, logging, and database settings.
 type App struct {
 	App  Main `json:"app"  yaml:"app"`
 	Grpc Grpc `json:"grpc" yaml:"grpc"`

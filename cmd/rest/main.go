@@ -1,3 +1,6 @@
+// Command rest serves the item API over HTTP. It is one of the service's
+// entrypoints; cmd/grpc serves the same domain over gRPC and cmd/migrations
+// applies the database schema.
 package main
 
 import (
@@ -26,7 +29,6 @@ import (
 	"github.com/a-novel/service-template/internal/handlers"
 )
 
-// Runs the main REST server.
 func main() {
 	cfg := config.AppPresetDefault
 	ctx := context.Background()

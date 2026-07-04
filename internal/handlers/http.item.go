@@ -8,6 +8,7 @@ import (
 	"github.com/a-novel/service-template/internal/core"
 )
 
+// Item is the REST representation of an item returned by the public endpoints.
 type Item struct {
 	ID          uuid.UUID `json:"id"`
 	Name        string    `json:"name"`
@@ -26,6 +27,7 @@ func loadItem(s *core.Item) Item {
 	}
 }
 
+// loadItemMap adapts loadItem to lo.Map, ignoring the slice index.
 func loadItemMap(item *core.Item, _ int) Item {
 	return loadItem(item)
 }

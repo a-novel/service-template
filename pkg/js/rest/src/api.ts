@@ -2,15 +2,23 @@ import { decodeHttpResponse, handleHttpResponse } from "@a-novel-kit/nodelib-bro
 
 import type { ZodType } from "zod";
 
+// Fallback decoder used when no schema is supplied: parses the JSON body as-is,
+// trusting it to match T.
 async function decodeRawHttpResponse<T>(response: Response): Promise<T> {
   return await response.json();
 }
 
+/** Health of a single upstream dependency reported by the service. */
 export type HealthDependency = {
   status: "up" | "down";
+  /** Failure detail, set only when status is "down". */
   err?: string;
 };
 
+/**
+ * A TemplateApi is the HTTP client for the template service. Construct it with
+ * the service base URL, then pass it to the resource helpers to make requests.
+ */
 export class TemplateApi {
   private readonly _baseUrl: string;
 
@@ -18,20 +26,24 @@ export class TemplateApi {
     this._baseUrl = baseUrl;
   }
 
+  /** Sends a request and resolves once the status is validated, discarding the body. */
   async fetchVoid(input: string, init?: RequestInit): Promise<void> {
     await fetch(`${this._baseUrl}${input}`, init).then(handleHttpResponse);
   }
 
+  /** Sends a request and decodes the JSON body, validating it against the schema when given. */
   async fetch<T>(input: string, validator?: ZodType<T>, init?: RequestInit): Promise<T> {
     return await fetch(`${this._baseUrl}${input}`, init)
       .then(handleHttpResponse)
       .then(validator ? decodeHttpResponse(validator) : decodeRawHttpResponse<T>);
   }
 
+  /** Liveness probe; resolves when the service is reachable. */
   async ping(): Promise<void> {
     await this.fetchVoid("/ping", { method: "GET" });
   }
 
+  /** Reports the health of the service, keyed by upstream dependency name. */
   async health(): Promise<Record<string, HealthDependency>> {
     return await this.fetch("/healthcheck", undefined, { method: "GET" });
   }

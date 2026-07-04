@@ -14,14 +14,18 @@ import (
 	"github.com/a-novel/service-template/internal/dao"
 )
 
+// ItemDeletePublicService is the core operation the delete endpoint delegates to.
 type ItemDeletePublicService interface {
 	Exec(ctx context.Context, request *core.ItemDeleteRequest) (*core.Item, error)
 }
 
+// ItemDeletePublicRequest carries the query parameters accepted by the delete endpoint.
 type ItemDeletePublicRequest struct {
 	ID uuid.UUID `schema:"id"`
 }
 
+// ItemDeletePublic is the HTTP handler for the delete-item endpoint. It responds
+// with the deleted item.
 type ItemDeletePublic struct {
 	service ItemDeletePublicService
 	logger  logging.Log

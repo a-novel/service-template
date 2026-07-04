@@ -16,6 +16,7 @@ import (
 //go:embed pg.itemCreate.sql
 var itemCreateQuery string
 
+// ItemCreateRequest is the input to [ItemCreate.Exec].
 type ItemCreateRequest struct {
 	ID          uuid.UUID
 	Name        string

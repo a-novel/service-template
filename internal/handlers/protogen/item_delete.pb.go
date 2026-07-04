@@ -21,6 +21,7 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
+// ItemDeleteRequest identifies the item to delete.
 type ItemDeleteRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Id            string                 `protobuf:"bytes,1,opt,name=id,proto3" json:"id,omitempty"`
@@ -65,6 +66,7 @@ func (x *ItemDeleteRequest) GetId() string {
 	return ""
 }
 
+// ItemDeleteResponse returns the item as it stood just before deletion.
 type ItemDeleteResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Item          *Item                  `protobuf:"bytes,1,opt,name=item,proto3" json:"item,omitempty"`

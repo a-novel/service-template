@@ -26,7 +26,7 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 //
-// ItemCreateService creates a new item.
+// ItemCreateService creates a new item from the supplied attributes.
 type ItemCreateServiceClient interface {
 	ItemCreate(ctx context.Context, in *ItemCreateRequest, opts ...grpc.CallOption) (*ItemCreateResponse, error)
 }
@@ -53,7 +53,7 @@ func (c *itemCreateServiceClient) ItemCreate(ctx context.Context, in *ItemCreate
 // All implementations must embed UnimplementedItemCreateServiceServer
 // for forward compatibility.
 //
-// ItemCreateService creates a new item.
+// ItemCreateService creates a new item from the supplied attributes.
 type ItemCreateServiceServer interface {
 	ItemCreate(context.Context, *ItemCreateRequest) (*ItemCreateResponse, error)
 	mustEmbedUnimplementedItemCreateServiceServer()

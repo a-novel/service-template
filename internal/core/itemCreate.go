@@ -14,10 +14,12 @@ import (
 	"github.com/a-novel/service-template/internal/dao"
 )
 
+// ItemCreateDao is the persistence dependency ItemCreate uses to insert an item.
 type ItemCreateDao interface {
 	Exec(ctx context.Context, request *dao.ItemCreateRequest) (*dao.Item, error)
 }
 
+// ItemCreateRequest carries the fields for a new item.
 type ItemCreateRequest struct {
 	Name        string `validate:"required,notblank,max=256"`
 	Description string `validate:"max=1024"`

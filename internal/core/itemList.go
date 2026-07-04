@@ -12,6 +12,7 @@ import (
 	"github.com/a-novel/service-template/internal/dao"
 )
 
+// ItemListDao is the persistence dependency ItemList uses to read a page of items.
 type ItemListDao interface {
 	Exec(ctx context.Context, request *dao.ItemListRequest) ([]*dao.Item, error)
 }
@@ -25,6 +26,7 @@ const (
 	ItemListMaxSize = 100
 )
 
+// ItemListRequest selects a page of items.
 type ItemListRequest struct {
 	// Limit defaults to ItemListDefaultSize when zero or negative; see Exec.
 	Limit  int `validate:"max=100"`

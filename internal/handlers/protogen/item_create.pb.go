@@ -21,6 +21,7 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
+// ItemCreateRequest carries the attributes of the item to create. The server assigns the ID and timestamps.
 type ItemCreateRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Name          string                 `protobuf:"bytes,1,opt,name=name,proto3" json:"name,omitempty"`
@@ -73,6 +74,7 @@ func (x *ItemCreateRequest) GetDescription() string {
 	return ""
 }
 
+// ItemCreateResponse returns the newly created item, including its server-assigned fields.
 type ItemCreateResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Item          *Item                  `protobuf:"bytes,1,opt,name=item,proto3" json:"item,omitempty"`

@@ -14,10 +14,13 @@ import (
 	"github.com/a-novel/service-template/internal/handlers/protogen"
 )
 
+// ItemCreateService creates an item from the request and returns the stored
+// record. [ItemCreate] delegates to it; the core layer supplies the implementation.
 type ItemCreateService interface {
 	Exec(ctx context.Context, request *core.ItemCreateRequest) (*core.Item, error)
 }
 
+// ItemCreate is the gRPC handler for the ItemCreate RPC.
 type ItemCreate struct {
 	protogen.UnimplementedItemCreateServiceServer
 
@@ -28,6 +31,8 @@ func NewItemCreate(service ItemCreateService) *ItemCreate {
 	return &ItemCreate{service: service}
 }
 
+// ItemCreate creates an item and returns it. A rejected request maps to
+// InvalidArgument; any other failure maps to Internal.
 func (handler *ItemCreate) ItemCreate(
 	ctx context.Context, request *protogen.ItemCreateRequest,
 ) (*protogen.ItemCreateResponse, error) {
@@ -53,6 +58,8 @@ func (handler *ItemCreate) ItemCreate(
 	return &protogen.ItemCreateResponse{Item: itemToProto(item)}, nil
 }
 
+// itemToProto converts a core item into its protobuf form, encoding timestamps
+// as RFC 3339 strings. It is shared by every item handler in this package.
 func itemToProto(item *core.Item) *protogen.Item {
 	return &protogen.Item{
 		Id:          item.ID.String(),

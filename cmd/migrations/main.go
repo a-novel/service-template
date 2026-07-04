@@ -1,3 +1,6 @@
+// Command migrations applies the service's database schema migrations and exits.
+// The cmd/grpc and cmd/rest entrypoints serve the item API once the schema is in
+// place.
 package main
 
 import (
@@ -11,7 +14,6 @@ import (
 	"github.com/a-novel/service-template/internal/models/migrations"
 )
 
-// Applies migrations.
 func main() {
 	ctx := lo.Must(postgres.NewContext(context.Background(), config.PostgresPresetDefault))
 	lo.Must0(postgres.RunMigrationsContext(ctx, migrations.Migrations))

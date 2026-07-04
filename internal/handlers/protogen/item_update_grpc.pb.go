@@ -26,7 +26,7 @@ const (
 //
 // For semantics around ctx use and closing/ending streaming RPCs, please refer to https://pkg.go.dev/google.golang.org/grpc/?tab=doc#ClientConn.NewStream.
 //
-// ItemUpdateService updates an existing item.
+// ItemUpdateService replaces the mutable attributes of an existing item.
 type ItemUpdateServiceClient interface {
 	ItemUpdate(ctx context.Context, in *ItemUpdateRequest, opts ...grpc.CallOption) (*ItemUpdateResponse, error)
 }
@@ -53,7 +53,7 @@ func (c *itemUpdateServiceClient) ItemUpdate(ctx context.Context, in *ItemUpdate
 // All implementations must embed UnimplementedItemUpdateServiceServer
 // for forward compatibility.
 //
-// ItemUpdateService updates an existing item.
+// ItemUpdateService replaces the mutable attributes of an existing item.
 type ItemUpdateServiceServer interface {
 	ItemUpdate(context.Context, *ItemUpdateRequest) (*ItemUpdateResponse, error)
 	mustEmbedUnimplementedItemUpdateServiceServer()

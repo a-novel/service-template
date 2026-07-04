@@ -13,10 +13,13 @@ import (
 	"github.com/a-novel/service-template/internal/handlers/protogen"
 )
 
+// ItemListService returns a page of items bounded by the request's limit and
+// offset. [ItemList] delegates to it; the core layer supplies the implementation.
 type ItemListService interface {
 	Exec(ctx context.Context, request *core.ItemListRequest) ([]*core.Item, error)
 }
 
+// ItemList is the gRPC handler for the ItemList RPC.
 type ItemList struct {
 	protogen.UnimplementedItemListServiceServer
 
@@ -27,6 +30,8 @@ func NewItemList(service ItemListService) *ItemList {
 	return &ItemList{service: service}
 }
 
+// ItemList returns a page of items. A rejected request maps to InvalidArgument;
+// any other failure maps to Internal.
 func (handler *ItemList) ItemList(
 	ctx context.Context, request *protogen.ItemListRequest,
 ) (*protogen.ItemListResponse, error) {

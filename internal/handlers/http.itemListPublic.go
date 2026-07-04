@@ -13,15 +13,19 @@ import (
 	"github.com/a-novel/service-template/internal/core"
 )
 
+// ItemListPublicService is the core operation the list endpoint delegates to.
 type ItemListPublicService interface {
 	Exec(ctx context.Context, request *core.ItemListRequest) ([]*core.Item, error)
 }
 
+// ItemListPublicRequest carries the pagination query parameters accepted by the
+// list endpoint.
 type ItemListPublicRequest struct {
 	Limit  int `schema:"limit"`
 	Offset int `schema:"offset"`
 }
 
+// ItemListPublic is the HTTP handler for the list-items endpoint.
 type ItemListPublic struct {
 	service ItemListPublicService
 	logger  logging.Log

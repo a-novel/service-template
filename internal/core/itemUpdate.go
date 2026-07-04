@@ -14,10 +14,12 @@ import (
 	"github.com/a-novel/service-template/internal/dao"
 )
 
+// ItemUpdateDao is the persistence dependency ItemUpdate uses to write an item's new values.
 type ItemUpdateDao interface {
 	Exec(ctx context.Context, request *dao.ItemUpdateRequest) (*dao.Item, error)
 }
 
+// ItemUpdateRequest carries the target item ID and its new field values.
 type ItemUpdateRequest struct {
 	ID          uuid.UUID
 	Name        string `validate:"required,notblank,max=256"`

@@ -21,17 +21,15 @@ const (
 	_ = protoimpl.EnforceVersion(protoimpl.MaxVersion - 20)
 )
 
+// DependencyStatus reports whether a single dependency is reachable and serving.
 type DependencyStatus int32
 
 const (
-	// DEPENDENCY_STATUS_UNSPECIFIED means the application has failed to, or has not yet
-	// assess the status of the given dependency.
+	// DEPENDENCY_STATUS_UNSPECIFIED means the status has not yet been assessed, or the assessment failed.
 	DependencyStatus_DEPENDENCY_STATUS_UNSPECIFIED DependencyStatus = 0
-	// DEPENDENCY_STATUS_UP means the dependency was successfully pinged, and
-	// should serve normally.
+	// DEPENDENCY_STATUS_UP means the dependency was successfully pinged and should serve normally.
 	DependencyStatus_DEPENDENCY_STATUS_UP DependencyStatus = 1
-	// DEPENDENCY_STATUS_DOWN means the application has contacted the dependency, but it
-	// failed to respond with a proper status.
+	// DEPENDENCY_STATUS_DOWN means the dependency was reached but did not report a healthy status.
 	DependencyStatus_DEPENDENCY_STATUS_DOWN DependencyStatus = 2
 )
 
@@ -76,10 +74,11 @@ func (DependencyStatus) EnumDescriptor() ([]byte, []int) {
 	return file_status_proto_rawDescGZIP(), []int{0}
 }
 
+// DependencyHealth is the outcome of checking a single dependency.
 type DependencyHealth struct {
 	state  protoimpl.MessageState `protogen:"open.v1"`
 	Status DependencyStatus       `protobuf:"varint,1,opt,name=status,proto3,enum=DependencyStatus" json:"status,omitempty"`
-	// The error that occurred when checking for the dependency status, if any.
+	// Error returned by the health check, empty when the dependency is healthy.
 	Err           string `protobuf:"bytes,2,opt,name=err,proto3" json:"err,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
@@ -129,6 +128,7 @@ func (x *DependencyHealth) GetErr() string {
 	return ""
 }
 
+// StatusRequest takes no parameters.
 type StatusRequest struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	unknownFields protoimpl.UnknownFields
@@ -165,6 +165,7 @@ func (*StatusRequest) Descriptor() ([]byte, []int) {
 	return file_status_proto_rawDescGZIP(), []int{1}
 }
 
+// StatusResponse reports the health of each dependency the service relies on.
 type StatusResponse struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
 	Postgres      *DependencyHealth      `protobuf:"bytes,1,opt,name=postgres,proto3" json:"postgres,omitempty"`

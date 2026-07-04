@@ -17,8 +17,12 @@ import (
 //go:embed pg.itemGet.sql
 var itemGetQuery string
 
+// ErrItemGetNotFound is returned by [ItemGet.Exec] when no item matches the requested
+// ID. It is joined onto the underlying sql.ErrNoRows so callers can branch on it with
+// errors.Is.
 var ErrItemGetNotFound = errors.New("item not found")
 
+// ItemGetRequest is the input to [ItemGet.Exec].
 type ItemGetRequest struct {
 	ID uuid.UUID
 }
