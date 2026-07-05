@@ -6,31 +6,33 @@
 # version of the base gRPC image, suited for local development rather than full scale production.
 FROM docker.io/library/golang:1.26.4-alpine AS builder
 
+ENV CGO_ENABLED=0
+
 WORKDIR /app
 
-# ======================================================================================================================
-# Copy build files.
-# ======================================================================================================================
-COPY ./go.mod ./go.mod
-COPY ./go.sum ./go.sum
-COPY "./cmd/grpc" "./cmd/grpc"
-COPY "./cmd/migrations" "./cmd/migrations"
+COPY go.mod go.sum ./
+RUN --mount=type=cache,target=/go/pkg/mod \
+    go mod download
+
+# Install grpcurl (healthcheck) before the source COPY so its cached compile
+# survives source-only rebuilds. Pinned for reproducibility.
+RUN --mount=type=cache,target=/go/pkg/mod \
+    --mount=type=cache,target=/root/.cache/go-build \
+    GOBIN=/usr/local/bin go install github.com/fullstorydev/grpcurl/cmd/grpcurl@v1.9.3
+
+COPY ./cmd/grpc ./cmd/grpc
+COPY ./cmd/migrations ./cmd/migrations
 COPY ./internal/handlers ./internal/handlers
 COPY ./internal/dao ./internal/dao
 COPY ./internal/core ./internal/core
 COPY ./internal/models ./internal/models
 COPY ./internal/config ./internal/config
 
-RUN go mod download
-
-# ======================================================================================================================
-# Build executables.
-# ======================================================================================================================
-RUN go build -o /grpc cmd/grpc/main.go
-RUN go build -o /migrations cmd/migrations/main.go
-
-# Used for healthcheck.
-RUN GOBIN=/grpcurl go install github.com/fullstorydev/grpcurl/cmd/grpcurl@latest
+# One RUN so the two binaries share a single warm module + build cache.
+RUN --mount=type=cache,target=/go/pkg/mod \
+    --mount=type=cache,target=/root/.cache/go-build \
+    go build -ldflags="-s -w" -trimpath -o /grpc ./cmd/grpc/ && \
+    go build -ldflags="-s -w" -trimpath -o /migrations ./cmd/migrations/
 
 FROM docker.io/library/alpine:3.24.1
 
@@ -38,22 +40,14 @@ WORKDIR /
 
 COPY --from=builder /grpc /grpc
 COPY --from=builder /migrations /migrations
+COPY --from=builder /usr/local/bin/grpcurl /usr/local/bin/grpcurl
 
-COPY --from=builder /grpcurl /bin/
-
-# ======================================================================================================================
-# Healthcheck.
-# ======================================================================================================================
 HEALTHCHECK --interval=1s --timeout=5s --retries=10 --start-period=1s \
   CMD grpcurl --plaintext -d '' localhost:8080 grpc.health.v1.Health/Check || exit 1
 
-# ======================================================================================================================
-# Finish setup.
-# ======================================================================================================================
-# Make sure the executable uses the default port.
 ENV GRPC_PORT=8080
 
-# GRPC port.
+# gRPC port.
 EXPOSE 8080
 # TLS port.
 EXPOSE 443
