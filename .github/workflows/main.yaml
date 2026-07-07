@@ -20,7 +20,7 @@ jobs:
       - name: go generate
         shell: bash
         run: go generate ./...
-      - uses: a-novel-kit/workflows/generic-actions/check-changes@v1.17.1
+      - uses: a-novel-kit/workflows/generic-actions/check-changes@v1.18.0
         with:
           fail_message: go generate definitions are not up-to-date, please run 'go generate ./...' and commit the changes
 
@@ -30,7 +30,7 @@ jobs:
     permissions:
       contents: read
     steps:
-      - uses: a-novel-kit/workflows/go-actions/lint-go@v1.17.1
+      - uses: a-novel-kit/workflows/go-actions/lint-go@v1.18.0
 
   lint-proto:
     runs-on: ubuntu-latest
@@ -46,7 +46,7 @@ jobs:
       contents: read
       packages: read
     steps:
-      - uses: a-novel-kit/workflows/node-actions/lint-node@v1.17.1
+      - uses: a-novel-kit/workflows/node-actions/lint-node@v1.18.0
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           app_private_key: ${{ secrets.DEPENDENCY_BOT_PRIVATE_KEY }}
@@ -81,7 +81,7 @@ jobs:
     steps:
       - uses: actions/checkout@v7
       - uses: ./.github/actions/run-migrations
-      - uses: a-novel-kit/workflows/go-actions/test-go@v1.17.1
+      - uses: a-novel-kit/workflows/go-actions/test-go@v1.18.0
         id: test
         with:
           filter_extra_patterns: "| grep /internal | grep -v /protogen"
@@ -128,7 +128,7 @@ jobs:
       GRPC_URL: "localhost:8080"
     steps:
       - uses: actions/checkout@v7
-      - uses: a-novel-kit/workflows/go-actions/test-go@v1.17.1
+      - uses: a-novel-kit/workflows/go-actions/test-go@v1.18.0
         id: test
         with:
           filter_extra_patterns: "| grep /pkg"
@@ -175,7 +175,7 @@ jobs:
     env:
       REST_URL: "http://localhost:8080"
     steps:
-      - uses: a-novel-kit/workflows/node-actions/test-node@v1.17.1
+      - uses: a-novel-kit/workflows/node-actions/test-node@v1.18.0
         id: test
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
@@ -200,7 +200,7 @@ jobs:
       POSTGRES_HOST_AUTH_METHOD: scram-sha-256
       POSTGRES_INITDB_ARGS: --auth=scram-sha-256
     steps:
-      - uses: a-novel-kit/workflows/build-actions/docker@v1.17.1
+      - uses: a-novel-kit/workflows/build-actions/docker@v1.18.0
         id: build
         with:
           file: builds/database.Dockerfile
@@ -241,7 +241,7 @@ jobs:
     env:
       POSTGRES_DSN: postgres://postgres:postgres@localhost:5432/postgres?sslmode=disable
     steps:
-      - uses: a-novel-kit/workflows/build-actions/docker-job@v1.17.1
+      - uses: a-novel-kit/workflows/build-actions/docker-job@v1.18.0
         with:
           file: builds/migrations.Dockerfile
           image_name: ${{ github.repository }}/jobs/migrations
@@ -277,7 +277,7 @@ jobs:
     steps:
       - uses: actions/checkout@v7
       - uses: ./.github/actions/run-migrations
-      - uses: a-novel-kit/workflows/build-actions/docker@v1.17.1
+      - uses: a-novel-kit/workflows/build-actions/docker@v1.18.0
         with:
           file: builds/grpc.Dockerfile
           image_name: ${{ github.repository }}/grpc
@@ -285,7 +285,7 @@ jobs:
           run_args: -e POSTGRES_DSN="${POSTGRES_DSN}"
 
   build-standalone-grpc:
-    needs: [test-go, build-database]
+    needs: [test-go]
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -294,34 +294,17 @@ jobs:
       id-token: write
     outputs:
       digest: ${{ steps.build.outputs.digest }}
-    services:
-      postgres-template:
-        image: ghcr.io/a-novel/service-template/database@${{ needs.build-database.outputs.digest }}
-        ports:
-          - "5432:5432"
-        env:
-          POSTGRES_PASSWORD: postgres
-          POSTGRES_USER: postgres
-          POSTGRES_DB: postgres
-          POSTGRES_HOST_AUTH_METHOD: scram-sha-256
-          POSTGRES_INITDB_ARGS: --auth=scram-sha-256
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-    env:
-      POSTGRES_DSN: postgres://postgres:postgres@localhost:5432/postgres?sslmode=disable
+    # This image is booted and exercised by test-pkg (a full
+    # integration run), so this job only builds + pushes it. skip_healthcheck
+    # drops the redundant smoke run and the container constellation it needed.
     steps:
-      - uses: actions/checkout@v7
-      - uses: ./.github/actions/run-migrations
-      - uses: a-novel-kit/workflows/build-actions/docker@v1.17.1
+      - uses: a-novel-kit/workflows/build-actions/docker@v1.18.0
         id: build
         with:
           file: builds/standalone.grpc.Dockerfile
           image_name: ${{ github.repository }}/standalone-grpc
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          run_args: -e POSTGRES_DSN="${POSTGRES_DSN}"
+          skip_healthcheck: true
 
   build-rest:
     needs: [test-go, build-database]
@@ -352,7 +335,7 @@ jobs:
     steps:
       - uses: actions/checkout@v7
       - uses: ./.github/actions/run-migrations
-      - uses: a-novel-kit/workflows/build-actions/docker@v1.17.1
+      - uses: a-novel-kit/workflows/build-actions/docker@v1.18.0
         with:
           file: builds/rest.Dockerfile
           image_name: ${{ github.repository }}/rest
@@ -360,7 +343,7 @@ jobs:
           run_args: -e POSTGRES_DSN="${POSTGRES_DSN}"
 
   build-standalone-rest:
-    needs: [test-go, build-database]
+    needs: [test-go]
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -369,34 +352,17 @@ jobs:
       id-token: write
     outputs:
       digest: ${{ steps.build.outputs.digest }}
-    services:
-      postgres-template:
-        image: ghcr.io/a-novel/service-template/database@${{ needs.build-database.outputs.digest }}
-        ports:
-          - "5432:5432"
-        env:
-          POSTGRES_PASSWORD: postgres
-          POSTGRES_USER: postgres
-          POSTGRES_DB: postgres
-          POSTGRES_HOST_AUTH_METHOD: scram-sha-256
-          POSTGRES_INITDB_ARGS: --auth=scram-sha-256
-        options: >-
-          --health-cmd pg_isready
-          --health-interval 10s
-          --health-timeout 5s
-          --health-retries 5
-    env:
-      POSTGRES_DSN: postgres://postgres:postgres@localhost:5432/postgres?sslmode=disable
+    # This image is booted and exercised by test-pkg-js (a full
+    # integration run), so this job only builds + pushes it. skip_healthcheck
+    # drops the redundant smoke run and the container constellation it needed.
     steps:
-      - uses: actions/checkout@v7
-      - uses: ./.github/actions/run-migrations
-      - uses: a-novel-kit/workflows/build-actions/docker@v1.17.1
+      - uses: a-novel-kit/workflows/build-actions/docker@v1.18.0
         id: build
         with:
           file: builds/standalone.rest.Dockerfile
           image_name: ${{ github.repository }}/standalone-rest
           github_token: ${{ secrets.GITHUB_TOKEN }}
-          run_args: -e POSTGRES_DSN="${POSTGRES_DSN}"
+          skip_healthcheck: true
 
   build-js:
     needs: [test-pkg-js]
@@ -405,7 +371,7 @@ jobs:
       contents: read
       packages: read
     steps:
-      - uses: a-novel-kit/workflows/node-actions/build-node@v1.17.1
+      - uses: a-novel-kit/workflows/node-actions/build-node@v1.18.0
         with:
           github_token: ${{ secrets.GITHUB_TOKEN }}
           app_private_key: ${{ secrets.DEPENDENCY_BOT_PRIVATE_KEY }}
@@ -419,7 +385,7 @@ jobs:
     permissions:
       contents: read
     steps:
-      - uses: a-novel-kit/workflows/go-actions/go-report-card@v1.17.1
+      - uses: a-novel-kit/workflows/go-actions/go-report-card@v1.18.0
         if: github.ref == 'refs/heads/master' && success()
 
   report-codecov:
@@ -428,7 +394,7 @@ jobs:
     permissions:
       contents: read
     steps:
-      - uses: a-novel-kit/workflows/generic-actions/codecov@v1.17.1
+      - uses: a-novel-kit/workflows/generic-actions/codecov@v1.18.0
         with:
           codecov_token: ${{ secrets.CODECOV_TOKEN }}
           coverage_files: coverage.txt,coverage_pkg.txt,coverage/*
