@@ -1,6 +1,6 @@
 module github.com/a-novel/service-template
 
-go 1.26.4
+go 1.26.5
 
 tool (
 	github.com/bufbuild/buf/cmd/buf
