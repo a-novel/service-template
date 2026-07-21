@@ -104,6 +104,8 @@ github.com/a-novel/service-template v0.0.0-20260721122959-899a2b6ae512 h1:WK3HgS
 github.com/a-novel/service-template v0.0.0-20260721122959-899a2b6ae512/go.mod h1:nwiLpd3ueN2/JWC0gPw+h92EP5XbpQKkgb6JNCmnosY=
 github.com/a-novel/service-template v0.0.0-20260721150430-e0e2d029108f h1:szOq1BLDOuIPHBR8DpvSNM2oepRd+qfxG5InxOj7VfM=
 github.com/a-novel/service-template v0.0.0-20260721150430-e0e2d029108f/go.mod h1:nwiLpd3ueN2/JWC0gPw+h92EP5XbpQKkgb6JNCmnosY=
+github.com/a-novel/service-template v0.0.0-20260721162753-924f45feb8a1 h1:t6nXMnQR++tnHysbMRDGdb4ehZ7XMDfaaromIz2wCS8=
+github.com/a-novel/service-template v0.0.0-20260721162753-924f45feb8a1/go.mod h1:nwiLpd3ueN2/JWC0gPw+h92EP5XbpQKkgb6JNCmnosY=
 github.com/alecthomas/chroma/v2 v2.24.1 h1:m5ffpfZbIb++k8AqFEKy9uVgY12xIQtBsQlc6DfZJQM=
 github.com/alecthomas/chroma/v2 v2.24.1/go.mod h1:l+ohZ9xRXIbGe7cIW+YZgOGbvuVLjMps/FYN/CwuabI=
 github.com/alecthomas/go-check-sumtype v0.3.1 h1:u9aUvbGINJxLVXiFvHUlPEaD7VDULsrxJb4Aq31NLkU=
