@@ -6,7 +6,7 @@ tool github.com/golangci/golangci-lint/v2/cmd/golangci-lint
 
 require (
 	github.com/a-novel-kit/golib v0.22.10
-	github.com/a-novel/service-template v0.0.0-20260721202119-49aa393d84e0
+	github.com/a-novel/service-template v0.0.0-20260721220355-b1ab09b04638
 	github.com/go-chi/chi/v5 v5.3.1
 	github.com/go-chi/cors v1.2.2
 	github.com/go-playground/validator/v10 v10.30.3
