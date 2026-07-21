@@ -98,6 +98,8 @@ github.com/a-novel/service-template v0.0.0-20260721030039-16f078095fed h1:2lJpyA
 github.com/a-novel/service-template v0.0.0-20260721030039-16f078095fed/go.mod h1:nwiLpd3ueN2/JWC0gPw+h92EP5XbpQKkgb6JNCmnosY=
 github.com/a-novel/service-template v0.0.0-20260721081732-dba2604492e6 h1:JY/ozE79NvLqu/8SFJODIq4U3tWKI0NIpbZwiDuUeL8=
 github.com/a-novel/service-template v0.0.0-20260721081732-dba2604492e6/go.mod h1:nwiLpd3ueN2/JWC0gPw+h92EP5XbpQKkgb6JNCmnosY=
+github.com/a-novel/service-template v0.0.0-20260721110526-53b6c1b7a174 h1:rbreBX23IHFx9JDV8pJySqXEnY7D5CfUAbxvRBt8mYA=
+github.com/a-novel/service-template v0.0.0-20260721110526-53b6c1b7a174/go.mod h1:nwiLpd3ueN2/JWC0gPw+h92EP5XbpQKkgb6JNCmnosY=
 github.com/alecthomas/chroma/v2 v2.24.1 h1:m5ffpfZbIb++k8AqFEKy9uVgY12xIQtBsQlc6DfZJQM=
 github.com/alecthomas/chroma/v2 v2.24.1/go.mod h1:l+ohZ9xRXIbGe7cIW+YZgOGbvuVLjMps/FYN/CwuabI=
 github.com/alecthomas/go-check-sumtype v0.3.1 h1:u9aUvbGINJxLVXiFvHUlPEaD7VDULsrxJb4Aq31NLkU=
