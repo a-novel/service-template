@@ -6,7 +6,7 @@ tool gotest.tools/gotestsum
 
 require (
 	github.com/a-novel-kit/golib v0.23.0
-	github.com/a-novel/service-template v0.0.0-20260722041453-a10232ef9c93
+	github.com/a-novel/service-template v0.0.0-20260722105049-e2ecc34ca13c
 	github.com/go-chi/chi/v5 v5.3.1
 	github.com/go-chi/cors v1.2.2
 	github.com/go-playground/validator/v10 v10.30.3
