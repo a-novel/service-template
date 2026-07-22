@@ -156,6 +156,88 @@ func TestItemList(t *testing.T) {
 				},
 			},
 		},
+		// The two cases below share a single created_at across every fixture, so created_at alone
+		// cannot order them and only the id tiebreaker makes the result deterministic. The fixtures
+		// are inserted in ascending id order while the expectation is descending, so without the
+		// tiebreaker the query returns them in heap (insertion) order and both cases fail.
+		{
+			name: "Success/SameTimestamp",
+
+			fixtures: []*dao.Item{
+				{
+					ID:        uuid.MustParse("00000000-0000-0000-0000-000000000001"),
+					Name:      "item one",
+					CreatedAt: time.Date(2021, 1, 1, 0, 0, 0, 0, time.UTC),
+					UpdatedAt: time.Date(2021, 1, 1, 0, 0, 0, 0, time.UTC),
+				},
+				{
+					ID:        uuid.MustParse("00000000-0000-0000-0000-000000000002"),
+					Name:      "item two",
+					CreatedAt: time.Date(2021, 1, 1, 0, 0, 0, 0, time.UTC),
+					UpdatedAt: time.Date(2021, 1, 1, 0, 0, 0, 0, time.UTC),
+				},
+				{
+					ID:        uuid.MustParse("00000000-0000-0000-0000-000000000003"),
+					Name:      "item three",
+					CreatedAt: time.Date(2021, 1, 1, 0, 0, 0, 0, time.UTC),
+					UpdatedAt: time.Date(2021, 1, 1, 0, 0, 0, 0, time.UTC),
+				},
+			},
+
+			request: &dao.ItemListRequest{Limit: 2, Offset: 0},
+
+			expect: []*dao.Item{
+				{
+					ID:        uuid.MustParse("00000000-0000-0000-0000-000000000003"),
+					Name:      "item three",
+					CreatedAt: time.Date(2021, 1, 1, 0, 0, 0, 0, time.UTC),
+					UpdatedAt: time.Date(2021, 1, 1, 0, 0, 0, 0, time.UTC),
+				},
+				{
+					ID:        uuid.MustParse("00000000-0000-0000-0000-000000000002"),
+					Name:      "item two",
+					CreatedAt: time.Date(2021, 1, 1, 0, 0, 0, 0, time.UTC),
+					UpdatedAt: time.Date(2021, 1, 1, 0, 0, 0, 0, time.UTC),
+				},
+			},
+		},
+		{
+			// The second page of the same tied set: it must continue where the first left off rather
+			// than re-serving a row, which is the concrete damage an unstable sort causes.
+			name: "Success/SameTimestampSecondPage",
+
+			fixtures: []*dao.Item{
+				{
+					ID:        uuid.MustParse("00000000-0000-0000-0000-000000000001"),
+					Name:      "item one",
+					CreatedAt: time.Date(2021, 1, 1, 0, 0, 0, 0, time.UTC),
+					UpdatedAt: time.Date(2021, 1, 1, 0, 0, 0, 0, time.UTC),
+				},
+				{
+					ID:        uuid.MustParse("00000000-0000-0000-0000-000000000002"),
+					Name:      "item two",
+					CreatedAt: time.Date(2021, 1, 1, 0, 0, 0, 0, time.UTC),
+					UpdatedAt: time.Date(2021, 1, 1, 0, 0, 0, 0, time.UTC),
+				},
+				{
+					ID:        uuid.MustParse("00000000-0000-0000-0000-000000000003"),
+					Name:      "item three",
+					CreatedAt: time.Date(2021, 1, 1, 0, 0, 0, 0, time.UTC),
+					UpdatedAt: time.Date(2021, 1, 1, 0, 0, 0, 0, time.UTC),
+				},
+			},
+
+			request: &dao.ItemListRequest{Limit: 2, Offset: 2},
+
+			expect: []*dao.Item{
+				{
+					ID:        uuid.MustParse("00000000-0000-0000-0000-000000000001"),
+					Name:      "item one",
+					CreatedAt: time.Date(2021, 1, 1, 0, 0, 0, 0, time.UTC),
+					UpdatedAt: time.Date(2021, 1, 1, 0, 0, 0, 0, time.UTC),
+				},
+			},
+		},
 	}
 
 	dao := dao.NewItemList()

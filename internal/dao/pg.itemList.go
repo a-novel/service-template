@@ -20,7 +20,9 @@ type ItemListRequest struct {
 	Offset int
 }
 
-// ItemList retrieves a paginated list of items ordered by creation date (newest first).
+// ItemList retrieves a paginated list of items ordered by creation date (newest first), with the id
+// as a tiebreaker so the ordering is total. Offset pagination is only coherent over a total order —
+// see the query for what goes wrong without it.
 type ItemList struct{}
 
 func NewItemList() *ItemList {
