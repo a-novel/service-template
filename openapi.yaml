@@ -179,7 +179,7 @@ components:
                 $ref: "#/components/schemas/healthStatus"
             examples:
               - { "client:postgres": { "status": "up" } }
-              - { "client:postgres": { "status": "down", "err": "Connection to host refused" } }
+              - { "client:postgres": { "status": "down" } }
 
     item:
       description: An item resource.
@@ -214,19 +214,21 @@ components:
   schemas:
     healthStatus:
       type: object
-      description: Connection status of a single server dependency.
+      description: |
+        Status of a single dependency entry, as observed by the server. The shape is
+        intentionally minimal so that an unauthenticated caller cannot infer
+        infrastructure details from a degraded dependency; richer diagnostics are
+        recorded on server-side traces.
       required: [status]
+      additionalProperties: false
       examples:
         - { "status": "up" }
-        - { "status": "down", "err": "Connection to host refused" }
+        - { "status": "down" }
       properties:
         status:
           type: string
           description: Exposes whether the server managed to connect to the dependency.
           enum: [up, down]
-        err:
-          type: string
-          description: The error message returned by the dependency, if any.
 
     item:
       type: object
