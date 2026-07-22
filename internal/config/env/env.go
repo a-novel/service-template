@@ -117,8 +117,8 @@ var (
 	// CorsMaxAge sets the maximum age (in seconds) for CORS preflight cache.
 	CorsMaxAge = config.LoadEnv(corsMaxAge, CorsMaxAgeDefault, config.IntParser)
 
-	// GcloudProjectId names the Google Cloud project the service runs in. When set,
-	// logging and tracing target Google Cloud rather than the local console.
+	// GcloudProjectId names the Google Cloud project the service runs in. Setting
+	// it switches logging and tracing from the local console to Google Cloud.
 	//
 	// See: https://docs.cloud.google.com/resource-manager/docs/creating-managing-projects
 	GcloudProjectId = gcloudProjectId

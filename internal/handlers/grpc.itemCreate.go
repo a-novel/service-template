@@ -15,7 +15,7 @@ import (
 )
 
 // ItemCreateService creates an item from the request and returns the stored
-// record. [ItemCreate] delegates to it; the core layer supplies the implementation.
+// record. The core layer supplies the implementation.
 type ItemCreateService interface {
 	Exec(ctx context.Context, request *core.ItemCreateRequest) (*core.Item, error)
 }
@@ -59,7 +59,7 @@ func (handler *ItemCreate) ItemCreate(
 }
 
 // itemToProto converts a core item into its protobuf form, encoding timestamps
-// as RFC 3339 strings. It is shared by every item handler in this package.
+// as RFC 3339 strings.
 func itemToProto(item *core.Item) *protogen.Item {
 	return &protogen.Item{
 		Id:          item.ID.String(),

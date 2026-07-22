@@ -1,6 +1,6 @@
-# This image exposes our app as a REST server.
+# Exposes the service as a REST server.
 #
-# It requires a patched database instance to run properly.
+# It needs a database instance with the schema migrations already applied.
 FROM docker.io/library/golang:1.26.5-alpine AS builder
 
 ENV CGO_ENABLED=0
@@ -32,10 +32,9 @@ COPY --from=builder /rest /rest
 HEALTHCHECK --interval=1s --timeout=5s --retries=10 --start-period=1s \
   CMD wget -qO /dev/null http://localhost:8080/ping || exit 1
 
-# Make sure the executable uses the default port.
 ENV REST_PORT=8080
 
-# Rest api port.
+# REST port.
 EXPOSE 8080
 
 CMD ["/rest"]

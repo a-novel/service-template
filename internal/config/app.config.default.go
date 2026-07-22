@@ -38,10 +38,9 @@ var LoggerProdHttp = &loggingpresets.LogGcloud{
 	ProjectId: env.GcloudProjectId,
 }
 
-// AppPresetDefault is the configuration the service runs with when none is
-// supplied explicitly. It reads every value from the environment and selects the
-// production or local logging and tracing backends based on whether a Google
-// Cloud project is configured.
+// AppPresetDefault is the configuration the service starts with. It reads every
+// value from the environment, and picks the Google Cloud logging and tracing
+// backends once a project ID is set.
 var AppPresetDefault = App{
 	App: Main{
 		Name: env.AppName,

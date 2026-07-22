@@ -16,8 +16,7 @@ import (
 )
 
 // ItemDeleteService deletes the item identified by the request and returns the
-// removed record. [ItemDelete] delegates to it; the core layer supplies the
-// implementation.
+// removed record. The core layer supplies the implementation.
 type ItemDeleteService interface {
 	Exec(ctx context.Context, request *core.ItemDeleteRequest) (*core.Item, error)
 }

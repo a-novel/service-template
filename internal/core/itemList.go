@@ -28,7 +28,7 @@ const (
 
 // ItemListRequest selects a page of items.
 type ItemListRequest struct {
-	// Limit defaults to ItemListDefaultSize when zero or negative; see Exec.
+	// Limit defaults to ItemListDefaultSize when zero or negative.
 	Limit  int `validate:"max=100"`
 	Offset int `validate:"min=0"`
 }
@@ -46,8 +46,7 @@ func (service *ItemList) Exec(ctx context.Context, request *ItemListRequest) ([]
 	ctx, span := otel.Tracer().Start(ctx, "service.ItemList")
 	defer span.End()
 
-	// Resolve the effective page size without mutating the caller's request:
-	// a zero or negative Limit means "use the default".
+	// Resolved locally so the caller's request stays untouched.
 	limit := request.Limit
 	if limit <= 0 {
 		limit = ItemListDefaultSize

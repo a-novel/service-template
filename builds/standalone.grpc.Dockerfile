@@ -1,9 +1,7 @@
-# This image exposes our app as a gRPC server.
+# Exposes the service as a gRPC server, against a database whose schema may be out of date.
 #
-# It requires a database instance to run properly. The instance may not be patched.
-#
-# This image will make sure all patches are applied before starting the server. It is a larger
-# version of the base gRPC image, suited for local development rather than full scale production.
+# It ships the migrations binary alongside the server and applies pending migrations on start,
+# which makes it larger than the base gRPC image and suited to local development.
 FROM docker.io/library/golang:1.26.5-alpine AS builder
 
 ENV CGO_ENABLED=0
@@ -14,8 +12,8 @@ COPY go.mod go.sum ./
 RUN --mount=type=cache,target=/go/pkg/mod \
     go mod download
 
-# Install grpcurl (healthcheck) before the source COPY so its cached compile
-# survives source-only rebuilds. Pinned for reproducibility.
+# grpcurl backs the healthcheck. Installed before the source COPY so its cached compile
+# survives a source-only rebuild, and pinned for reproducibility.
 RUN --mount=type=cache,target=/go/pkg/mod \
     --mount=type=cache,target=/root/.cache/go-build \
     GOBIN=/usr/local/bin go install github.com/fullstorydev/grpcurl/cmd/grpcurl@v1.9.3
@@ -52,5 +50,5 @@ EXPOSE 8080
 # TLS port.
 EXPOSE 443
 
-# Run patches before starting the server.
+# Apply pending migrations, then start the server.
 CMD ["sh", "-c", "/migrations && /grpc"]

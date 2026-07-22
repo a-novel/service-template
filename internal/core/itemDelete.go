@@ -20,8 +20,8 @@ type ItemDeleteDao interface {
 
 // ItemDeleteRequest identifies the item to remove.
 type ItemDeleteRequest struct {
-	// ID must be a non-zero UUID; uuid.Nil is rejected as an unset identifier,
-	// typically a missing request parameter rather than a real lookup.
+	// ID of the item. uuid.Nil is rejected as an unset identifier, usually a
+	// missing request parameter.
 	ID uuid.UUID `validate:"required"`
 }
 

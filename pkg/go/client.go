@@ -11,9 +11,8 @@ import (
 	"github.com/a-novel/service-template/internal/handlers/protogen"
 )
 
-// Request, response, and entity types are re-exported from the service's
-// generated protobuf definitions so callers can use the client without
-// importing the service's internal packages.
+// Request, response, and entity types are re-exported from the service's generated
+// protobuf definitions, so callers never import the service's internal packages.
 type (
 	StatusRequest  = protogen.StatusRequest
 	StatusResponse = protogen.StatusResponse

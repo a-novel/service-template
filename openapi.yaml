@@ -25,10 +25,9 @@ paths:
       operationId: ping
       summary: Ping the server.
       description: |
-        A simple endpoint to check whether the server is up and running. It always returns the same response.
+        Checks whether the server is up and running. It always returns the same response.
 
-        This does not report on the server dependencies. Use the `/healthcheck` endpoint to diagnose the actual
-        health of the server.
+        Dependency health lives on the `/healthcheck` endpoint.
       tags: [health]
       security: []
       responses:
@@ -44,7 +43,7 @@ paths:
       operationId: healthcheck
       summary: Health diagnosis of the server.
       description: |
-        Performs a complete health diagnosis of the server dependencies, by trying to reach them each.
+        Reaches out to every server dependency and reports whether each one responded.
       tags: [health]
       security: []
       responses:
@@ -215,10 +214,9 @@ components:
     healthStatus:
       type: object
       description: |
-        Status of a single dependency entry, as observed by the server. The shape is
-        intentionally minimal so that an unauthenticated caller cannot infer
-        infrastructure details from a degraded dependency; richer diagnostics are
-        recorded on server-side traces.
+        Status of a single dependency entry, as observed by the server. It carries the
+        state alone, so an unauthenticated caller cannot infer infrastructure details
+        from a degraded dependency; richer diagnostics are recorded on server-side traces.
       required: [status]
       additionalProperties: false
       examples:
