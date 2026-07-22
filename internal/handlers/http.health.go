@@ -20,10 +20,9 @@ const (
 )
 
 // RestHealthStatus is the JSON representation of a single dependency's health.
-// The shape is deliberately minimal: /healthcheck is an unauthenticated public
-// endpoint, so it must not expose raw error messages — those routinely include
-// internal hostnames, ports, or schema names that leak infrastructure topology.
-// The underlying error is recorded on the trace span for operators instead.
+// /healthcheck is unauthenticated, so the body carries the state alone: a raw
+// error message would leak internal hostnames, ports, or schema names. The
+// underlying error goes to the trace span, where operators can read it.
 type RestHealthStatus struct {
 	// Status is either [RestHealthStatusUp] or [RestHealthStatusDown].
 	Status string `json:"status"`
@@ -31,7 +30,7 @@ type RestHealthStatus struct {
 
 // NewRestHealthStatus converts an error into a RestHealthStatus, mapping nil to
 // [RestHealthStatusUp] and any non-nil error to [RestHealthStatusDown]. The error
-// itself is intentionally discarded from the public response; see [RestHealthStatus].
+// itself is dropped from the public response; see [RestHealthStatus].
 func NewRestHealthStatus(err error) *RestHealthStatus {
 	return &RestHealthStatus{
 		Status: lo.Ternary(err == nil, RestHealthStatusUp, RestHealthStatusDown),
@@ -66,8 +65,8 @@ func (handler *RestHealth) reportPostgres(ctx context.Context) error {
 
 	pgdb, ok := pg.(*bun.DB)
 	if !ok {
-		// In transaction mode the pooled handle is a transaction rather than a
-		// *bun.DB and exposes no Ping; treat the dependency as healthy.
+		// In transaction mode the pooled handle is a transaction, which exposes
+		// no Ping; treat the dependency as healthy.
 		return nil
 	}
 

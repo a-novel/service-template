@@ -16,8 +16,7 @@ import (
 )
 
 // ItemUpdateService applies the request's changes to the identified item and
-// returns the updated record. [ItemUpdate] delegates to it; the core layer
-// supplies the implementation.
+// returns the updated record. The core layer supplies the implementation.
 type ItemUpdateService interface {
 	Exec(ctx context.Context, request *core.ItemUpdateRequest) (*core.Item, error)
 }

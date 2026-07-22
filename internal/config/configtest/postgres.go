@@ -11,12 +11,10 @@ import (
 )
 
 // PostgresPreset is the PostgreSQL configuration shared by integration tests,
-// such as the DAO tests. It targets the same database as the production preset;
-// the transactional harness rolls back each test, so tests never observe each
-// other's writes.
+// such as the DAO tests. It targets the production database; the transactional
+// harness rolls back each test, so tests never observe each other's writes.
 //
-// It lives in a regular (non-_test.go) file because Go excludes _test.go files
-// from a package's exported surface, and other packages' tests need to import
-// this preset. Production code never imports configtest; that boundary is a
-// convention enforced in review rather than by the compiler.
+// It lives in a regular (non-_test.go) file so other packages' tests can import
+// it: Go excludes _test.go files from a package's exported surface. Keeping
+// production code out of configtest is a convention enforced in review.
 var PostgresPreset = postgrespresets.NewDefault(pgdriver.WithDSN(env.PostgresDsn))

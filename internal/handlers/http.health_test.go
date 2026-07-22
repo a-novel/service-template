@@ -42,10 +42,9 @@ func TestHealth(t *testing.T) {
 			expectStatus: http.StatusOK,
 		},
 		{
-			// Omitting postgres from the context makes reportPostgres fail, so the
-			// entry reports status=down. The exact-match assertion on expectResponse
-			// below is the regression guard: it fails if any extra field (notably a
-			// re-introduced "err") leaks into the public response shape.
+			// Omitting postgres from the context makes the probe fail, so the entry reports
+			// status=down. The exact match on expectResponse guards the public shape: it
+			// fails if any extra field, such as a re-introduced "err", leaks into it.
 			name: "Success/Degraded",
 
 			request: httptest.NewRequestWithContext(t.Context(), http.MethodPost, "/", nil),

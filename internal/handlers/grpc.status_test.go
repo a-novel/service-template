@@ -35,10 +35,9 @@ func TestStatus(t *testing.T) {
 			},
 		},
 		{
-			// Omitting postgres from the context makes the probe fail, so the entry
-			// reports DEPENDENCY_STATUS_DOWN. Comparing the whole response is the
-			// regression guard: it fails if a raw error string is ever attached back
-			// onto DependencyHealth.
+			// Omitting postgres from the context makes the probe fail, so the entry reports
+			// DEPENDENCY_STATUS_DOWN. Comparing the whole response guards the message shape:
+			// it fails if a raw error string is ever attached back onto DependencyHealth.
 			name: "Success/Degraded",
 
 			skipPostgres: true,

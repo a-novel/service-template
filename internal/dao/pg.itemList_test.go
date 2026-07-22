@@ -156,10 +156,9 @@ func TestItemList(t *testing.T) {
 				},
 			},
 		},
-		// The two cases below share a single created_at across every fixture, so created_at alone
-		// cannot order them and only the id tiebreaker makes the result deterministic. The fixtures
-		// are inserted in ascending id order while the expectation is descending, so without the
-		// tiebreaker the query returns them in heap (insertion) order and both cases fail.
+		// The two cases below give every fixture the same created_at, so only the id tiebreaker
+		// makes the result deterministic. Fixtures go in by ascending id and come out descending,
+		// so an untied query returns them in insertion order and both cases fail.
 		{
 			name: "Success/SameTimestamp",
 
@@ -202,8 +201,8 @@ func TestItemList(t *testing.T) {
 			},
 		},
 		{
-			// The second page of the same tied set: it must continue where the first left off rather
-			// than re-serving a row, which is the concrete damage an unstable sort causes.
+			// The second page of the same tied set must continue where the first left off; an
+			// unstable sort re-serves a row here.
 			name: "Success/SameTimestampSecondPage",
 
 			fixtures: []*dao.Item{

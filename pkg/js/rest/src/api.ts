@@ -2,8 +2,7 @@ import { decodeHttpResponse, handleHttpResponse } from "@a-novel-kit/nodelib-bro
 
 import type { ZodType } from "zod";
 
-// Fallback decoder used when no schema is supplied: parses the JSON body as-is,
-// trusting it to match T.
+// Parses the JSON body as-is, trusting it to match T. Used when no schema is supplied.
 async function decodeRawHttpResponse<T>(response: Response): Promise<T> {
   return await response.json();
 }

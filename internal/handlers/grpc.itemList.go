@@ -14,7 +14,7 @@ import (
 )
 
 // ItemListService returns a page of items bounded by the request's limit and
-// offset. [ItemList] delegates to it; the core layer supplies the implementation.
+// offset. The core layer supplies the implementation.
 type ItemListService interface {
 	Exec(ctx context.Context, request *core.ItemListRequest) ([]*core.Item, error)
 }

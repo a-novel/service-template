@@ -15,10 +15,9 @@ import (
 // NewGrpcHealthStatus converts an error into a DependencyHealth proto message,
 // mapping nil to DEPENDENCY_STATUS_UP and any non-nil error to DEPENDENCY_STATUS_DOWN.
 //
-// The error itself is intentionally discarded from the returned message; raw dependency
-// errors routinely embed internal hostnames, ports, or schema names that would leak
-// infrastructure topology. Operators get the underlying error from the trace span the
-// failing health probe records on its way out.
+// The error itself is dropped from the message: a raw dependency error routinely embeds
+// internal hostnames, ports, or schema names. The health probe records it on its trace
+// span, where operators can read it.
 func NewGrpcHealthStatus(err error) *protogen.DependencyHealth {
 	return &protogen.DependencyHealth{
 		Status: lo.Ternary(
@@ -60,8 +59,8 @@ func (handler *GrpcStatus) reportPostgres(ctx context.Context) error {
 
 	pgdb, ok := pg.(*bun.DB)
 	if !ok {
-		// In transaction mode the context carries a transaction, not a *bun.DB,
-		// so there is no pooled connection to ping. Report healthy rather than fail.
+		// In transaction mode the context carries a transaction, so there is no
+		// pooled connection to ping; treat the dependency as healthy.
 		return nil
 	}
 
