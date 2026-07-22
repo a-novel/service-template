@@ -20,6 +20,8 @@ func TestStatus(t *testing.T) {
 	testCases := []struct {
 		name string
 
+		skipPostgres bool
+
 		expect       *protogen.StatusResponse
 		expectStatus codes.Code
 	}{
@@ -32,6 +34,21 @@ func TestStatus(t *testing.T) {
 				},
 			},
 		},
+		{
+			// Omitting postgres from the context makes the probe fail, so the entry
+			// reports DEPENDENCY_STATUS_DOWN. Comparing the whole response is the
+			// regression guard: it fails if a raw error string is ever attached back
+			// onto DependencyHealth.
+			name: "Success/Degraded",
+
+			skipPostgres: true,
+
+			expect: &protogen.StatusResponse{
+				Postgres: &protogen.DependencyHealth{
+					Status: protogen.DependencyStatus_DEPENDENCY_STATUS_DOWN,
+				},
+			},
+		},
 	}
 
 	for _, testCase := range testCases {
@@ -40,8 +57,14 @@ func TestStatus(t *testing.T) {
 
 			handler := handlers.NewGrpcStatus()
 
-			ctx, err := postgres.NewContext(t.Context(), configtest.PostgresPreset)
-			require.NoError(t, err)
+			ctx := t.Context()
+
+			if !testCase.skipPostgres {
+				var err error
+
+				ctx, err = postgres.NewContext(ctx, configtest.PostgresPreset)
+				require.NoError(t, err)
+			}
 
 			res, err := handler.Status(ctx, new(protogen.StatusRequest))
 			resSt, ok := status.FromError(err)

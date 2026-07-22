@@ -24,6 +24,8 @@ func TestHealth(t *testing.T) {
 
 		request *http.Request
 
+		skipPostgres bool
+
 		expectStatus   int
 		expectResponse any
 	}{
@@ -39,6 +41,24 @@ func TestHealth(t *testing.T) {
 			},
 			expectStatus: http.StatusOK,
 		},
+		{
+			// Omitting postgres from the context makes reportPostgres fail, so the
+			// entry reports status=down. The exact-match assertion on expectResponse
+			// below is the regression guard: it fails if any extra field (notably a
+			// re-introduced "err") leaks into the public response shape.
+			name: "Success/Degraded",
+
+			request: httptest.NewRequestWithContext(t.Context(), http.MethodPost, "/", nil),
+
+			skipPostgres: true,
+
+			expectResponse: map[string]any{
+				"client:postgres": map[string]any{
+					"status": handlers.RestHealthStatusDown,
+				},
+			},
+			expectStatus: http.StatusOK,
+		},
 	}
 
 	for _, testCase := range testCases {
@@ -49,8 +69,12 @@ func TestHealth(t *testing.T) {
 			w := httptest.NewRecorder()
 
 			rCtx := testCase.request.Context()
-			rCtx, err := postgres.NewContext(rCtx, configtest.PostgresPreset)
-			require.NoError(t, err)
+			if !testCase.skipPostgres {
+				var err error
+
+				rCtx, err = postgres.NewContext(rCtx, configtest.PostgresPreset)
+				require.NoError(t, err)
+			}
 
 			handler.ServeHTTP(w, testCase.request.WithContext(rCtx))
 
