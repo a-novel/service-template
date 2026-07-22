@@ -15,11 +15,19 @@ enum DependencyStatus {
   DEPENDENCY_STATUS_DOWN = 2;
 }
 
-// DependencyHealth is the outcome of checking a single dependency.
+// DependencyHealth reports the health of a single external dependency.
+//
+// The shape is deliberately minimal. This gRPC surface is internal today, but errors from a
+// dependency health check routinely embed internal hostnames, ports, or schema names, and
+// carrying them in the response would leak infrastructure topology if it ever became
+// externally reachable. The underlying error is recorded on the trace span for operators.
 message DependencyHealth {
+  // Number 2 and name "err" are reserved so a future field cannot re-introduce a raw error
+  // string, which would re-open the topology leak this message is shaped to avoid.
+  reserved 2;
+  reserved "err";
+
   DependencyStatus status = 1;
-  // Error returned by the health check, empty when the dependency is healthy.
-  string err = 2;
 }
 
 // StatusRequest takes no parameters.
