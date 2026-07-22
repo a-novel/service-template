@@ -20,9 +20,9 @@ const (
 )
 
 // RestHealthStatus is the JSON representation of a single dependency's health.
-// /healthcheck is unauthenticated, so the body carries the state alone: a raw
-// error message would leak internal hostnames, ports, or schema names. The
-// underlying error goes to the trace span, where operators can read it.
+// /healthcheck is unauthenticated, so the body carries the state alone. A raw error
+// message carries internal hostnames, ports, or schema names. The underlying error
+// goes to the trace span, where operators can read it.
 type RestHealthStatus struct {
 	// Status is either [RestHealthStatusUp] or [RestHealthStatusDown].
 	Status string `json:"status"`
