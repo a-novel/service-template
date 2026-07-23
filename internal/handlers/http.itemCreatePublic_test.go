@@ -141,3 +141,39 @@ func TestRestItemCreatePublic(t *testing.T) {
 		})
 	}
 }
+
+// The 201 response must carry Content-Type: application/json, which openapi.yaml declares.
+// It goes through a real server on purpose: httptest.ResponseRecorder's Header() stays live
+// after WriteHeader, so a header the client never receives still reads back as set — which is
+// exactly why the old WriteHeader-then-SendJSON ordering shipped a text/plain 201 unnoticed.
+func TestRestItemCreatePublicSetsJSONContentType(t *testing.T) {
+	t.Parallel()
+
+	service := handlersmocks.NewMockItemCreatePublicService(t)
+	service.EXPECT().
+		Exec(mock.Anything, &core.ItemCreateRequest{Name: "n", Description: "d"}).
+		Return(&core.Item{
+			ID:          uuid.MustParse("00000000-0000-0000-0000-000000000001"),
+			Name:        "n",
+			Description: "d",
+			CreatedAt:   time.Date(2021, 1, 1, 0, 0, 0, 0, time.UTC),
+			UpdatedAt:   time.Date(2021, 1, 1, 0, 0, 0, 0, time.UTC),
+		}, nil)
+
+	server := httptest.NewServer(handlers.NewItemCreatePublic(service, config.LoggerDevHttp))
+	t.Cleanup(server.Close)
+
+	req, err := http.NewRequestWithContext(
+		t.Context(), http.MethodPost, server.URL, strings.NewReader(`{"name":"n","description":"d"}`),
+	)
+	require.NoError(t, err)
+
+	res, err := server.Client().Do(req)
+	require.NoError(t, err)
+
+	t.Cleanup(func() { _ = res.Body.Close() })
+
+	require.Equal(t, http.StatusCreated, res.StatusCode)
+	require.Equal(t, "application/json", res.Header.Get("Content-Type"),
+		"a 201 that declares application/json must actually send it")
+}
