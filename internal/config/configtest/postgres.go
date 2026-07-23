@@ -11,8 +11,11 @@ import (
 )
 
 // PostgresPreset is the PostgreSQL configuration shared by integration tests,
-// such as the DAO tests. It targets the production database; the transactional
-// harness rolls back each test, so tests never observe each other's writes.
+// such as the DAO tests. Those run under postgres.RunDBTest: the migration set is
+// applied once into a template database, and each test gets its own clone of it,
+// dropped afterward — so tests never observe each other's writes. No transaction
+// is opened, and postgres.InTx reports false, which is what a data-access object
+// gating an outbound call needs.
 //
 // It lives in a regular (non-_test.go) file so other packages' tests can import
 // it: Go excludes _test.go files from a package's exported surface. Keeping
