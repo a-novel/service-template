@@ -12,7 +12,6 @@ A scaffold for new A-Novel backend services: fork it, rename the Go module, and 
 ![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/a-novel/service-template)
 
 ![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/a-novel/service-template/main.yaml)
-[![Go Report Card](https://goreportcard.com/badge/github.com/a-novel/service-template)](https://goreportcard.com/report/github.com/a-novel/service-template)
 [![codecov](https://codecov.io/gh/a-novel/service-template/graph/badge.svg)](https://codecov.io/gh/a-novel/service-template)
 
 ![Coverage graph](https://codecov.io/gh/a-novel/service-template/graphs/sunburst.svg)
