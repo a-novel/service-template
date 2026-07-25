@@ -33,9 +33,11 @@ jobs:
           base: ${{ github.event.pull_request.base.sha }}
 
   generated-go:
+    needs: [build-database]
     runs-on: ubuntu-latest
     permissions:
       contents: read
+      packages: read
     env:
       POSTGRES_DSN: postgres://postgres:postgres@localhost:5432/postgres?sslmode=disable
     steps:
@@ -46,7 +48,8 @@ jobs:
         uses: ./.github/actions/start-ci-services
         with:
           services: postgres
-          build_services: postgres
+          database_image: ghcr.io/a-novel/service-template/database@${{ needs.build-database.outputs.digest }}
+          registry_login: "true"
       - uses: a-novel-kit/workflows/go-actions/generate-go@v1.28.0
 
   lint-go:
@@ -140,9 +143,11 @@ jobs:
           version: "1.28.0"
 
   test-go:
+    needs: [build-database]
     runs-on: ubuntu-latest
     permissions:
       contents: read
+      packages: read
     outputs:
       artifact-id: ${{ steps.test.outputs.artifact-id }}
     env:
@@ -164,7 +169,7 @@ jobs:
           modfile: gotestsum.mod
 
   test-pkg:
-    needs: [build-standalone-grpc]
+    needs: [build-database, build-standalone-grpc]
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -180,7 +185,7 @@ jobs:
       - uses: ./.github/actions/start-ci-services
         with:
           services: standalone-grpc
-          build_services: postgres
+          database_image: ghcr.io/a-novel/service-template/database@${{ needs.build-database.outputs.digest }}
           standalone_grpc_image: ghcr.io/a-novel/service-template/standalone-grpc@${{ needs.build-standalone-grpc.outputs.digest }}
           registry_login: "true"
       - uses: a-novel-kit/workflows/go-actions/test-go@v1.28.0
@@ -194,7 +199,7 @@ jobs:
           modfile: gotestsum.mod
 
   test-pkg-js:
-    needs: [build-standalone-rest]
+    needs: [build-database, build-standalone-rest]
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -210,7 +215,7 @@ jobs:
       - uses: ./.github/actions/start-ci-services
         with:
           services: standalone-rest
-          build_services: postgres
+          database_image: ghcr.io/a-novel/service-template/database@${{ needs.build-database.outputs.digest }}
           standalone_rest_image: ghcr.io/a-novel/service-template/standalone-rest@${{ needs.build-standalone-rest.outputs.digest }}
           registry_login: "true"
       - uses: a-novel-kit/workflows/node-actions/test-node@v1.28.0
@@ -229,8 +234,11 @@ jobs:
       packages: write
       attestations: write
       id-token: write
+    outputs:
+      digest: ${{ steps.build.outputs.digest }}
     steps:
       - uses: a-novel-kit/workflows/build-actions/docker@v1.28.0
+        id: build
         with:
           file: builds/database.Dockerfile
           image_name: ${{ github.repository }}/database
@@ -239,6 +247,7 @@ jobs:
           run_args: -e POSTGRES_PASSWORD=postgres
 
   build-migrations:
+    needs: [build-database]
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -260,6 +269,7 @@ jobs:
           run_args: -e POSTGRES_DSN="${POSTGRES_DSN}"
 
   build-grpc:
+    needs: [build-database]
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -303,6 +313,7 @@ jobs:
           skip_healthcheck: true
 
   build-rest:
+    needs: [build-database]
     runs-on: ubuntu-latest
     permissions:
       contents: read

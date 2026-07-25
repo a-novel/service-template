@@ -1,14 +1,10 @@
 name: start-ci-services
-description: Build selected CI Compose services, then start and wait for the requested topology.
+description: Start and wait for the requested CI Compose topology.
 
 inputs:
   services:
     required: true
     description: Space-separated Compose services to start.
-  build_services:
-    required: false
-    default: ""
-    description: Space-separated Compose services to build before startup.
   database_image:
     required: false
     default: service-template-database:ci
@@ -38,21 +34,6 @@ runs:
       run: |
         set -euo pipefail
         printf '%s' "${GH_TOKEN}" | docker login ghcr.io --username "${REGISTRY_USERNAME}" --password-stdin
-
-    - name: Build CI services
-      if: inputs.build_services != ''
-      shell: bash
-      env:
-        BUILD_SERVICES: ${{ inputs.build_services }}
-        COMPOSE_PROJECT_NAME: ci-${{ github.job }}-${{ github.run_id }}-${{ github.run_attempt }}
-        DATABASE_IMAGE: ${{ inputs.database_image }}
-        POSTGRES_PASSWORD: postgres
-        STANDALONE_GRPC_IMAGE: ${{ inputs.standalone_grpc_image }}
-        STANDALONE_REST_IMAGE: ${{ inputs.standalone_rest_image }}
-      run: |
-        set -euo pipefail
-        read -r -a build_services <<< "${BUILD_SERVICES}"
-        docker compose --file builds/compose.ci.yaml build "${build_services[@]}"
 
     - name: Start CI services
       shell: bash
