@@ -5,6 +5,12 @@ FROM docker.io/library/postgres:18.4
 
 ARG DEBIAN_FRONTEND=noninteractive
 
+# Stable CI and local-development defaults. A password remains mandatory at runtime.
+ENV POSTGRES_USER=postgres \
+    POSTGRES_DB=postgres \
+    POSTGRES_HOST_AUTH_METHOD=scram-sha-256 \
+    POSTGRES_INITDB_ARGS=--auth=scram-sha-256
+
 # ======================================================================================================================
 # Prepare extension scripts.
 # ======================================================================================================================
