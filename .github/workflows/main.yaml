@@ -230,7 +230,7 @@ jobs:
       attestations: write
       id-token: write
     steps:
-      - uses: a-novel-kit/workflows/build-actions/docker@v1.27.1
+      - uses: a-novel-kit/workflows/build-actions/docker@v1.28.0
         with:
           file: builds/database.Dockerfile
           image_name: ${{ github.repository }}/database
