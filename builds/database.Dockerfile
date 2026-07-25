@@ -5,6 +5,9 @@ FROM docker.io/library/postgres:18.4
 
 ARG DEBIAN_FRONTEND=noninteractive
 
+# Require password authentication for both local and host connections.
+ENV POSTGRES_INITDB_ARGS=--auth=scram-sha-256
+
 # ======================================================================================================================
 # Prepare extension scripts.
 # ======================================================================================================================
