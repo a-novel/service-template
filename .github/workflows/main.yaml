@@ -222,6 +222,22 @@ jobs:
           coverage_artifact: jscover
           test_action: "test:ci"
 
+  build-database:
+    runs-on: ubuntu-latest
+    permissions:
+      contents: read
+      packages: write
+      attestations: write
+      id-token: write
+    steps:
+      - uses: a-novel-kit/workflows/build-actions/docker@v1.27.1
+        with:
+          file: builds/database.Dockerfile
+          image_name: ${{ github.repository }}/database
+          cache: false
+          github_token: ${{ secrets.GITHUB_TOKEN }}
+          run_args: -e POSTGRES_PASSWORD=postgres
+
   build-migrations:
     runs-on: ubuntu-latest
     permissions:
