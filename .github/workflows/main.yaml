@@ -79,6 +79,8 @@ jobs:
         with:
           persist-credentials: false
       - uses: bufbuild/buf-action@v1
+        with:
+          pr_comment: false
 
   lint-js:
     runs-on: ubuntu-latest
