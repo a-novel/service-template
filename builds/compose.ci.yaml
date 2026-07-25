@@ -1,9 +1,6 @@
 services:
   postgres:
     image: "${DATABASE_IMAGE:-service-template-database:ci}"
-    build:
-      context: ..
-      dockerfile: ./builds/database.Dockerfile
     ports:
       - "5432:5432"
     environment:
@@ -12,9 +9,6 @@ services:
   standalone-grpc:
     profiles: ["grpc"]
     image: "${STANDALONE_GRPC_IMAGE:-service-template-standalone-grpc:ci}"
-    build:
-      context: ..
-      dockerfile: ./builds/standalone.grpc.Dockerfile
     ports:
       - "8080:8080"
     depends_on:
@@ -26,9 +20,6 @@ services:
   standalone-rest:
     profiles: ["rest"]
     image: "${STANDALONE_REST_IMAGE:-service-template-standalone-rest:ci}"
-    build:
-      context: ..
-      dockerfile: ./builds/standalone.rest.Dockerfile
     ports:
       - "8080:8080"
     depends_on:
