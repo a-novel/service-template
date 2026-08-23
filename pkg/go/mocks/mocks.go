@@ -146,8 +146,8 @@ func (_c *MockClient_ItemCreate_Call) Run(run func(ctx context.Context, req *ser
 	return _c
 }
 
-func (_c *MockClient_ItemCreate_Call) Return(v *servicetemplate.ItemCreateResponse, err error) *MockClient_ItemCreate_Call {
-	_c.Call.Return(v, err)
+func (_c *MockClient_ItemCreate_Call) Return(itemCreateResponse *servicetemplate.ItemCreateResponse, err error) *MockClient_ItemCreate_Call {
+	_c.Call.Return(itemCreateResponse, err)
 	return _c
 }
 
@@ -229,8 +229,8 @@ func (_c *MockClient_ItemDelete_Call) Run(run func(ctx context.Context, req *ser
 	return _c
 }
 
-func (_c *MockClient_ItemDelete_Call) Return(v *servicetemplate.ItemDeleteResponse, err error) *MockClient_ItemDelete_Call {
-	_c.Call.Return(v, err)
+func (_c *MockClient_ItemDelete_Call) Return(itemDeleteResponse *servicetemplate.ItemDeleteResponse, err error) *MockClient_ItemDelete_Call {
+	_c.Call.Return(itemDeleteResponse, err)
 	return _c
 }
 
@@ -312,8 +312,8 @@ func (_c *MockClient_ItemGet_Call) Run(run func(ctx context.Context, req *servic
 	return _c
 }
 
-func (_c *MockClient_ItemGet_Call) Return(v *servicetemplate.ItemGetResponse, err error) *MockClient_ItemGet_Call {
-	_c.Call.Return(v, err)
+func (_c *MockClient_ItemGet_Call) Return(itemGetResponse *servicetemplate.ItemGetResponse, err error) *MockClient_ItemGet_Call {
+	_c.Call.Return(itemGetResponse, err)
 	return _c
 }
 
@@ -395,8 +395,8 @@ func (_c *MockClient_ItemList_Call) Run(run func(ctx context.Context, req *servi
 	return _c
 }
 
-func (_c *MockClient_ItemList_Call) Return(v *servicetemplate.ItemListResponse, err error) *MockClient_ItemList_Call {
-	_c.Call.Return(v, err)
+func (_c *MockClient_ItemList_Call) Return(itemListResponse *servicetemplate.ItemListResponse, err error) *MockClient_ItemList_Call {
+	_c.Call.Return(itemListResponse, err)
 	return _c
 }
 
@@ -478,8 +478,8 @@ func (_c *MockClient_ItemUpdate_Call) Run(run func(ctx context.Context, req *ser
 	return _c
 }
 
-func (_c *MockClient_ItemUpdate_Call) Return(v *servicetemplate.ItemUpdateResponse, err error) *MockClient_ItemUpdate_Call {
-	_c.Call.Return(v, err)
+func (_c *MockClient_ItemUpdate_Call) Return(itemUpdateResponse *servicetemplate.ItemUpdateResponse, err error) *MockClient_ItemUpdate_Call {
+	_c.Call.Return(itemUpdateResponse, err)
 	return _c
 }
 
@@ -561,8 +561,8 @@ func (_c *MockClient_Status_Call) Run(run func(ctx context.Context, req *service
 	return _c
 }
 
-func (_c *MockClient_Status_Call) Return(v *servicetemplate.StatusResponse, err error) *MockClient_Status_Call {
-	_c.Call.Return(v, err)
+func (_c *MockClient_Status_Call) Return(statusResponse *servicetemplate.StatusResponse, err error) *MockClient_Status_Call {
+	_c.Call.Return(statusResponse, err)
 	return _c
 }
 
