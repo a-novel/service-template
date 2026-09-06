@@ -66,6 +66,16 @@ func TestItemGet(t *testing.T) {
 			expectErr: core.ErrInvalidRequest,
 		},
 		{
+			name: "Error/NotFound",
+
+			request: &core.ItemGetRequest{
+				ID: uuid.MustParse("00000000-0000-0000-0000-000000000001"),
+			},
+
+			daoMock:   &daoMock{err: dao.ErrItemGetNotFound},
+			expectErr: core.ErrItemGetNotFound,
+		},
+		{
 			name: "Error/Dao",
 
 			request: &core.ItemGetRequest{

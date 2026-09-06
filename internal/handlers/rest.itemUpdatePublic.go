@@ -12,7 +12,6 @@ import (
 	"github.com/a-novel-kit/golib/otel"
 
 	"github.com/a-novel/service-template/internal/core"
-	"github.com/a-novel/service-template/internal/dao"
 )
 
 // ItemUpdatePublicService is the core operation the update endpoint delegates to.
@@ -60,8 +59,8 @@ func (handler *ItemUpdatePublic) ServeHTTP(w http.ResponseWriter, r *http.Reques
 	})
 	if err != nil {
 		httpf.HandleError(ctx, handler.logger, w, span, httpf.ErrMap{
-			dao.ErrItemUpdateNotFound: http.StatusNotFound,
-			core.ErrInvalidRequest:    http.StatusBadRequest,
+			core.ErrItemUpdateNotFound: http.StatusNotFound,
+			core.ErrInvalidRequest:     http.StatusBadRequest,
 		}, err)
 
 		return

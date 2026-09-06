@@ -15,7 +15,6 @@ import (
 
 	"github.com/a-novel/service-template/internal/config"
 	"github.com/a-novel/service-template/internal/core"
-	"github.com/a-novel/service-template/internal/dao"
 	"github.com/a-novel/service-template/internal/handlers"
 	handlersmocks "github.com/a-novel/service-template/internal/handlers/mocks"
 )
@@ -99,7 +98,7 @@ func TestRestItemGetPublic(t *testing.T) {
 				req: &core.ItemGetRequest{
 					ID: uuid.MustParse("00000000-0000-0000-0000-000000000001"),
 				},
-				err: dao.ErrItemGetNotFound,
+				err: core.ErrItemGetNotFound,
 			},
 
 			expectStatus: http.StatusNotFound,

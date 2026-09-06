@@ -11,7 +11,6 @@ import (
 	"github.com/a-novel-kit/golib/otel"
 
 	"github.com/a-novel/service-template/internal/core"
-	"github.com/a-novel/service-template/internal/dao"
 )
 
 // ItemGetPublicService is the core operation the get endpoint delegates to.
@@ -50,8 +49,8 @@ func (handler *ItemGetPublic) ServeHTTP(w http.ResponseWriter, r *http.Request) 
 	item, err := handler.service.Exec(ctx, &core.ItemGetRequest{ID: request.ID})
 	if err != nil {
 		httpf.HandleError(ctx, handler.logger, w, span, httpf.ErrMap{
-			dao.ErrItemGetNotFound: http.StatusNotFound,
-			core.ErrInvalidRequest: http.StatusBadRequest,
+			core.ErrItemGetNotFound: http.StatusNotFound,
+			core.ErrInvalidRequest:  http.StatusBadRequest,
 		}, err)
 
 		return

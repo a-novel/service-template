@@ -66,6 +66,16 @@ func TestItemDelete(t *testing.T) {
 			expectErr: core.ErrInvalidRequest,
 		},
 		{
+			name: "Error/NotFound",
+
+			request: &core.ItemDeleteRequest{
+				ID: uuid.MustParse("00000000-0000-0000-0000-000000000001"),
+			},
+
+			daoMock:   &daoMock{err: dao.ErrItemDeleteNotFound},
+			expectErr: core.ErrItemDeleteNotFound,
+		},
+		{
 			name: "Error/Dao",
 
 			request: &core.ItemDeleteRequest{

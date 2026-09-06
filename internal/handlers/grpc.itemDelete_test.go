@@ -12,7 +12,6 @@ import (
 	"google.golang.org/grpc/status"
 
 	"github.com/a-novel/service-template/internal/core"
-	"github.com/a-novel/service-template/internal/dao"
 	"github.com/a-novel/service-template/internal/handlers"
 	handlersmocks "github.com/a-novel/service-template/internal/handlers/mocks"
 	"github.com/a-novel/service-template/internal/handlers/protogen"
@@ -83,7 +82,7 @@ func TestGrpcItemDelete(t *testing.T) {
 			},
 
 			serviceMock: &serviceMock{
-				err: dao.ErrItemDeleteNotFound,
+				err: core.ErrItemDeleteNotFound,
 			},
 
 			expectStatus: codes.NotFound,
