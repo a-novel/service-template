@@ -4,7 +4,6 @@ import (
 	"context"
 
 	"github.com/samber/lo"
-	"github.com/uptrace/bun"
 
 	"github.com/a-novel-kit/golib/otel"
 	"github.com/a-novel-kit/golib/postgres"
@@ -52,19 +51,7 @@ func (handler *GrpcStatus) reportPostgres(ctx context.Context) error {
 	ctx, span := otel.Tracer().Start(ctx, "grpc.Status(reportPostgres)")
 	defer span.End()
 
-	pg, err := postgres.GetContext(ctx)
-	if err != nil {
-		return otel.ReportError(span, err)
-	}
-
-	pgdb, ok := pg.(*bun.DB)
-	if !ok {
-		// In transaction mode the context carries a transaction, so there is no
-		// pooled connection to ping; treat the dependency as healthy.
-		return nil
-	}
-
-	err = pgdb.Ping()
+	err := postgres.Health(ctx)
 	if err != nil {
 		return otel.ReportError(span, err)
 	}
