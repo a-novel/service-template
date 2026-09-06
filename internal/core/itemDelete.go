@@ -35,7 +35,7 @@ func NewItemDelete(dao ItemDeleteDao) *ItemDelete {
 }
 
 func (service *ItemDelete) Exec(ctx context.Context, request *ItemDeleteRequest) (*Item, error) {
-	ctx, span := otel.Tracer().Start(ctx, "service.ItemDelete")
+	ctx, span := otel.Tracer().Start(ctx, "core.ItemDelete")
 	defer span.End()
 
 	span.SetAttributes(attribute.String("item.id", request.ID.String()))
@@ -50,11 +50,5 @@ func (service *ItemDelete) Exec(ctx context.Context, request *ItemDeleteRequest)
 		return nil, otel.ReportError(span, fmt.Errorf("delete item: %w", err))
 	}
 
-	return otel.ReportSuccess(span, &Item{
-		ID:          entity.ID,
-		Name:        entity.Name,
-		Description: entity.Description,
-		CreatedAt:   entity.CreatedAt,
-		UpdatedAt:   entity.UpdatedAt,
-	}), nil
+	return otel.ReportSuccess(span, newItem(entity)), nil
 }

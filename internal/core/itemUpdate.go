@@ -36,7 +36,7 @@ func NewItemUpdate(dao ItemUpdateDao) *ItemUpdate {
 }
 
 func (service *ItemUpdate) Exec(ctx context.Context, request *ItemUpdateRequest) (*Item, error) {
-	ctx, span := otel.Tracer().Start(ctx, "service.ItemUpdate")
+	ctx, span := otel.Tracer().Start(ctx, "core.ItemUpdate")
 	defer span.End()
 
 	span.SetAttributes(
@@ -59,11 +59,5 @@ func (service *ItemUpdate) Exec(ctx context.Context, request *ItemUpdateRequest)
 		return nil, otel.ReportError(span, fmt.Errorf("update item: %w", err))
 	}
 
-	return otel.ReportSuccess(span, &Item{
-		ID:          entity.ID,
-		Name:        entity.Name,
-		Description: entity.Description,
-		CreatedAt:   entity.CreatedAt,
-		UpdatedAt:   entity.UpdatedAt,
-	}), nil
+	return otel.ReportSuccess(span, newItem(entity)), nil
 }
