@@ -46,8 +46,9 @@ var AppPresetDefault = App{
 		Name: env.AppName,
 	},
 	Grpc: Grpc{
-		Port: env.GrpcPort,
-		Ping: env.GrpcPing,
+		Port:     env.GrpcPort,
+		Ping:     env.GrpcPing,
+		Shutdown: env.GrpcTimeoutShutdown,
 	},
 	Rest: Rest{
 		Port: env.RestPort,
@@ -57,6 +58,7 @@ var AppPresetDefault = App{
 			Write:      env.RestTimeoutWrite,
 			Idle:       env.RestTimeoutIdle,
 			Request:    env.RestTimeoutRequest,
+			Shutdown:   env.RestTimeoutShutdown,
 		},
 		MaxRequestSize: env.RestMaxRequestSize,
 		Cors: RestCors{

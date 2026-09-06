@@ -3,7 +3,7 @@ module github.com/a-novel/service-template
 go 1.27.1
 
 require (
-	github.com/a-novel-kit/golib v0.32.0
+	github.com/a-novel-kit/golib v0.32.1-0.20260906015559-d3901e997601
 	github.com/go-chi/chi/v5 v5.3.2
 	github.com/go-chi/cors v1.2.2
 	github.com/go-playground/validator/v10 v10.30.4
