@@ -22,8 +22,9 @@ func getEnv(name string) string {
 const (
 	AppNameDefault = "service-template"
 
-	GrpcPortDefault = 8080
-	GrpcDefaultPing = time.Second * 5
+	GrpcPortDefault            = 8080
+	GrpcDefaultPing            = time.Second * 5
+	GrpcTimeoutShutdownDefault = 30 * time.Second
 
 	RestPortDefault              = 8080
 	RestTimeoutReadDefault       = 15 * time.Second
@@ -31,6 +32,7 @@ const (
 	RestTimeoutWriteDefault      = 30 * time.Second
 	RestTimeoutIdleDefault       = 60 * time.Second
 	RestTimeoutRequestDefault    = 60 * time.Second
+	RestTimeoutShutdownDefault   = 30 * time.Second
 	RestMaxRequestSizeDefault    = 2 << 20 // 2 MiB
 	CorsAllowCredentialsDefault  = false
 	CorsMaxAgeDefault            = 3600
@@ -61,9 +63,10 @@ var (
 	appName = getEnv("APP_NAME")
 	otel    = getEnv("OTEL")
 
-	grpcPort = getEnv("GRPC_PORT")
-	grpcUrl  = getEnv("GRPC_URL")
-	grpcPing = getEnv("GRPC_PING")
+	grpcPort            = getEnv("GRPC_PORT")
+	grpcUrl             = getEnv("GRPC_URL")
+	grpcPing            = getEnv("GRPC_PING")
+	grpcTimeoutShutdown = getEnv("GRPC_TIMEOUT_SHUTDOWN")
 
 	restPort              = getEnv("REST_PORT")
 	restTimeoutRead       = getEnv("REST_TIMEOUT_READ")
@@ -72,6 +75,7 @@ var (
 	restTimeoutIdle       = getEnv("REST_TIMEOUT_IDLE")
 	restTimeoutRequest    = getEnv("REST_TIMEOUT_REQUEST")
 	restMaxRequestSize    = getEnv("REST_MAX_REQUEST_SIZE")
+	restTimeoutShutdown   = getEnv("REST_TIMEOUT_SHUTDOWN")
 
 	corsAllowedOrigins   = getEnv("REST_CORS_ALLOWED_ORIGINS")
 	corsAllowedHeaders   = getEnv("REST_CORS_ALLOWED_HEADERS")
@@ -105,6 +109,10 @@ var (
 	GrpcUrl = grpcUrl
 	// GrpcPing is the refresh interval for the gRPC server's internal health check.
 	GrpcPing = config.LoadEnv(grpcPing, GrpcDefaultPing, config.DurationParser)
+	// GrpcTimeoutShutdown bounds graceful RPC drain before remaining calls are stopped.
+	GrpcTimeoutShutdown = config.LoadEnv(
+		grpcTimeoutShutdown, GrpcTimeoutShutdownDefault, config.DurationParser,
+	)
 
 	// RestPort is the port on which the REST server listens for incoming requests.
 	RestPort = config.LoadEnv(restPort, RestPortDefault, config.IntParser)
@@ -118,6 +126,10 @@ var (
 	RestTimeoutIdle = config.LoadEnv(restTimeoutIdle, RestTimeoutIdleDefault, config.DurationParser)
 	// RestTimeoutRequest is the maximum duration for processing an incoming REST request.
 	RestTimeoutRequest = config.LoadEnv(restTimeoutRequest, RestTimeoutRequestDefault, config.DurationParser)
+	// RestTimeoutShutdown bounds graceful request drain before remaining connections are closed.
+	RestTimeoutShutdown = config.LoadEnv(
+		restTimeoutShutdown, RestTimeoutShutdownDefault, config.DurationParser,
+	)
 	// RestMaxRequestSize is the maximum size of an incoming REST request body.
 	RestMaxRequestSize = config.LoadEnv(restMaxRequestSize, RestMaxRequestSizeDefault, config.Int64Parser)
 
