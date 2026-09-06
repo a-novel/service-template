@@ -43,7 +43,7 @@ func NewItemList(dao ItemListDao) *ItemList {
 }
 
 func (service *ItemList) Exec(ctx context.Context, request *ItemListRequest) ([]*Item, error) {
-	ctx, span := otel.Tracer().Start(ctx, "service.ItemList")
+	ctx, span := otel.Tracer().Start(ctx, "core.ItemList")
 	defer span.End()
 
 	// Resolved locally so the caller's request stays untouched.
@@ -74,13 +74,7 @@ func (service *ItemList) Exec(ctx context.Context, request *ItemListRequest) ([]
 
 	items := make([]*Item, len(entities))
 	for i, entity := range entities {
-		items[i] = &Item{
-			ID:          entity.ID,
-			Name:        entity.Name,
-			Description: entity.Description,
-			CreatedAt:   entity.CreatedAt,
-			UpdatedAt:   entity.UpdatedAt,
-		}
+		items[i] = newItem(entity)
 	}
 
 	return otel.ReportSuccess(span, items), nil
