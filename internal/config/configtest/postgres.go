@@ -11,7 +11,7 @@ import (
 )
 
 // PostgresPreset is the PostgreSQL configuration shared by integration tests,
-// such as the DAO tests. Those run under postgres.RunDBTest: the migration set is
+// such as the DAO tests. Those run under postgrestest.RunDBTest: the migration set is
 // applied once into a template database, and each test gets its own clone of it,
 // dropped afterward — so tests never observe each other's writes. No transaction
 // is opened, and postgres.InTx reports false, which is what a data-access object

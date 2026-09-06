@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"context"
-	"encoding/json"
 	"net/http"
 
 	"github.com/google/uuid"
@@ -41,11 +40,9 @@ func (handler *ItemUpdatePublic) ServeHTTP(w http.ResponseWriter, r *http.Reques
 	ctx, span := otel.Tracer().Start(r.Context(), "rest.ItemUpdatePublic")
 	defer span.End()
 
-	decoder := json.NewDecoder(r.Body)
-
 	var request ItemUpdatePublicRequest
 
-	err := decoder.Decode(&request)
+	err := httpf.DecodeJSON(r.Body, &request)
 	if err != nil {
 		httpf.HandleError(ctx, handler.logger, w, span, httpf.ErrMap{nil: http.StatusBadRequest}, err)
 
