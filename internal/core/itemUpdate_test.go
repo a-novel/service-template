@@ -84,6 +84,17 @@ func TestItemUpdate(t *testing.T) {
 			expectErr: core.ErrInvalidRequest,
 		},
 		{
+			name: "Error/NotFound",
+
+			request: &core.ItemUpdateRequest{
+				ID:   uuid.MustParse("00000000-0000-0000-0000-000000000001"),
+				Name: "updated item",
+			},
+
+			daoMock:   &daoMock{err: dao.ErrItemUpdateNotFound},
+			expectErr: core.ErrItemUpdateNotFound,
+		},
+		{
 			name: "Error/Dao",
 
 			request: &core.ItemUpdateRequest{

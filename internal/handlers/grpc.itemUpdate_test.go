@@ -12,7 +12,6 @@ import (
 	"google.golang.org/grpc/status"
 
 	"github.com/a-novel/service-template/internal/core"
-	"github.com/a-novel/service-template/internal/dao"
 	"github.com/a-novel/service-template/internal/handlers"
 	handlersmocks "github.com/a-novel/service-template/internal/handlers/mocks"
 	"github.com/a-novel/service-template/internal/handlers/protogen"
@@ -101,7 +100,7 @@ func TestGrpcItemUpdate(t *testing.T) {
 			},
 
 			serviceMock: &serviceMock{
-				err: dao.ErrItemUpdateNotFound,
+				err: core.ErrItemUpdateNotFound,
 			},
 
 			expectStatus: codes.NotFound,

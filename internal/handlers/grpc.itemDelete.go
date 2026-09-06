@@ -11,7 +11,6 @@ import (
 	"github.com/a-novel-kit/golib/otel"
 
 	"github.com/a-novel/service-template/internal/core"
-	"github.com/a-novel/service-template/internal/dao"
 	"github.com/a-novel/service-template/internal/handlers/protogen"
 )
 
@@ -55,7 +54,7 @@ func (handler *ItemDelete) ItemDelete(
 		return nil, status.Error(codes.InvalidArgument, "invalid request")
 	}
 
-	if errors.Is(err, dao.ErrItemDeleteNotFound) {
+	if errors.Is(err, core.ErrItemDeleteNotFound) {
 		_ = otel.ReportError(span, err)
 
 		return nil, status.Error(codes.NotFound, "item not found")

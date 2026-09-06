@@ -11,7 +11,6 @@ import (
 	"github.com/a-novel-kit/golib/otel"
 
 	"github.com/a-novel/service-template/internal/core"
-	"github.com/a-novel/service-template/internal/dao"
 )
 
 // ItemDeletePublicService is the core operation the delete endpoint delegates to.
@@ -51,8 +50,8 @@ func (handler *ItemDeletePublic) ServeHTTP(w http.ResponseWriter, r *http.Reques
 	item, err := handler.service.Exec(ctx, &core.ItemDeleteRequest{ID: request.ID})
 	if err != nil {
 		httpf.HandleError(ctx, handler.logger, w, span, httpf.ErrMap{
-			dao.ErrItemDeleteNotFound: http.StatusNotFound,
-			core.ErrInvalidRequest:    http.StatusBadRequest,
+			core.ErrItemDeleteNotFound: http.StatusNotFound,
+			core.ErrInvalidRequest:     http.StatusBadRequest,
 		}, err)
 
 		return
