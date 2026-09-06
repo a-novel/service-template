@@ -146,6 +146,20 @@ func TestRestItemUpdatePublic(t *testing.T) {
 
 			expectStatus: http.StatusInternalServerError,
 		},
+		{
+			name: "Error/MultipleValues",
+
+			request: httptest.NewRequestWithContext(t.Context(), http.MethodPut, "/item", strings.NewReader(`{} {}`)),
+
+			expectStatus: http.StatusBadRequest,
+		},
+		{
+			name: "Error/TrailingGarbage",
+
+			request: httptest.NewRequestWithContext(t.Context(), http.MethodPut, "/item", strings.NewReader(`{} garbage`)),
+
+			expectStatus: http.StatusBadRequest,
+		},
 	}
 
 	for _, testCase := range testCases {

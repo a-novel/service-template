@@ -2,7 +2,6 @@ package handlers
 
 import (
 	"context"
-	"encoding/json"
 	"net/http"
 
 	"github.com/a-novel-kit/golib/httpf"
@@ -38,11 +37,9 @@ func (handler *ItemCreatePublic) ServeHTTP(w http.ResponseWriter, r *http.Reques
 	ctx, span := otel.Tracer().Start(r.Context(), "rest.ItemCreatePublic")
 	defer span.End()
 
-	decoder := json.NewDecoder(r.Body)
-
 	var request ItemCreatePublicRequest
 
-	err := decoder.Decode(&request)
+	err := httpf.DecodeJSON(r.Body, &request)
 	if err != nil {
 		httpf.HandleError(ctx, handler.logger, w, span, httpf.ErrMap{nil: http.StatusBadRequest}, err)
 
