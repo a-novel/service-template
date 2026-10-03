@@ -50,5 +50,5 @@ func (service *ItemDelete) Exec(ctx context.Context, request *ItemDeleteRequest)
 		return nil, otel.ReportError(span, fmt.Errorf("delete item: %w", err))
 	}
 
-	return otel.ReportSuccess(span, newItem(entity)), nil
+	return newItem(entity), nil
 }

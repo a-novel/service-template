@@ -9,7 +9,6 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	"go.opentelemetry.io/otel/attribute"
 
 	"github.com/a-novel-kit/golib/otel"
 	"github.com/a-novel-kit/golib/postgres"
@@ -42,12 +41,6 @@ func (dao *ItemUpdate) Exec(ctx context.Context, request *ItemUpdateRequest) (*I
 	ctx, span := otel.Tracer().Start(ctx, "dao.ItemUpdate")
 	defer span.End()
 
-	span.SetAttributes(
-		attribute.String("item.id", request.ID.String()),
-		attribute.String("item.name", request.Name),
-		attribute.Int64("item.updated_at", request.Now.Unix()),
-	)
-
 	tx, err := postgres.GetContext(ctx)
 	if err != nil {
 		return nil, otel.ReportError(span, fmt.Errorf("get transaction: %w", err))
@@ -64,5 +57,5 @@ func (dao *ItemUpdate) Exec(ctx context.Context, request *ItemUpdateRequest) (*I
 		return nil, otel.ReportError(span, fmt.Errorf("execute query: %w", err))
 	}
 
-	return otel.ReportSuccess(span, entity), nil
+	return entity, nil
 }

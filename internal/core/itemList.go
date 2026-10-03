@@ -70,12 +70,10 @@ func (service *ItemList) Exec(ctx context.Context, request *ItemListRequest) ([]
 		return nil, otel.ReportError(span, fmt.Errorf("list items: %w", err))
 	}
 
-	span.SetAttributes(attribute.Int("items.count", len(entities)))
-
 	items := make([]*Item, len(entities))
 	for i, entity := range entities {
 		items[i] = newItem(entity)
 	}
 
-	return otel.ReportSuccess(span, items), nil
+	return items, nil
 }

@@ -35,11 +35,7 @@ func (dao *ItemCreate) Exec(ctx context.Context, request *ItemCreateRequest) (*I
 	ctx, span := otel.Tracer().Start(ctx, "dao.ItemCreate")
 	defer span.End()
 
-	span.SetAttributes(
-		attribute.String("item.id", request.ID.String()),
-		attribute.String("item.name", request.Name),
-		attribute.Int64("item.created_at", request.Now.Unix()),
-	)
+	span.SetAttributes(attribute.String("item.id", request.ID.String()))
 
 	tx, err := postgres.GetContext(ctx)
 	if err != nil {
@@ -53,5 +49,5 @@ func (dao *ItemCreate) Exec(ctx context.Context, request *ItemCreateRequest) (*I
 		return nil, otel.ReportError(span, fmt.Errorf("execute query: %w", err))
 	}
 
-	return otel.ReportSuccess(span, entity), nil
+	return entity, nil
 }

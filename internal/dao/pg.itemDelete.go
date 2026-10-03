@@ -8,7 +8,6 @@ import (
 	"fmt"
 
 	"github.com/google/uuid"
-	"go.opentelemetry.io/otel/attribute"
 
 	"github.com/a-novel-kit/golib/otel"
 	"github.com/a-novel-kit/golib/postgres"
@@ -38,8 +37,6 @@ func (dao *ItemDelete) Exec(ctx context.Context, request *ItemDeleteRequest) (*I
 	ctx, span := otel.Tracer().Start(ctx, "dao.ItemDelete")
 	defer span.End()
 
-	span.SetAttributes(attribute.String("item.id", request.ID.String()))
-
 	tx, err := postgres.GetContext(ctx)
 	if err != nil {
 		return nil, otel.ReportError(span, fmt.Errorf("get transaction: %w", err))
@@ -56,5 +53,5 @@ func (dao *ItemDelete) Exec(ctx context.Context, request *ItemDeleteRequest) (*I
 		return nil, otel.ReportError(span, fmt.Errorf("execute query: %w", err))
 	}
 
-	return otel.ReportSuccess(span, entity), nil
+	return entity, nil
 }
