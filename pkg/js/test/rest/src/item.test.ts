@@ -31,6 +31,13 @@ describe("itemCreate", () => {
     const api = new TemplateApi(process.env.REST_URL!);
     await expectStatus(itemCreate(api, ""), 400);
   });
+
+  it("names the invalid field of a rejected item", async () => {
+    const api = new TemplateApi(process.env.REST_URL!);
+    await expect(itemCreate(api, "   ")).rejects.toThrow(
+      '{"type":"about:blank","title":"Bad Request","status":400,"tags":{"invalidFields":{"name":"notblank"}}}'
+    );
+  });
 });
 
 describe("itemGet", () => {
