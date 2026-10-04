@@ -43,8 +43,6 @@ func (handler *ItemList) ItemList(
 		Offset: int(request.GetOffset()),
 	})
 	if errors.Is(err, core.ErrInvalidRequest) {
-		_ = otel.ReportError(span, err)
-
 		return nil, status.Error(codes.InvalidArgument, "invalid request")
 	}
 

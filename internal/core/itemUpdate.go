@@ -59,5 +59,5 @@ func (service *ItemUpdate) Exec(ctx context.Context, request *ItemUpdateRequest)
 		return nil, otel.ReportError(span, fmt.Errorf("update item: %w", err))
 	}
 
-	return otel.ReportSuccess(span, newItem(entity)), nil
+	return newItem(entity), nil
 }

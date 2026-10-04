@@ -55,5 +55,5 @@ func (service *ItemCreate) Exec(ctx context.Context, request *ItemCreateRequest)
 		return nil, otel.ReportError(span, fmt.Errorf("create item: %w", err))
 	}
 
-	return otel.ReportSuccess(span, newItem(entity)), nil
+	return newItem(entity), nil
 }

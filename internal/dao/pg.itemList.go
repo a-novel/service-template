@@ -32,11 +32,6 @@ func (dao *ItemList) Exec(ctx context.Context, request *ItemListRequest) ([]*Ite
 	ctx, span := otel.Tracer().Start(ctx, "dao.ItemList")
 	defer span.End()
 
-	span.SetAttributes(
-		attribute.Int("item.limit", request.Limit),
-		attribute.Int("item.offset", request.Offset),
-	)
-
 	tx, err := postgres.GetContext(ctx)
 	if err != nil {
 		return nil, otel.ReportError(span, fmt.Errorf("get transaction: %w", err))
@@ -51,5 +46,5 @@ func (dao *ItemList) Exec(ctx context.Context, request *ItemListRequest) ([]*Ite
 
 	span.SetAttributes(attribute.Int("items.count", len(entities)))
 
-	return otel.ReportSuccess(span, entities), nil
+	return entities, nil
 }

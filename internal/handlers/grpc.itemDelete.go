@@ -42,21 +42,15 @@ func (handler *ItemDelete) ItemDelete(
 
 	id, err := uuid.Parse(request.GetId())
 	if err != nil {
-		_ = otel.ReportError(span, err)
-
 		return nil, status.Error(codes.InvalidArgument, "invalid item id")
 	}
 
 	item, err := handler.service.Exec(ctx, &core.ItemDeleteRequest{ID: id})
 	if errors.Is(err, core.ErrInvalidRequest) {
-		_ = otel.ReportError(span, err)
-
 		return nil, status.Error(codes.InvalidArgument, "invalid request")
 	}
 
 	if errors.Is(err, core.ErrItemDeleteNotFound) {
-		_ = otel.ReportError(span, err)
-
 		return nil, status.Error(codes.NotFound, "item not found")
 	}
 

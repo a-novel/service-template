@@ -44,8 +44,6 @@ func (handler *ItemCreate) ItemCreate(
 		Description: request.GetDescription(),
 	})
 	if errors.Is(err, core.ErrInvalidRequest) {
-		_ = otel.ReportError(span, err)
-
 		return nil, status.Error(codes.InvalidArgument, "invalid request")
 	}
 
