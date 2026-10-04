@@ -22,7 +22,8 @@ const (
 
 // LoggerProd ships production logs to Google Cloud Logging.
 var LoggerProd = loggingpresets.GRPCGcloud{
-	Component: env.GcloudProjectId,
+	Component: env.AppName,
+	ProjectId: env.GcloudProjectId,
 }
 
 // LoggerDev pretty-prints logs to the console for local development.
