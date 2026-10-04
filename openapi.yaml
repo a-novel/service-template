@@ -202,7 +202,12 @@ components:
 
     badRequest:
       description: |
-        The request sent to the server could not be parsed, or failed validation.
+        The request sent to the server could not be parsed, or failed validation. A validation failure names
+        each invalid field and the rule it broke.
+      content:
+        application/problem+json:
+          schema:
+            $ref: "#/components/schemas/invalidRequest"
 
     internalError:
       description: Something unexpected happened.
@@ -211,6 +216,42 @@ components:
       description: I'm a teapot!
 
   schemas:
+    invalidRequest:
+      type: object
+      description: |
+        An RFC 9457 problem details body whose tags name the request fields that failed validation. Field
+        paths and rule codes come from the API definition, never from the submitted values.
+      required: [type, title, status, tags]
+      additionalProperties: false
+      properties:
+        type:
+          type: string
+          description: The problem type; about:blank makes the title the HTTP status text.
+          const: about:blank
+        title:
+          type: string
+          description: The HTTP status text.
+          examples: [Bad Request]
+        status:
+          type: integer
+          description: The HTTP status code.
+          const: 400
+        tags:
+          type: object
+          description: Public details about the failure. Clients ignore tags they do not know.
+          required: [invalidFields]
+          additionalProperties: true
+          properties:
+            invalidFields:
+              type: object
+              description: |
+                Maps the path of each invalid field, in lower camel case with `.` for nesting and `[i]` for a
+                list item, to the validation rule it broke. Standard rules carry their usual name (required,
+                max); service rules name a domain check (notblank).
+              additionalProperties:
+                type: string
+              examples:
+                - { "name": "notblank" }
     healthStatus:
       type: object
       description: |
