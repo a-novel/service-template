@@ -37,6 +37,8 @@ type Client interface {
 	UnaryEcho(
 		ctx context.Context, req *golibproto.UnaryEchoRequest, opts ...grpc.CallOption,
 	) (*golibproto.UnaryEchoResponse, error)
+	// Status reports the health of the service's dependencies. It returns Unavailable when a
+	// dependency probe fails. Set a request deadline.
 	Status(ctx context.Context, req *StatusRequest, opts ...grpc.CallOption) (*StatusResponse, error)
 
 	ItemCreate(ctx context.Context, req *ItemCreateRequest, opts ...grpc.CallOption) (*ItemCreateResponse, error)

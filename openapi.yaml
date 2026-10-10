@@ -44,11 +44,15 @@ paths:
       summary: Health diagnosis of the server.
       description: |
         Reaches out to every server dependency and reports whether each one responded.
+        Returns HTTP 200 only when every dependency is healthy, otherwise HTTP 503 with the same
+        sanitized report. Use `/ping` for process-only liveness.
       tags: [health]
       security: []
       responses:
         "200":
           $ref: "#/components/responses/health"
+        "503":
+          $ref: "#/components/responses/healthUnavailable"
         "418":
           $ref: "#/components/responses/teapot"
         default:
@@ -73,6 +77,8 @@ paths:
           $ref: "#/components/responses/item"
         "400":
           $ref: "#/components/responses/badRequest"
+        "503":
+          $ref: "#/components/responses/plannedDowntime"
         default:
           $ref: "#/components/responses/internalError"
 
@@ -91,6 +97,8 @@ paths:
           $ref: "#/components/responses/itemList"
         "400":
           $ref: "#/components/responses/badRequest"
+        "503":
+          $ref: "#/components/responses/plannedDowntime"
         default:
           $ref: "#/components/responses/internalError"
 
@@ -111,6 +119,8 @@ paths:
           $ref: "#/components/responses/badRequest"
         "404":
           $ref: "#/components/responses/notFound"
+        "503":
+          $ref: "#/components/responses/plannedDowntime"
         default:
           $ref: "#/components/responses/internalError"
 
@@ -134,6 +144,8 @@ paths:
           $ref: "#/components/responses/badRequest"
         "404":
           $ref: "#/components/responses/notFound"
+        "503":
+          $ref: "#/components/responses/plannedDowntime"
         default:
           $ref: "#/components/responses/internalError"
 
@@ -153,6 +165,8 @@ paths:
           $ref: "#/components/responses/badRequest"
         "404":
           $ref: "#/components/responses/notFound"
+        "503":
+          $ref: "#/components/responses/plannedDowntime"
         default:
           $ref: "#/components/responses/internalError"
 
@@ -167,18 +181,38 @@ components:
             examples: [pong]
 
     health:
-      description: Summary of the server dependencies.
+      description: All server dependencies are healthy.
       content:
         application/json:
           schema:
-            type: object
-            required: ["client:postgres"]
-            properties:
-              "client:postgres":
-                $ref: "#/components/schemas/healthStatus"
-            examples:
-              - { "client:postgres": { "status": "up" } }
-              - { "client:postgres": { "status": "down" } }
+            $ref: "#/components/schemas/healthReport"
+          examples:
+            healthy:
+              value: { "client:postgres": { "status": "up" } }
+
+    healthUnavailable:
+      description: |
+        At least one dependency probe failed. Raw probe errors are not exposed. During a planned
+        downtime, a problem body tagged `downtime` instead.
+      content:
+        application/problem+json:
+          schema:
+            $ref: "#/components/schemas/plannedDowntimeProblem"
+        application/json:
+          schema:
+            $ref: "#/components/schemas/healthReport"
+          examples:
+            degraded:
+              value: { "client:postgres": { "status": "down" } }
+
+    plannedDowntime:
+      description: |
+        The service is in a planned downtime and refuses work until operators end it. The platform
+        reads the announced window from the downtime document infra publishes.
+      content:
+        application/problem+json:
+          schema:
+            $ref: "#/components/schemas/plannedDowntimeProblem"
 
     item:
       description: An item resource.
@@ -252,6 +286,33 @@ components:
                 type: string
               examples:
                 - { "name": "notblank" }
+    plannedDowntimeProblem:
+      type: object
+      description: The answer to a request refused during a planned downtime.
+      required: [type, title, status, tags]
+      properties:
+        type:
+          type: string
+          const: about:blank
+        title:
+          type: string
+        status:
+          type: integer
+          const: 503
+        tags:
+          type: object
+          required: [downtime]
+          properties:
+            downtime:
+              type: boolean
+              const: true
+    healthReport:
+      type: object
+      description: Sanitized dependency statuses. Every dependency must be up for HTTP 200.
+      required: ["client:postgres"]
+      properties:
+        "client:postgres":
+          $ref: "#/components/schemas/healthStatus"
     healthStatus:
       type: object
       description: |

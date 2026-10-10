@@ -37,7 +37,8 @@ func NewRestHealthStatus(err error) *RestHealthStatus {
 }
 
 // RestHealth is the HTTP handler for the health endpoint. It probes each
-// backing dependency and reports their individual status.
+// backing dependency and reports their individual status, with HTTP 503 when any
+// probe fails.
 type RestHealth struct{}
 
 func NewRestHealth() *RestHealth {
@@ -48,8 +49,13 @@ func (handler *RestHealth) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	ctx, span := otel.Tracer().Start(r.Context(), "rest.Health")
 	defer span.End()
 
-	httpf.SendJSONStatus(ctx, w, span, http.StatusOK, map[string]any{
-		"client:postgres": NewRestHealthStatus(handler.reportPostgres(ctx)),
+	// reportPostgres records a failure on its own span; this one only sets the status.
+	err := handler.reportPostgres(ctx)
+
+	statusCode := lo.Ternary(err == nil, http.StatusOK, http.StatusServiceUnavailable)
+
+	httpf.SendJSONStatus(ctx, w, span, statusCode, map[string]any{
+		"client:postgres": NewRestHealthStatus(err),
 	})
 }
 

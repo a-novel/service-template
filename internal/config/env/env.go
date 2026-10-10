@@ -7,6 +7,7 @@ import (
 	"time"
 
 	"github.com/a-novel-kit/golib/config"
+	"github.com/a-novel-kit/golib/downtime"
 )
 
 // prefix is prepended to every configuration variable name that this package reads.
@@ -46,6 +47,8 @@ const (
 	// PostgresMaxIdleConnsDefault matches the open limit so a burst does not close
 	// connections it is about to reopen.
 	PostgresMaxIdleConnsDefault = 20
+	PostgresPortDefault         = 5432
+	PostgresTLSEnabledDefault   = true
 )
 
 // Default values applied when an environment variable is unset.
@@ -57,6 +60,12 @@ var (
 // Raw values for environment variables.
 var (
 	postgresDsn          = getEnv("POSTGRES_DSN")
+	postgresHost         = getEnv("POSTGRES_HOST")
+	postgresPort         = getEnv("POSTGRES_PORT")
+	postgresUser         = getEnv("POSTGRES_USER")
+	postgresPassword     = getEnv("POSTGRES_PASSWORD")
+	postgresDatabase     = getEnv("POSTGRES_DATABASE")
+	postgresTLSEnabled   = getEnv("POSTGRES_TLS_ENABLED")
 	postgresMaxOpenConns = getEnv("POSTGRES_MAX_OPEN_CONNS")
 	postgresMaxIdleConns = getEnv("POSTGRES_MAX_IDLE_CONNS")
 
@@ -83,13 +92,28 @@ var (
 	corsMaxAge           = getEnv("REST_CORS_MAX_AGE")
 
 	gcloudProjectId = getEnv("GCLOUD_PROJECT_ID")
+
+	downtimeStart = getEnv("DOWNTIME_START")
 )
 
 var (
-	// PostgresDsn is the URL used to connect to the PostgreSQL database instance.
-	// Typically formatted as:
+	// PostgresDsn is the legacy URL used when PostgresHost is empty, formatted as
 	//	postgres://<user>:<password>@<host>:<port>/<database>
+	//
+	// Configure the discrete PostgreSQL fields for new deployments.
 	PostgresDsn = postgresDsn
+	// PostgresHost is the PostgreSQL server hostname or IP address.
+	PostgresHost = postgresHost
+	// PostgresPort is the PostgreSQL server port.
+	PostgresPort = config.LoadEnv(postgresPort, PostgresPortDefault, config.IntParser)
+	// PostgresUser is the PostgreSQL login role.
+	PostgresUser = postgresUser
+	// PostgresPassword is the PostgreSQL login credential.
+	PostgresPassword = postgresPassword
+	// PostgresDatabase is the PostgreSQL database name.
+	PostgresDatabase = postgresDatabase
+	// PostgresTLSEnabled controls transport encryption for the PostgreSQL connection.
+	PostgresTLSEnabled = config.LoadEnv(postgresTLSEnabled, PostgresTLSEnabledDefault, config.BoolParser)
 
 	// PostgresMaxOpenConns is the maximum number of open connections to the database.
 	PostgresMaxOpenConns = config.LoadEnv(postgresMaxOpenConns, PostgresMaxOpenConnsDefault, config.IntParser)
@@ -151,4 +175,8 @@ var (
 	//
 	// See: https://docs.cloud.google.com/resource-manager/docs/creating-managing-projects
 	GcloudProjectId = gcloudProjectId
+
+	// DowntimeStart is when a planned downtime of this service starts, in RFC 3339. From then
+	// until it is removed, the service refuses work. Nil when none is planned.
+	DowntimeStart = config.LoadEnv(downtimeStart, nil, downtime.ParseStart)
 )

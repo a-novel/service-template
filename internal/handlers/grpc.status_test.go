@@ -35,18 +35,13 @@ func TestStatus(t *testing.T) {
 			},
 		},
 		{
-			// Omitting postgres from the context makes the probe fail, so the entry reports
-			// DEPENDENCY_STATUS_DOWN. Comparing the whole response guards the message shape:
-			// it fails if a raw error string is ever attached back onto DependencyHealth.
-			name: "Success/Degraded",
+			// Omitting postgres from the context makes the probe fail. The RPC then answers
+			// Unavailable with no report, so a raw dependency error never reaches the caller.
+			name: "Error/Unavailable",
 
 			skipPostgres: true,
 
-			expect: &protogen.StatusResponse{
-				Postgres: &protogen.DependencyHealth{
-					Status: protogen.DependencyStatus_DEPENDENCY_STATUS_DOWN,
-				},
-			},
+			expectStatus: codes.Unavailable,
 		},
 	}
 
