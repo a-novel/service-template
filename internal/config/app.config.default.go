@@ -44,7 +44,8 @@ var LoggerProdHttp = &loggingpresets.LogGcloud{
 // backends once a project ID is set.
 var AppPresetDefault = App{
 	App: Main{
-		Name: env.AppName,
+		Name:          env.AppName,
+		DowntimeStart: env.DowntimeStart,
 	},
 	Grpc: Grpc{
 		Port:     env.GrpcPort,

@@ -66,7 +66,7 @@ The service runs as published OCI images plus a PostgreSQL database. Both server
 | `service-template/jobs/migrations` | One-shot schema migration job; runs to completion before the servers start. |
 | `service-template/database`        | Pre-tuned PostgreSQL image — or bring your own Postgres.                    |
 
-Pin every image to the same release tag. A production deployment runs `database`, then `migrations` to completion, then any number of `grpc` and/or `rest` replicas:
+Pin every image to the same release tag. A production deployment runs `database`, then `migrations` to completion, then any number of `grpc` and/or `rest` replicas. Provide `POSTGRES_USER`, `POSTGRES_PASSWORD`, and `POSTGRES_DATABASE` through the orchestrator; store the password as a secret.
 
 <!-- TODO(project-docs): replace v0.0.0 with the new service's release tag -->
 
@@ -76,9 +76,9 @@ services:
     image: ghcr.io/a-novel/service-template/database:v0.0.0
     networks: [api]
     environment:
-      POSTGRES_PASSWORD: postgres
-      POSTGRES_USER: postgres
-      POSTGRES_DB: postgres
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
+      POSTGRES_USER: "${POSTGRES_USER}"
+      POSTGRES_DB: "${POSTGRES_DATABASE}"
       POSTGRES_HOST_AUTH_METHOD: scram-sha-256
       POSTGRES_INITDB_ARGS: --auth=scram-sha-256
     volumes:
@@ -89,7 +89,12 @@ services:
     depends_on:
       postgres-template: { condition: service_healthy }
     environment:
-      POSTGRES_DSN: "postgres://postgres:postgres@postgres-template:5432/postgres?sslmode=disable"
+      POSTGRES_HOST: postgres-template
+      POSTGRES_PORT: "5432"
+      POSTGRES_USER: "${POSTGRES_USER}"
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
+      POSTGRES_DATABASE: "${POSTGRES_DATABASE}"
+      POSTGRES_TLS_ENABLED: "false"
     networks: [api]
 
   service-template:
@@ -99,7 +104,12 @@ services:
       postgres-template: { condition: service_healthy }
       migrations-template: { condition: service_completed_successfully }
     environment:
-      POSTGRES_DSN: "postgres://postgres:postgres@postgres-template:5432/postgres?sslmode=disable"
+      POSTGRES_HOST: postgres-template
+      POSTGRES_PORT: "5432"
+      POSTGRES_USER: "${POSTGRES_USER}"
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
+      POSTGRES_DATABASE: "${POSTGRES_DATABASE}"
+      POSTGRES_TLS_ENABLED: "false"
     networks: [api]
 
 networks:
@@ -111,13 +121,34 @@ volumes:
 
 Run both servers by adding a second service that reuses the same database and migrations with the `rest` image.
 
+### Database image
+
+The database image packages PostgreSQL and pgBackRest on Wolfi. Its
+[package manifest](./builds/database.apko.yaml) is assembled with apko during the container
+build, from [locks](./builds/database.apko.lock.json) that pin every package, so an unchanged
+image rebuilds to the same digest; Docker and Podman users need no additional host tools.
+PostgreSQL keeps its standard `POSTGRES_*` initialization variables, `uuid-ossp` extension and
+volume at `/var/lib/postgresql`. Backup scheduling and repository credentials remain the
+operator's responsibility.
+
+Use a fresh volume when moving from the Debian-based image. To keep existing data, take a
+logical dump and restore it into the new database, then validate it before switching traffic.
+Do not reuse a Debian data directory or assume its physical backups are portable: the libc,
+collation and extension environment changed. Retain the previous image with its backups.
+
 ### Configuration
 
-Every variable is read from the process environment. Env-var names can be globally prefixed via `SERVICE_TEMPLATE_ENV_PREFIX` (rename this when forking — see [Using this template](#using-this-template)).
+Every variable is read from the process environment. Env-var names can be globally prefixed via `SERVICE_TEMPLATE_ENV_PREFIX` (rename this when forking — see [Using this template](#using-this-template)). Set `POSTGRES_HOST` to use the discrete connection fields; `POSTGRES_DSN` remains a compatibility fallback.
 
-| Name           | Description                                 | Images |
-| -------------- | ------------------------------------------- | ------ |
-| `POSTGRES_DSN` | PostgreSQL connection string. **Required.** | all    |
+| Name                   | Description                                                                                                                   | Images |
+| ---------------------- | ----------------------------------------------------------------------------------------------------------------------------- | ------ |
+| `POSTGRES_HOST`        | PostgreSQL hostname or IP address. Selects the discrete connection fields. **Required for new deployments.**                  | all    |
+| `POSTGRES_PORT`        | PostgreSQL port. Defaults to `5432`.                                                                                          | all    |
+| `POSTGRES_USER`        | PostgreSQL login role. **Required when `POSTGRES_HOST` is set.**                                                              | all    |
+| `POSTGRES_PASSWORD`    | PostgreSQL login password. **Required when `POSTGRES_HOST` is set; inject it as a secret.**                                   | all    |
+| `POSTGRES_DATABASE`    | PostgreSQL database name. **Required when `POSTGRES_HOST` is set.**                                                           | all    |
+| `POSTGRES_TLS_ENABLED` | Encrypt the PostgreSQL connection. Defaults to `true`; disable only when another trusted boundary protects the database link. | all    |
+| `POSTGRES_DSN`         | Connection-URL fallback, read only when `POSTGRES_HOST` is empty.                                                             | all    |
 
 <details>
 <summary>Optional configuration (server tuning, OpenTelemetry)</summary>
@@ -150,6 +181,12 @@ Database connection pool (server images). The limits are **per process**. The da
 | ------------------------- | ----------------------------------------- | ------- |
 | `POSTGRES_MAX_OPEN_CONNS` | Maximum open connections to the database. | `20`    |
 | `POSTGRES_MAX_IDLE_CONNS` | Maximum connections kept open while idle. | `20`    |
+
+Planned downtime (server images):
+
+| Name             | Description                                                                                                                                                                                                        | Default |
+| ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------- |
+| `DOWNTIME_START` | When a planned downtime starts, in RFC 3339. From then until it is removed, even past the announced end, the servers answer `503` / `UNAVAILABLE` except for ping and gRPC health, and start without the database. |         |
 
 Logs and tracing — OpenTelemetry supports a stdout and a Google Cloud exporter (all server images):
 

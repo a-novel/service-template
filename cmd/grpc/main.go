@@ -12,13 +12,16 @@ import (
 	"os/signal"
 	"strconv"
 	"syscall"
+	"time"
 
 	"github.com/samber/lo"
 	"google.golang.org/grpc"
 	healthpb "google.golang.org/grpc/health/grpc_health_v1"
 	"google.golang.org/grpc/reflection"
 
+	"github.com/a-novel-kit/golib/downtime"
 	"github.com/a-novel-kit/golib/grpcf"
+	golibproto "github.com/a-novel-kit/golib/grpcf/proto/gen"
 	"github.com/a-novel-kit/golib/otel"
 	"github.com/a-novel-kit/golib/postgres"
 
@@ -47,10 +50,13 @@ func main() {
 		log.SetFlags(log.Flags() &^ (log.Ldate | log.Ltime))
 	}
 
-	ctx = lo.Must(postgres.NewContext(ctx, cfg.Postgres))
+	// A server started during a planned downtime refuses work, so it leaves the database alone.
+	if !downtime.Started(cfg.App.DowntimeStart, time.Now()) {
+		ctx = lo.Must(postgres.NewContext(ctx, cfg.Postgres))
 
-	database := lo.Must(cfg.Postgres.DB(ctx))
-	defer closeDatabase(database)
+		database := lo.Must(cfg.Postgres.DB(ctx))
+		defer closeDatabase(database)
+	}
 
 	// =================================================================================================================
 	// DAO
@@ -91,17 +97,25 @@ func main() {
 		return postgres.TransferContext(ctx, rpCtx)
 	}
 
+	// During a planned downtime, only liveness answers; the logger records the refusals.
+	open := []string{
+		"/" + healthpb.Health_ServiceDesc.ServiceName + "/",
+		"/" + golibproto.EchoService_ServiceDesc.ServiceName + "/",
+	}
+
 	server := grpc.NewServer(
 		cfg.Otel.RpcInterceptor(),
 		grpc.ChainUnaryInterceptor(
 			grpcf.BaseContextUnaryInterceptor(ctxInterceptor),
 			cfg.Logger.UnaryInterceptor(),
 			cfg.Logger.PanicUnaryInterceptor(),
+			downtime.UnaryServerInterceptor(cfg.App.DowntimeStart, open...),
 		),
 		grpc.ChainStreamInterceptor(
 			grpcf.BaseContextStreamInterceptor(ctxInterceptor),
 			cfg.Logger.StreamInterceptor(),
 			cfg.Logger.PanicStreamInterceptor(),
+			downtime.StreamServerInterceptor(cfg.App.DowntimeStart, open...),
 		),
 	)
 
