@@ -44,7 +44,10 @@ export class TemplateApi {
     await this.fetchVoid("/ping", { method: "GET" });
   }
 
-  /** Reports the health of the service, keyed by upstream dependency name. */
+  /**
+   * Reports the health of the service, keyed by upstream dependency name, when every dependency
+   * is healthy. Throws on HTTP 503 when a dependency probe fails, or on another non-2xx response.
+   */
   async health(): Promise<Record<string, HealthDependency>> {
     return await this.fetch("/healthcheck", undefined, { method: "GET" });
   }

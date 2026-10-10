@@ -3,7 +3,8 @@ package handlers
 import (
 	"context"
 
-	"github.com/samber/lo"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
 
 	"github.com/a-novel-kit/golib/otel"
 	"github.com/a-novel-kit/golib/postgres"
@@ -11,19 +12,11 @@ import (
 	"github.com/a-novel/service-template/internal/handlers/protogen"
 )
 
-// NewGrpcHealthStatus converts an error into a DependencyHealth proto message,
-// mapping nil to DEPENDENCY_STATUS_UP and any non-nil error to DEPENDENCY_STATUS_DOWN.
-//
-// The error itself is dropped from the message: a raw dependency error routinely embeds
-// internal hostnames, ports, or schema names. The health probe records it on its trace
-// span, where operators can read it.
-func NewGrpcHealthStatus(err error) *protogen.DependencyHealth {
+// NewGrpcHealthStatus returns the health report for a dependency whose probe succeeded. A failed
+// probe answers Unavailable instead, so the report never carries a raw dependency error.
+func NewGrpcHealthStatus() *protogen.DependencyHealth {
 	return &protogen.DependencyHealth{
-		Status: lo.Ternary(
-			err == nil,
-			protogen.DependencyStatus_DEPENDENCY_STATUS_UP,
-			protogen.DependencyStatus_DEPENDENCY_STATUS_DOWN,
-		),
+		Status: protogen.DependencyStatus_DEPENDENCY_STATUS_UP,
 	}
 }
 
@@ -37,13 +30,18 @@ func NewGrpcStatus() *GrpcStatus {
 	return new(GrpcStatus)
 }
 
-// Status probes each dependency and returns its current health.
+// Status probes each dependency and returns their health, or Unavailable when a probe fails.
 func (handler *GrpcStatus) Status(ctx context.Context, _ *protogen.StatusRequest) (*protogen.StatusResponse, error) {
 	ctx, span := otel.Tracer().Start(ctx, "grpc.Status")
 	defer span.End()
 
+	// reportPostgres records a failure on its own span.
+	if handler.reportPostgres(ctx) != nil {
+		return nil, status.Error(codes.Unavailable, "service dependencies unavailable")
+	}
+
 	return &protogen.StatusResponse{
-		Postgres: NewGrpcHealthStatus(handler.reportPostgres(ctx)),
+		Postgres: NewGrpcHealthStatus(),
 	}, nil
 }
 

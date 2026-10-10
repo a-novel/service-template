@@ -43,9 +43,9 @@ func TestHealth(t *testing.T) {
 		},
 		{
 			// Omitting postgres from the context makes the probe fail, so the entry reports
-			// status=down. The exact match on expectResponse guards the public shape: it
-			// fails if any extra field, such as a re-introduced "err", leaks into it.
-			name: "Success/Degraded",
+			// status=down with HTTP 503. The exact match on expectResponse guards the public
+			// shape: it fails if any extra field, such as a re-introduced "err", leaks into it.
+			name: "Error/Degraded",
 
 			request: httptest.NewRequestWithContext(t.Context(), http.MethodPost, "/", nil),
 
@@ -56,7 +56,7 @@ func TestHealth(t *testing.T) {
 					"status": handlers.RestHealthStatusDown,
 				},
 			},
-			expectStatus: http.StatusOK,
+			expectStatus: http.StatusServiceUnavailable,
 		},
 	}
 
