@@ -5,7 +5,6 @@ package main
 
 import (
 	"context"
-	"fmt"
 	"io"
 	"log"
 	"os"
@@ -91,15 +90,11 @@ func main() {
 	// SERVER
 	// =================================================================================================================
 
-	// During a planned downtime, only liveness answers; the logger records the refusals.
-	server := grpcf.NewServer(grpcf.ServerOptions{
-		Otel:          cfg.Otel,
-		Logger:        cfg.Logger,
-		DowntimeStart: cfg.App.DowntimeStart,
-		BaseContext: func(rpCtx context.Context) context.Context {
-			return postgres.TransferContext(ctx, rpCtx)
-		},
-	})
+	ctxInterceptor := func(rpCtx context.Context) context.Context {
+		return postgres.TransferContext(ctx, rpCtx)
+	}
+
+	server := grpcf.NewServer(cfg.Otel, cfg.Logger, cfg.App.DowntimeStart, ctxInterceptor)
 
 	healthcheck := grpcf.RegisterEchoServers(server)
 	healthcheck.SetServingStatus("", healthpb.HealthCheckResponse_SERVING)
@@ -124,7 +119,7 @@ func main() {
 
 	log.Println("Starting gRPC server on :" + strconv.Itoa(cfg.Grpc.Port))
 
-	err := grpcf.Serve(ctx, server, fmt.Sprintf("0.0.0.0:%d", cfg.Grpc.Port), cfg.Grpc.Shutdown)
+	err := grpcf.ListenAndServe(ctx, cfg.Grpc, server)
 
 	stop()
 
