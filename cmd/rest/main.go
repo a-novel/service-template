@@ -7,17 +7,13 @@ import (
 	"context"
 	"io"
 	"log"
-	"net"
 	"net/http"
 	"os"
 	"os/signal"
-	"strconv"
 	"syscall"
 	"time"
 
 	"github.com/go-chi/chi/v5"
-	"github.com/go-chi/chi/v5/middleware"
-	"github.com/go-chi/cors"
 	"github.com/samber/lo"
 
 	"github.com/a-novel-kit/golib/downtime"
@@ -93,51 +89,33 @@ func main() {
 	// ROUTER
 	// =================================================================================================================
 
-	router := chi.NewRouter()
+	router := httpf.NewRouter(cfg.Rest, httpf.RouterOptions{
+		Otel:          cfg.Otel,
+		Logger:        cfg.HttpLogger,
+		DowntimeStart: cfg.App.DowntimeStart,
+		Liveness:      "/ping",
+		Methods:       []string{http.MethodHead, http.MethodGet, http.MethodPost, http.MethodPut, http.MethodDelete},
+	})
 
-	router.Use(middleware.Recoverer)
-	router.Use(middleware.ClientIPFromRemoteAddr)
-	router.Use(middleware.Timeout(cfg.Rest.Timeouts.Request))
-	router.Use(middleware.RequestSize(cfg.Rest.MaxRequestSize))
-	router.Use(cfg.Otel.HttpHandler())
-	router.Use(cors.Handler(cors.Options{
-		AllowedOrigins:   cfg.Rest.Cors.AllowedOrigins,
-		AllowedHeaders:   cfg.Rest.Cors.AllowedHeaders,
-		AllowCredentials: cfg.Rest.Cors.AllowCredentials,
-		AllowedMethods: []string{
-			http.MethodHead,
-			http.MethodGet,
-			http.MethodPost,
-			http.MethodPut,
-			http.MethodDelete,
-		},
-		MaxAge: cfg.Rest.Cors.MaxAge,
-	}))
-	router.Use(cfg.HttpLogger.Logger())
-	// During a planned downtime, only liveness answers.
-	router.Use(downtime.Middleware(cfg.App.DowntimeStart, "/ping"))
-
+	// Probes reach /ping without a budget.
 	router.Get("/ping", handlerPing.ServeHTTP)
-	router.Get("/healthcheck", handlerHealth.ServeHTTP)
-	router.Post("/items", handlerItemCreate.ServeHTTP)
-	router.Get("/items", handlerItemList.ServeHTTP)
-	router.Get("/item", handlerItemGet.ServeHTTP)
-	router.Put("/item", handlerItemUpdate.ServeHTTP)
-	router.Delete("/item", handlerItemDelete.ServeHTTP)
+
+	router.Group(func(api chi.Router) {
+		api.Use(httpf.NewLimits(cfg.Rest).Standard())
+
+		api.Get("/healthcheck", handlerHealth.ServeHTTP)
+		api.Post("/items", handlerItemCreate.ServeHTTP)
+		api.Get("/items", handlerItemList.ServeHTTP)
+		api.Get("/item", handlerItemGet.ServeHTTP)
+		api.Put("/item", handlerItemUpdate.ServeHTTP)
+		api.Delete("/item", handlerItemDelete.ServeHTTP)
+	})
 
 	// =================================================================================================================
 	// RUN
 	// =================================================================================================================
 
-	httpServer := &http.Server{
-		Addr:              ":" + strconv.Itoa(cfg.Rest.Port),
-		Handler:           router,
-		ReadTimeout:       cfg.Rest.Timeouts.Read,
-		ReadHeaderTimeout: cfg.Rest.Timeouts.ReadHeader,
-		WriteTimeout:      cfg.Rest.Timeouts.Write,
-		IdleTimeout:       cfg.Rest.Timeouts.Idle,
-		BaseContext:       func(_ net.Listener) context.Context { return ctx },
-	}
+	httpServer := httpf.NewServer(ctx, cfg.Rest, router)
 
 	log.Println("Starting REST server on " + httpServer.Addr)
 

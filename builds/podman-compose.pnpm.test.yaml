@@ -22,6 +22,8 @@ services:
       - postgres-template
     environment:
       POSTGRES_DSN: "postgres://postgres:postgres@postgres-template:5432/${POSTGRES_DB}?sslmode=disable"
+      # The suite sends many requests per route within a second from one address.
+      REST_RATE_LIMITS_ENABLED: false
     networks:
       - template-integration-rest-test
 
