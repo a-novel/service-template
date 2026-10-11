@@ -32,6 +32,9 @@ import (
 	"github.com/a-novel/service-template/internal/handlers"
 )
 
+// restRateLimit caps the requests per second each visitor sends to each route.
+const restRateLimit = 5
+
 func main() {
 	cfg := config.AppPresetDefault
 
@@ -97,6 +100,12 @@ func main() {
 
 	router.Use(middleware.Recoverer)
 	router.Use(middleware.ClientIPFromRemoteAddr)
+
+	if cfg.Rest.ClientIPHeader != "" {
+		// The proxy's header names the visitor; a request without it keeps the peer address.
+		router.Use(middleware.ClientIPFromHeader(cfg.Rest.ClientIPHeader))
+	}
+
 	router.Use(middleware.Timeout(cfg.Rest.Timeouts.Request))
 	router.Use(middleware.RequestSize(cfg.Rest.MaxRequestSize))
 	router.Use(cfg.Otel.HttpHandler())
@@ -117,13 +126,21 @@ func main() {
 	// During a planned downtime, only liveness answers.
 	router.Use(downtime.Middleware(cfg.App.DowntimeStart, "/ping"))
 
+	// Probes reach /ping without a budget.
 	router.Get("/ping", handlerPing.ServeHTTP)
-	router.Get("/healthcheck", handlerHealth.ServeHTTP)
-	router.Post("/items", handlerItemCreate.ServeHTTP)
-	router.Get("/items", handlerItemList.ServeHTTP)
-	router.Get("/item", handlerItemGet.ServeHTTP)
-	router.Put("/item", handlerItemUpdate.ServeHTTP)
-	router.Delete("/item", handlerItemDelete.ServeHTTP)
+
+	router.Group(func(api chi.Router) {
+		if cfg.Rest.RateLimitsEnabled {
+			api.Use(handlers.RestLimit(restRateLimit, time.Second))
+		}
+
+		api.Get("/healthcheck", handlerHealth.ServeHTTP)
+		api.Post("/items", handlerItemCreate.ServeHTTP)
+		api.Get("/items", handlerItemList.ServeHTTP)
+		api.Get("/item", handlerItemGet.ServeHTTP)
+		api.Put("/item", handlerItemUpdate.ServeHTTP)
+		api.Delete("/item", handlerItemDelete.ServeHTTP)
+	})
 
 	// =================================================================================================================
 	// RUN
