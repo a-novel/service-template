@@ -7,13 +7,12 @@ import (
 	"context"
 	"io"
 	"log"
-	"net/http"
 	"os"
 	"os/signal"
+	"strconv"
 	"syscall"
 	"time"
 
-	"github.com/go-chi/chi/v5"
 	"github.com/samber/lo"
 
 	"github.com/a-novel-kit/golib/downtime"
@@ -89,37 +88,23 @@ func main() {
 	// ROUTER
 	// =================================================================================================================
 
-	router := httpf.NewRouter(cfg.Rest, httpf.RouterOptions{
-		Otel:          cfg.Otel,
-		Logger:        cfg.HttpLogger,
-		DowntimeStart: cfg.App.DowntimeStart,
-		Liveness:      "/ping",
-		Methods:       []string{http.MethodHead, http.MethodGet, http.MethodPost, http.MethodPut, http.MethodDelete},
-	})
+	router := httpf.NewRouter(cfg.Rest, cfg.Otel, cfg.HttpLogger, cfg.App.DowntimeStart)
 
-	// Probes reach /ping without a budget.
 	router.Get("/ping", handlerPing.ServeHTTP)
-
-	router.Group(func(api chi.Router) {
-		api.Use(httpf.NewLimits(cfg.Rest).Standard())
-
-		api.Get("/healthcheck", handlerHealth.ServeHTTP)
-		api.Post("/items", handlerItemCreate.ServeHTTP)
-		api.Get("/items", handlerItemList.ServeHTTP)
-		api.Get("/item", handlerItemGet.ServeHTTP)
-		api.Put("/item", handlerItemUpdate.ServeHTTP)
-		api.Delete("/item", handlerItemDelete.ServeHTTP)
-	})
+	router.Get("/healthcheck", handlerHealth.ServeHTTP)
+	router.Post("/items", handlerItemCreate.ServeHTTP)
+	router.Get("/items", handlerItemList.ServeHTTP)
+	router.Get("/item", handlerItemGet.ServeHTTP)
+	router.Put("/item", handlerItemUpdate.ServeHTTP)
+	router.Delete("/item", handlerItemDelete.ServeHTTP)
 
 	// =================================================================================================================
 	// RUN
 	// =================================================================================================================
 
-	httpServer := httpf.NewServer(ctx, cfg.Rest, router)
+	log.Println("Starting REST server on :" + strconv.Itoa(cfg.Rest.Port))
 
-	log.Println("Starting REST server on " + httpServer.Addr)
-
-	err := httpf.Serve(ctx, httpServer, cfg.Rest.Timeouts.Shutdown)
+	err := httpf.ListenAndServe(ctx, cfg.Rest, router)
 
 	stop()
 
