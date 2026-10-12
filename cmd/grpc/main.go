@@ -94,7 +94,7 @@ func main() {
 		return postgres.TransferContext(ctx, rpCtx)
 	}
 
-	server := grpcf.NewServer(cfg.Otel, cfg.Logger, cfg.App.DowntimeStart, ctxInterceptor)
+	server := grpcf.NewServer(ctx, cfg.Otel, cfg.Logger, cfg.App.DowntimeStart, ctxInterceptor)
 
 	healthcheck := grpcf.RegisterEchoServers(server)
 	healthcheck.SetServingStatus("", healthpb.HealthCheckResponse_SERVING)
