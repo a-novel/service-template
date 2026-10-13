@@ -47,6 +47,9 @@ jobs:
     timeout-minutes: 60
     strategy:
       fail-fast: false
+      # Deletions share the repository's API quota with its CI, so packages take turns; a backlog that
+      # outlasts the timeout resumes the next day.
+      max-parallel: 1
       matrix:
         package: ${{ fromJSON(needs.packages.outputs.names) }}
     # The cleanup is not safe to run twice at once on one package.
