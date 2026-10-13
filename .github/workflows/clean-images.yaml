@@ -64,4 +64,4 @@ jobs:
         with:
           package: ${{ matrix.package }}
           github_token: ${{ github.token }}
-          dry_run: "true"
+          dry_run: "false"
