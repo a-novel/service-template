@@ -1,3 +1,11 @@
+# Podman drops a Dockerfile's HEALTHCHECK from OCI images, the format it builds by default and the
+# one images are published in: a service the others wait for declares its check here.
+x-postgres-healthcheck: &postgres-healthcheck
+  test: ["CMD", "pg_isready"]
+  interval: 1s
+  timeout: 5s
+  retries: 10
+
 services:
   # ====================================================================================================================
   # DATABASE
@@ -19,6 +27,7 @@ services:
       POSTGRES_INITDB_ARGS: --auth=scram-sha-256
     volumes:
       - template-postgres-data:/var/lib/postgresql/
+    healthcheck: *postgres-healthcheck
 
   # ====================================================================================================================
   # ONE-SHOT TARGETS
@@ -51,8 +60,6 @@ services:
     depends_on:
       postgres-template:
         condition: service_healthy
-      service-template-migrations:
-        condition: service_completed_successfully
     environment:
       POSTGRES_DSN: postgres://postgres:postgres@postgres-template:5432/postgres?sslmode=disable
     networks:
@@ -68,8 +75,6 @@ services:
     depends_on:
       postgres-template:
         condition: service_healthy
-      service-template-migrations:
-        condition: service_completed_successfully
     environment:
       POSTGRES_DSN: postgres://postgres:postgres@postgres-template:5432/postgres?sslmode=disable
     networks:
