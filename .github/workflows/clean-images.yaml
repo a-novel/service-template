@@ -22,18 +22,22 @@ jobs:
   packages:
     runs-on: ubuntu-latest
     permissions:
-      packages: read
+      contents: read
     outputs:
       names: ${{ steps.list.outputs.names }}
     steps:
-      - name: List this repository's container packages
+      - uses: actions/checkout@v7
+        with:
+          sparse-checkout: .github/workflows
+          persist-credentials: false
+      # A workflow token cannot list the organization's packages, so the images this repository's
+      # workflows publish name them.
+      - name: List the images this repository publishes
         id: list
-        env:
-          GH_TOKEN: ${{ github.token }}
         run: |
           set -euo pipefail
-          names=$(gh api --paginate "orgs/$GITHUB_REPOSITORY_OWNER/packages?package_type=container" \
-            --jq '[.[] | select(.repository.full_name == env.GITHUB_REPOSITORY) | .name]' | jq -sc 'add // []')
+          names=$(grep -h -o -E 'image_name: \$\{\{ github\.repository \}\}[^ "]*' .github/workflows/*.yaml |
+            sed -E "s#.*\}\}#${GITHUB_REPOSITORY#*/}#" | sort -u | jq -R . | jq -sc .)
           echo "names=$names" >> "$GITHUB_OUTPUT"
 
   clean:
