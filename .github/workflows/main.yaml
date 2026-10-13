@@ -241,7 +241,7 @@ jobs:
     outputs:
       digest: ${{ steps.build.outputs.digest }}
     steps:
-      - uses: a-novel-kit/workflows/build-actions/docker@v1.51.2
+      - uses: a-novel-kit/workflows/build-actions/docker@71de109aac46959b37b9b88955bc5e12f8263be2
         id: build
         with:
           file: builds/database.Dockerfile
@@ -317,7 +317,7 @@ jobs:
           persist-credentials: false
       - *start-local-database
       - uses: $/.github/actions/run-migrations
-      - uses: a-novel-kit/workflows/build-actions/docker@v1.51.2
+      - uses: a-novel-kit/workflows/build-actions/docker@71de109aac46959b37b9b88955bc5e12f8263be2
         with:
           file: builds/grpc.Dockerfile
           image_name: ${{ github.repository }}/grpc
@@ -337,7 +337,7 @@ jobs:
     # integration run), so this job only builds + pushes it. skip_healthcheck
     # drops the redundant smoke run and the container constellation it needed.
     steps:
-      - uses: a-novel-kit/workflows/build-actions/docker@v1.51.2
+      - uses: a-novel-kit/workflows/build-actions/docker@71de109aac46959b37b9b88955bc5e12f8263be2
         id: build
         with:
           file: builds/standalone.grpc.Dockerfile
@@ -361,7 +361,7 @@ jobs:
           persist-credentials: false
       - *start-local-database
       - uses: $/.github/actions/run-migrations
-      - uses: a-novel-kit/workflows/build-actions/docker@v1.51.2
+      - uses: a-novel-kit/workflows/build-actions/docker@71de109aac46959b37b9b88955bc5e12f8263be2
         with:
           file: builds/rest.Dockerfile
           image_name: ${{ github.repository }}/rest
@@ -381,7 +381,7 @@ jobs:
     # integration run), so this job only builds + pushes it. skip_healthcheck
     # drops the redundant smoke run and the container constellation it needed.
     steps:
-      - uses: a-novel-kit/workflows/build-actions/docker@v1.51.2
+      - uses: a-novel-kit/workflows/build-actions/docker@71de109aac46959b37b9b88955bc5e12f8263be2
         id: build
         with:
           file: builds/standalone.rest.Dockerfile
