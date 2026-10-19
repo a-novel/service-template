@@ -1,7 +1,6 @@
-# Exposes the service as a REST server, against a database whose schema may be out of date.
-#
-# It ships the migrations binary alongside the server and applies pending migrations on start,
-# which makes it larger than the base REST image and suited to local development.
+# Standalone REST server image for local development. Applies migrations automatically before
+# starting the server, so the database needs no pre-initialization.
+# Production deployments use the base REST image (rest.Dockerfile).
 FROM docker.io/library/golang:1.27.2-alpine AS builder
 
 ENV CGO_ENABLED=0
@@ -20,15 +19,12 @@ COPY ./internal/core ./internal/core
 COPY ./internal/models ./internal/models
 COPY ./internal/config ./internal/config
 
-# One RUN so the two binaries share a single warm module + build cache.
 RUN --mount=type=cache,target=/go/pkg/mod \
     --mount=type=cache,target=/root/.cache/go-build \
     go build -ldflags="-s -w" -trimpath -o /rest ./cmd/rest/ && \
     go build -ldflags="-s -w" -trimpath -o /migrations ./cmd/migrations/
 
 FROM docker.io/library/alpine:3.24.2
-
-WORKDIR /
 
 COPY --from=builder /rest /rest
 COPY --from=builder /migrations /migrations
@@ -39,8 +35,6 @@ HEALTHCHECK --interval=1s --timeout=5s --retries=10 --start-period=1s \
 
 ENV REST_PORT=8080
 
-# REST port.
 EXPOSE 8080
 
-# Apply pending migrations, then start the server.
 CMD ["sh", "-c", "/migrations && /rest"]

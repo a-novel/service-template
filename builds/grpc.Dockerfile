@@ -1,6 +1,4 @@
-# Exposes the service as a gRPC server.
-#
-# It needs a database instance with the schema migrations already applied.
+# Runs the gRPC server. Requires a database with migrations already applied.
 FROM docker.io/library/golang:1.27.2-alpine AS builder
 
 # Static binary: no libc dependency, so it runs on a bare alpine base.
@@ -43,7 +41,6 @@ HEALTHCHECK --interval=1s --timeout=5s --retries=10 --start-period=1s \
 
 ENV GRPC_PORT=8080
 
-# gRPC port.
 EXPOSE 8080
 # TLS port.
 EXPOSE 443
