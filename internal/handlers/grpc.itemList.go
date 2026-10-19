@@ -13,26 +13,26 @@ import (
 	"github.com/a-novel/service-template/internal/handlers/protogen"
 )
 
-// ItemListService returns a page of items bounded by the request's limit and
+// GrpcItemListService returns a page of items bounded by the request's limit and
 // offset. The core layer supplies the implementation.
-type ItemListService interface {
+type GrpcItemListService interface {
 	Exec(ctx context.Context, request *core.ItemListRequest) ([]*core.Item, error)
 }
 
-// ItemList is the gRPC handler for the ItemList RPC.
-type ItemList struct {
+// GrpcItemList is the gRPC handler for the ItemList RPC.
+type GrpcItemList struct {
 	protogen.UnimplementedItemListServiceServer
 
-	service ItemListService
+	service GrpcItemListService
 }
 
-func NewItemList(service ItemListService) *ItemList {
-	return &ItemList{service: service}
+func NewGrpcItemList(service GrpcItemListService) *GrpcItemList {
+	return &GrpcItemList{service: service}
 }
 
 // ItemList returns a page of items. A rejected request maps to InvalidArgument;
 // any other failure maps to Internal.
-func (handler *ItemList) ItemList(
+func (handler *GrpcItemList) ItemList(
 	ctx context.Context, request *protogen.ItemListRequest,
 ) (*protogen.ItemListResponse, error) {
 	ctx, span := otel.Tracer().Start(ctx, "grpc.ItemList")

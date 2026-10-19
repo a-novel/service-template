@@ -14,22 +14,22 @@ import (
 //go:embed pg.itemList.sql
 var itemListQuery string
 
-// ItemListRequest is the input to [ItemList.Exec].
+// ItemListRequest is the input to [PgItemList.Exec].
 type ItemListRequest struct {
 	Limit  int
 	Offset int
 }
 
-// ItemList retrieves a paginated list of items ordered by creation date (newest first), with the id
+// PgItemList retrieves a paginated list of items ordered by creation date (newest first), with the id
 // as a tiebreaker so the ordering is total. Offset pagination is only coherent over a total order.
-type ItemList struct{}
+type PgItemList struct{}
 
-func NewItemList() *ItemList {
-	return new(ItemList)
+func NewPgItemList() *PgItemList {
+	return &PgItemList{}
 }
 
-func (dao *ItemList) Exec(ctx context.Context, request *ItemListRequest) ([]*Item, error) {
-	ctx, span := otel.Tracer().Start(ctx, "dao.ItemList")
+func (dao *PgItemList) Exec(ctx context.Context, request *ItemListRequest) ([]*Item, error) {
+	ctx, span := otel.Tracer().Start(ctx, "dao.PgItemList")
 	defer span.End()
 
 	tx, err := postgres.GetContext(ctx)

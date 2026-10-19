@@ -27,7 +27,7 @@ type GrpcStatus struct {
 }
 
 func NewGrpcStatus() *GrpcStatus {
-	return new(GrpcStatus)
+	return &GrpcStatus{}
 }
 
 // Status probes each dependency and returns their health, or Unavailable when a probe fails.

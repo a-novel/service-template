@@ -13,32 +13,32 @@ import (
 	"github.com/a-novel/service-template/internal/core"
 )
 
-// ItemDeletePublicService is the core operation the delete endpoint delegates to.
-type ItemDeletePublicService interface {
+// RestItemDeleteService is the core operation the delete endpoint delegates to.
+type RestItemDeleteService interface {
 	Exec(ctx context.Context, request *core.ItemDeleteRequest) (*core.Item, error)
 }
 
-// ItemDeletePublicRequest carries the query parameters accepted by the delete endpoint.
-type ItemDeletePublicRequest struct {
+// RestItemDeleteRequest carries the query parameters accepted by the delete endpoint.
+type RestItemDeleteRequest struct {
 	ID uuid.UUID `schema:"id"`
 }
 
-// ItemDeletePublic is the HTTP handler for the delete-item endpoint. It responds
+// RestItemDelete is the HTTP handler for the delete-item endpoint. It responds
 // with the deleted item.
-type ItemDeletePublic struct {
-	service ItemDeletePublicService
+type RestItemDelete struct {
+	service RestItemDeleteService
 	logger  logging.Log
 }
 
-func NewItemDeletePublic(service ItemDeletePublicService, logger logging.Log) *ItemDeletePublic {
-	return &ItemDeletePublic{service: service, logger: logger}
+func NewRestItemDelete(service RestItemDeleteService, logger logging.Log) *RestItemDelete {
+	return &RestItemDelete{service: service, logger: logger}
 }
 
-func (handler *ItemDeletePublic) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	ctx, span := otel.Tracer().Start(r.Context(), "rest.ItemDeletePublic")
+func (handler *RestItemDelete) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	ctx, span := otel.Tracer().Start(r.Context(), "rest.ItemDelete")
 	defer span.End()
 
-	var request ItemDeletePublicRequest
+	var request RestItemDeleteRequest
 
 	err := muxDecoder.Decode(&request, r.URL.Query())
 	if err != nil {

@@ -59,11 +59,11 @@ func main() {
 	// DAO
 	// =================================================================================================================
 
-	daoItemCreate := dao.NewItemCreate()
-	daoItemGet := dao.NewItemGet()
-	daoItemList := dao.NewItemList()
-	daoItemUpdate := dao.NewItemUpdate()
-	daoItemDelete := dao.NewItemDelete()
+	daoItemCreate := dao.NewPgItemCreate()
+	daoItemGet := dao.NewPgItemGet()
+	daoItemList := dao.NewPgItemList()
+	daoItemUpdate := dao.NewPgItemUpdate()
+	daoItemDelete := dao.NewPgItemDelete()
 
 	// =================================================================================================================
 	// SERVICES
@@ -80,11 +80,11 @@ func main() {
 	// =================================================================================================================
 
 	handlerStatus := handlers.NewGrpcStatus()
-	handlerItemCreate := handlers.NewItemCreate(serviceItemCreate)
-	handlerItemGet := handlers.NewItemGet(serviceItemGet)
-	handlerItemList := handlers.NewItemList(serviceItemList)
-	handlerItemUpdate := handlers.NewItemUpdate(serviceItemUpdate)
-	handlerItemDelete := handlers.NewItemDelete(serviceItemDelete)
+	handlerItemCreate := handlers.NewGrpcItemCreate(serviceItemCreate)
+	handlerItemGet := handlers.NewGrpcItemGet(serviceItemGet)
+	handlerItemList := handlers.NewGrpcItemList(serviceItemList)
+	handlerItemUpdate := handlers.NewGrpcItemUpdate(serviceItemUpdate)
+	handlerItemDelete := handlers.NewGrpcItemDelete(serviceItemDelete)
 
 	// =================================================================================================================
 	// SERVER

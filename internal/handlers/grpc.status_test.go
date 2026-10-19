@@ -14,7 +14,7 @@ import (
 	"github.com/a-novel/service-template/internal/handlers/protogen"
 )
 
-func TestStatus(t *testing.T) {
+func TestGrpcStatus(t *testing.T) {
 	t.Parallel()
 
 	testCases := []struct {

@@ -16,7 +16,7 @@ import (
 	"github.com/a-novel/service-template/internal/handlers"
 )
 
-func TestHealth(t *testing.T) {
+func TestRestHealth(t *testing.T) {
 	t.Parallel()
 
 	testCases := []struct {

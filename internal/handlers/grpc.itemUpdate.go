@@ -14,27 +14,27 @@ import (
 	"github.com/a-novel/service-template/internal/handlers/protogen"
 )
 
-// ItemUpdateService applies the request's changes to the identified item and
+// GrpcItemUpdateService applies the request's changes to the identified item and
 // returns the updated record. The core layer supplies the implementation.
-type ItemUpdateService interface {
+type GrpcItemUpdateService interface {
 	Exec(ctx context.Context, request *core.ItemUpdateRequest) (*core.Item, error)
 }
 
-// ItemUpdate is the gRPC handler for the ItemUpdate RPC.
-type ItemUpdate struct {
+// GrpcItemUpdate is the gRPC handler for the ItemUpdate RPC.
+type GrpcItemUpdate struct {
 	protogen.UnimplementedItemUpdateServiceServer
 
-	service ItemUpdateService
+	service GrpcItemUpdateService
 }
 
-func NewItemUpdate(service ItemUpdateService) *ItemUpdate {
-	return &ItemUpdate{service: service}
+func NewGrpcItemUpdate(service GrpcItemUpdateService) *GrpcItemUpdate {
+	return &GrpcItemUpdate{service: service}
 }
 
 // ItemUpdate applies the requested changes to the item with the given ID and
 // returns the updated record. A malformed ID or rejected request maps to
 // InvalidArgument, a missing item to NotFound, and any other failure to Internal.
-func (handler *ItemUpdate) ItemUpdate(
+func (handler *GrpcItemUpdate) ItemUpdate(
 	ctx context.Context, request *protogen.ItemUpdateRequest,
 ) (*protogen.ItemUpdateResponse, error) {
 	ctx, span := otel.Tracer().Start(ctx, "grpc.ItemUpdate")

@@ -20,7 +20,7 @@ import (
 	handlersmocks "github.com/a-novel/service-template/internal/handlers/mocks"
 )
 
-func TestRestItemCreatePublic(t *testing.T) {
+func TestRestItemCreate(t *testing.T) {
 	t.Parallel()
 
 	errFoo := errors.New("foo")
@@ -113,7 +113,7 @@ func TestRestItemCreatePublic(t *testing.T) {
 		t.Run(testCase.name, func(t *testing.T) {
 			t.Parallel()
 
-			service := handlersmocks.NewMockItemCreatePublicService(t)
+			service := handlersmocks.NewMockRestItemCreateService(t)
 
 			if testCase.serviceMock != nil {
 				service.EXPECT().
@@ -121,7 +121,7 @@ func TestRestItemCreatePublic(t *testing.T) {
 					Return(testCase.serviceMock.resp, testCase.serviceMock.err)
 			}
 
-			handler := handlers.NewItemCreatePublic(service, config.LoggerDev)
+			handler := handlers.NewRestItemCreate(service, config.LoggerDev)
 			w := httptest.NewRecorder()
 
 			handler.ServeHTTP(w, testCase.request)
@@ -149,7 +149,7 @@ func TestRestItemCreatePublic(t *testing.T) {
 func TestRestItemCreatePublicSetsJSONContentType(t *testing.T) {
 	t.Parallel()
 
-	service := handlersmocks.NewMockItemCreatePublicService(t)
+	service := handlersmocks.NewMockRestItemCreateService(t)
 	service.EXPECT().
 		Exec(mock.Anything, &core.ItemCreateRequest{Name: "n", Description: "d"}).
 		Return(&core.Item{
@@ -160,7 +160,7 @@ func TestRestItemCreatePublicSetsJSONContentType(t *testing.T) {
 			UpdatedAt:   time.Date(2021, 1, 1, 0, 0, 0, 0, time.UTC),
 		}, nil)
 
-	server := httptest.NewServer(handlers.NewItemCreatePublic(service, config.LoggerDev))
+	server := httptest.NewServer(handlers.NewRestItemCreate(service, config.LoggerDev))
 	t.Cleanup(server.Close)
 
 	req, err := http.NewRequestWithContext(

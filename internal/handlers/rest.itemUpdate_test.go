@@ -20,7 +20,7 @@ import (
 	handlersmocks "github.com/a-novel/service-template/internal/handlers/mocks"
 )
 
-func TestRestItemUpdatePublic(t *testing.T) {
+func TestRestItemUpdate(t *testing.T) {
 	t.Parallel()
 
 	errFoo := errors.New("foo")
@@ -151,7 +151,7 @@ func TestRestItemUpdatePublic(t *testing.T) {
 		t.Run(testCase.name, func(t *testing.T) {
 			t.Parallel()
 
-			service := handlersmocks.NewMockItemUpdatePublicService(t)
+			service := handlersmocks.NewMockRestItemUpdateService(t)
 
 			if testCase.serviceMock != nil {
 				service.EXPECT().
@@ -159,7 +159,7 @@ func TestRestItemUpdatePublic(t *testing.T) {
 					Return(testCase.serviceMock.resp, testCase.serviceMock.err)
 			}
 
-			handler := handlers.NewItemUpdatePublic(service, config.LoggerDev)
+			handler := handlers.NewRestItemUpdate(service, config.LoggerDev)
 			w := httptest.NewRecorder()
 
 			handler.ServeHTTP(w, testCase.request)

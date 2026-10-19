@@ -11,33 +11,33 @@ import (
 	"github.com/a-novel/service-template/internal/core"
 )
 
-// ItemCreatePublicService is the core operation the create endpoint delegates to.
-type ItemCreatePublicService interface {
+// RestItemCreateService is the core operation the create endpoint delegates to.
+type RestItemCreateService interface {
 	Exec(ctx context.Context, request *core.ItemCreateRequest) (*core.Item, error)
 }
 
-// ItemCreatePublicRequest is the JSON body accepted by the create endpoint.
-type ItemCreatePublicRequest struct {
+// RestItemCreateRequest is the JSON body accepted by the create endpoint.
+type RestItemCreateRequest struct {
 	Name        string `json:"name"`
 	Description string `json:"description"`
 }
 
-// ItemCreatePublic is the HTTP handler for the create-item endpoint. It responds
+// RestItemCreate is the HTTP handler for the create-item endpoint. It responds
 // 201 with the created item.
-type ItemCreatePublic struct {
-	service ItemCreatePublicService
+type RestItemCreate struct {
+	service RestItemCreateService
 	logger  logging.Log
 }
 
-func NewItemCreatePublic(service ItemCreatePublicService, logger logging.Log) *ItemCreatePublic {
-	return &ItemCreatePublic{service: service, logger: logger}
+func NewRestItemCreate(service RestItemCreateService, logger logging.Log) *RestItemCreate {
+	return &RestItemCreate{service: service, logger: logger}
 }
 
-func (handler *ItemCreatePublic) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	ctx, span := otel.Tracer().Start(r.Context(), "rest.ItemCreatePublic")
+func (handler *RestItemCreate) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	ctx, span := otel.Tracer().Start(r.Context(), "rest.ItemCreate")
 	defer span.End()
 
-	var request ItemCreatePublicRequest
+	var request RestItemCreateRequest
 
 	err := httpf.DecodeJSON(r.Body, &request)
 	if err != nil {

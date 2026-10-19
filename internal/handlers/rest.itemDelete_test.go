@@ -19,7 +19,7 @@ import (
 	handlersmocks "github.com/a-novel/service-template/internal/handlers/mocks"
 )
 
-func TestRestItemDeletePublic(t *testing.T) {
+func TestRestItemDelete(t *testing.T) {
 	t.Parallel()
 
 	errFoo := errors.New("foo")
@@ -128,7 +128,7 @@ func TestRestItemDeletePublic(t *testing.T) {
 		t.Run(testCase.name, func(t *testing.T) {
 			t.Parallel()
 
-			service := handlersmocks.NewMockItemDeletePublicService(t)
+			service := handlersmocks.NewMockRestItemDeleteService(t)
 
 			if testCase.serviceMock != nil {
 				service.EXPECT().
@@ -136,7 +136,7 @@ func TestRestItemDeletePublic(t *testing.T) {
 					Return(testCase.serviceMock.resp, testCase.serviceMock.err)
 			}
 
-			handler := handlers.NewItemDeletePublic(service, config.LoggerDev)
+			handler := handlers.NewRestItemDelete(service, config.LoggerDev)
 			w := httptest.NewRecorder()
 
 			handler.ServeHTTP(w, testCase.request)

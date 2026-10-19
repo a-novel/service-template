@@ -98,7 +98,7 @@ func TestGrpcItemCreate(t *testing.T) {
 		t.Run(testCase.name, func(t *testing.T) {
 			t.Parallel()
 
-			service := handlersmocks.NewMockItemCreateService(t)
+			service := handlersmocks.NewMockGrpcItemCreateService(t)
 
 			if testCase.serviceMock != nil {
 				service.EXPECT().
@@ -109,7 +109,7 @@ func TestGrpcItemCreate(t *testing.T) {
 					Return(testCase.serviceMock.resp, testCase.serviceMock.err)
 			}
 
-			handler := handlers.NewItemCreate(service)
+			handler := handlers.NewGrpcItemCreate(service)
 
 			res, err := handler.ItemCreate(t.Context(), testCase.request)
 			resSt, ok := status.FromError(err)

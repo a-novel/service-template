@@ -125,7 +125,7 @@ func TestGrpcItemUpdate(t *testing.T) {
 		t.Run(testCase.name, func(t *testing.T) {
 			t.Parallel()
 
-			service := handlersmocks.NewMockItemUpdateService(t)
+			service := handlersmocks.NewMockGrpcItemUpdateService(t)
 
 			if testCase.serviceMock != nil {
 				service.EXPECT().
@@ -137,7 +137,7 @@ func TestGrpcItemUpdate(t *testing.T) {
 					Return(testCase.serviceMock.resp, testCase.serviceMock.err)
 			}
 
-			handler := handlers.NewItemUpdate(service)
+			handler := handlers.NewGrpcItemUpdate(service)
 
 			res, err := handler.ItemUpdate(t.Context(), testCase.request)
 			resSt, ok := status.FromError(err)

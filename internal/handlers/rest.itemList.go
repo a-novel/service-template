@@ -13,33 +13,33 @@ import (
 	"github.com/a-novel/service-template/internal/core"
 )
 
-// ItemListPublicService is the core operation the list endpoint delegates to.
-type ItemListPublicService interface {
+// RestItemListService is the core operation the list endpoint delegates to.
+type RestItemListService interface {
 	Exec(ctx context.Context, request *core.ItemListRequest) ([]*core.Item, error)
 }
 
-// ItemListPublicRequest carries the pagination query parameters accepted by the
+// RestItemListRequest carries the pagination query parameters accepted by the
 // list endpoint.
-type ItemListPublicRequest struct {
+type RestItemListRequest struct {
 	Limit  int `schema:"limit"`
 	Offset int `schema:"offset"`
 }
 
-// ItemListPublic is the HTTP handler for the list-items endpoint.
-type ItemListPublic struct {
-	service ItemListPublicService
+// RestItemList is the HTTP handler for the list-items endpoint.
+type RestItemList struct {
+	service RestItemListService
 	logger  logging.Log
 }
 
-func NewItemListPublic(service ItemListPublicService, logger logging.Log) *ItemListPublic {
-	return &ItemListPublic{service: service, logger: logger}
+func NewRestItemList(service RestItemListService, logger logging.Log) *RestItemList {
+	return &RestItemList{service: service, logger: logger}
 }
 
-func (handler *ItemListPublic) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	ctx, span := otel.Tracer().Start(r.Context(), "rest.ItemListPublic")
+func (handler *RestItemList) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	ctx, span := otel.Tracer().Start(r.Context(), "rest.ItemList")
 	defer span.End()
 
-	var request ItemListPublicRequest
+	var request RestItemListRequest
 
 	err := muxDecoder.Decode(&request, r.URL.Query())
 	if err != nil {

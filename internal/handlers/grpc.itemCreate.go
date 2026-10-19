@@ -14,26 +14,26 @@ import (
 	"github.com/a-novel/service-template/internal/handlers/protogen"
 )
 
-// ItemCreateService creates an item from the request and returns the stored
+// GrpcItemCreateService creates an item from the request and returns the stored
 // record. The core layer supplies the implementation.
-type ItemCreateService interface {
+type GrpcItemCreateService interface {
 	Exec(ctx context.Context, request *core.ItemCreateRequest) (*core.Item, error)
 }
 
-// ItemCreate is the gRPC handler for the ItemCreate RPC.
-type ItemCreate struct {
+// GrpcItemCreate is the gRPC handler for the ItemCreate RPC.
+type GrpcItemCreate struct {
 	protogen.UnimplementedItemCreateServiceServer
 
-	service ItemCreateService
+	service GrpcItemCreateService
 }
 
-func NewItemCreate(service ItemCreateService) *ItemCreate {
-	return &ItemCreate{service: service}
+func NewGrpcItemCreate(service GrpcItemCreateService) *GrpcItemCreate {
+	return &GrpcItemCreate{service: service}
 }
 
 // ItemCreate creates an item and returns it. A rejected request maps to
 // InvalidArgument; any other failure maps to Internal.
-func (handler *ItemCreate) ItemCreate(
+func (handler *GrpcItemCreate) ItemCreate(
 	ctx context.Context, request *protogen.ItemCreateRequest,
 ) (*protogen.ItemCreateResponse, error) {
 	ctx, span := otel.Tracer().Start(ctx, "grpc.ItemCreate")

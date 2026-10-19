@@ -13,31 +13,31 @@ import (
 	"github.com/a-novel/service-template/internal/core"
 )
 
-// ItemGetPublicService is the core operation the get endpoint delegates to.
-type ItemGetPublicService interface {
+// RestItemGetService is the core operation the get endpoint delegates to.
+type RestItemGetService interface {
 	Exec(ctx context.Context, request *core.ItemGetRequest) (*core.Item, error)
 }
 
-// ItemGetPublicRequest carries the query parameters accepted by the get endpoint.
-type ItemGetPublicRequest struct {
+// RestItemGetRequest carries the query parameters accepted by the get endpoint.
+type RestItemGetRequest struct {
 	ID uuid.UUID `schema:"id"`
 }
 
-// ItemGetPublic is the HTTP handler for the get-item endpoint.
-type ItemGetPublic struct {
-	service ItemGetPublicService
+// RestItemGet is the HTTP handler for the get-item endpoint.
+type RestItemGet struct {
+	service RestItemGetService
 	logger  logging.Log
 }
 
-func NewItemGetPublic(service ItemGetPublicService, logger logging.Log) *ItemGetPublic {
-	return &ItemGetPublic{service: service, logger: logger}
+func NewRestItemGet(service RestItemGetService, logger logging.Log) *RestItemGet {
+	return &RestItemGet{service: service, logger: logger}
 }
 
-func (handler *ItemGetPublic) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	ctx, span := otel.Tracer().Start(r.Context(), "rest.ItemGetPublic")
+func (handler *RestItemGet) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	ctx, span := otel.Tracer().Start(r.Context(), "rest.ItemGet")
 	defer span.End()
 
-	var request ItemGetPublicRequest
+	var request RestItemGetRequest
 
 	err := muxDecoder.Decode(&request, r.URL.Query())
 	if err != nil {

@@ -13,34 +13,34 @@ import (
 	"github.com/a-novel/service-template/internal/core"
 )
 
-// ItemUpdatePublicService is the core operation the update endpoint delegates to.
-type ItemUpdatePublicService interface {
+// RestItemUpdateService is the core operation the update endpoint delegates to.
+type RestItemUpdateService interface {
 	Exec(ctx context.Context, request *core.ItemUpdateRequest) (*core.Item, error)
 }
 
-// ItemUpdatePublicRequest is the JSON body accepted by the update endpoint.
-type ItemUpdatePublicRequest struct {
+// RestItemUpdateRequest is the JSON body accepted by the update endpoint.
+type RestItemUpdateRequest struct {
 	ID          uuid.UUID `json:"id"`
 	Name        string    `json:"name"`
 	Description string    `json:"description"`
 }
 
-// ItemUpdatePublic is the HTTP handler for the update-item endpoint. It responds
+// RestItemUpdate is the HTTP handler for the update-item endpoint. It responds
 // with the updated item.
-type ItemUpdatePublic struct {
-	service ItemUpdatePublicService
+type RestItemUpdate struct {
+	service RestItemUpdateService
 	logger  logging.Log
 }
 
-func NewItemUpdatePublic(service ItemUpdatePublicService, logger logging.Log) *ItemUpdatePublic {
-	return &ItemUpdatePublic{service: service, logger: logger}
+func NewRestItemUpdate(service RestItemUpdateService, logger logging.Log) *RestItemUpdate {
+	return &RestItemUpdate{service: service, logger: logger}
 }
 
-func (handler *ItemUpdatePublic) ServeHTTP(w http.ResponseWriter, r *http.Request) {
-	ctx, span := otel.Tracer().Start(r.Context(), "rest.ItemUpdatePublic")
+func (handler *RestItemUpdate) ServeHTTP(w http.ResponseWriter, r *http.Request) {
+	ctx, span := otel.Tracer().Start(r.Context(), "rest.ItemUpdate")
 	defer span.End()
 
-	var request ItemUpdatePublicRequest
+	var request RestItemUpdateRequest
 
 	err := httpf.DecodeJSON(r.Body, &request)
 	if err != nil {

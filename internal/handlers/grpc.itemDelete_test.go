@@ -106,7 +106,7 @@ func TestGrpcItemDelete(t *testing.T) {
 		t.Run(testCase.name, func(t *testing.T) {
 			t.Parallel()
 
-			service := handlersmocks.NewMockItemDeleteService(t)
+			service := handlersmocks.NewMockGrpcItemDeleteService(t)
 
 			if testCase.serviceMock != nil {
 				service.EXPECT().
@@ -116,7 +116,7 @@ func TestGrpcItemDelete(t *testing.T) {
 					Return(testCase.serviceMock.resp, testCase.serviceMock.err)
 			}
 
-			handler := handlers.NewItemDelete(service)
+			handler := handlers.NewGrpcItemDelete(service)
 
 			res, err := handler.ItemDelete(t.Context(), testCase.request)
 			resSt, ok := status.FromError(err)

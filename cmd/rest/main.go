@@ -56,11 +56,11 @@ func main() {
 	// DAO
 	// =================================================================================================================
 
-	daoItemCreate := dao.NewItemCreate()
-	daoItemGet := dao.NewItemGet()
-	daoItemList := dao.NewItemList()
-	daoItemUpdate := dao.NewItemUpdate()
-	daoItemDelete := dao.NewItemDelete()
+	daoItemCreate := dao.NewPgItemCreate()
+	daoItemGet := dao.NewPgItemGet()
+	daoItemList := dao.NewPgItemList()
+	daoItemUpdate := dao.NewPgItemUpdate()
+	daoItemDelete := dao.NewPgItemDelete()
 
 	// =================================================================================================================
 	// SERVICES
@@ -76,13 +76,13 @@ func main() {
 	// HANDLERS
 	// =================================================================================================================
 
-	handlerPing := handlers.NewPing()
+	handlerPing := handlers.NewRestPing()
 	handlerHealth := handlers.NewRestHealth()
-	handlerItemCreate := handlers.NewItemCreatePublic(serviceItemCreate, cfg.Logger)
-	handlerItemGet := handlers.NewItemGetPublic(serviceItemGet, cfg.Logger)
-	handlerItemList := handlers.NewItemListPublic(serviceItemList, cfg.Logger)
-	handlerItemUpdate := handlers.NewItemUpdatePublic(serviceItemUpdate, cfg.Logger)
-	handlerItemDelete := handlers.NewItemDeletePublic(serviceItemDelete, cfg.Logger)
+	handlerItemCreate := handlers.NewRestItemCreate(serviceItemCreate, cfg.Logger)
+	handlerItemGet := handlers.NewRestItemGet(serviceItemGet, cfg.Logger)
+	handlerItemList := handlers.NewRestItemList(serviceItemList, cfg.Logger)
+	handlerItemUpdate := handlers.NewRestItemUpdate(serviceItemUpdate, cfg.Logger)
+	handlerItemDelete := handlers.NewRestItemDelete(serviceItemDelete, cfg.Logger)
 
 	// =================================================================================================================
 	// ROUTER

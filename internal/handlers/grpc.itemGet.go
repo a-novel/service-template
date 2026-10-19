@@ -14,27 +14,27 @@ import (
 	"github.com/a-novel/service-template/internal/handlers/protogen"
 )
 
-// ItemGetService returns the item identified by the request. The core layer
+// GrpcItemGetService returns the item identified by the request. The core layer
 // supplies the implementation.
-type ItemGetService interface {
+type GrpcItemGetService interface {
 	Exec(ctx context.Context, request *core.ItemGetRequest) (*core.Item, error)
 }
 
-// ItemGet is the gRPC handler for the ItemGet RPC.
-type ItemGet struct {
+// GrpcItemGet is the gRPC handler for the ItemGet RPC.
+type GrpcItemGet struct {
 	protogen.UnimplementedItemGetServiceServer
 
-	service ItemGetService
+	service GrpcItemGetService
 }
 
-func NewItemGet(service ItemGetService) *ItemGet {
-	return &ItemGet{service: service}
+func NewGrpcItemGet(service GrpcItemGetService) *GrpcItemGet {
+	return &GrpcItemGet{service: service}
 }
 
 // ItemGet returns the item with the given ID. A malformed ID or rejected request
 // maps to InvalidArgument, a missing item to NotFound, and any other failure to
 // Internal.
-func (handler *ItemGet) ItemGet(
+func (handler *GrpcItemGet) ItemGet(
 	ctx context.Context, request *protogen.ItemGetRequest,
 ) (*protogen.ItemGetResponse, error) {
 	ctx, span := otel.Tracer().Start(ctx, "grpc.ItemGet")
