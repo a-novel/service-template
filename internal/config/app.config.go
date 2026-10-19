@@ -1,6 +1,3 @@
-// Package config assembles the runtime configuration for the service: the typed
-// structs the application reads, and the default preset that populates them from
-// the environment.
 package config
 
 import (
@@ -22,16 +19,23 @@ type Main struct {
 	DowntimeStart *time.Time `json:"downtimeStart" yaml:"downtimeStart"`
 }
 
-// App is the complete configuration consumed by the service at startup, grouping
-// the server, observability, logging, and database settings.
+// App is the complete configuration the service reads at startup.
 type App struct {
-	App  Main               `json:"app"  yaml:"app"`
+	// App holds the top-level application settings.
+	App Main `json:"app" yaml:"app"`
+	// Grpc configures the gRPC server.
 	Grpc grpcf.ServerConfig `json:"grpc" yaml:"grpc"`
+	// Rest configures the REST server.
 	Rest httpf.ServerConfig `json:"rest" yaml:"rest"`
 
-	Otel       otel.Config        `json:"otel"       yaml:"otel"`
-	Log        logging.Log        `json:"log"        yaml:"log"`
-	Logger     logging.RPCConfig  `json:"logger"     yaml:"logger"`
-	HttpLogger logging.HTTPConfig `json:"httpLogger" yaml:"httpLogger"`
-	Postgres   postgres.Config    `json:"postgres"   yaml:"postgres"`
+	// Otel configures the OpenTelemetry exporter.
+	Otel otel.Config `json:"otel" yaml:"otel"`
+	// Logger is the application logger the REST handlers report their errors to.
+	Logger logging.Log `json:"logger" yaml:"logger"`
+	// GrpcLogger configures the gRPC request logging middleware.
+	GrpcLogger logging.RPCConfig `json:"grpcLogger" yaml:"grpcLogger"`
+	// RestLogger configures the REST request logging middleware.
+	RestLogger logging.HTTPConfig `json:"restLogger" yaml:"restLogger"`
+	// Postgres configures the PostgreSQL connection.
+	Postgres postgres.Config `json:"postgres" yaml:"postgres"`
 }

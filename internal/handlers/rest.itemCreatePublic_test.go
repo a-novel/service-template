@@ -121,7 +121,7 @@ func TestRestItemCreatePublic(t *testing.T) {
 					Return(testCase.serviceMock.resp, testCase.serviceMock.err)
 			}
 
-			handler := handlers.NewItemCreatePublic(service, config.LoggerDevHttp)
+			handler := handlers.NewItemCreatePublic(service, config.LoggerDev)
 			w := httptest.NewRecorder()
 
 			handler.ServeHTTP(w, testCase.request)
@@ -160,7 +160,7 @@ func TestRestItemCreatePublicSetsJSONContentType(t *testing.T) {
 			UpdatedAt:   time.Date(2021, 1, 1, 0, 0, 0, 0, time.UTC),
 		}, nil)
 
-	server := httptest.NewServer(handlers.NewItemCreatePublic(service, config.LoggerDevHttp))
+	server := httptest.NewServer(handlers.NewItemCreatePublic(service, config.LoggerDev))
 	t.Cleanup(server.Close)
 
 	req, err := http.NewRequestWithContext(

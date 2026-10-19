@@ -78,17 +78,17 @@ func main() {
 
 	handlerPing := handlers.NewPing()
 	handlerHealth := handlers.NewRestHealth()
-	handlerItemCreate := handlers.NewItemCreatePublic(serviceItemCreate, cfg.Log)
-	handlerItemGet := handlers.NewItemGetPublic(serviceItemGet, cfg.Log)
-	handlerItemList := handlers.NewItemListPublic(serviceItemList, cfg.Log)
-	handlerItemUpdate := handlers.NewItemUpdatePublic(serviceItemUpdate, cfg.Log)
-	handlerItemDelete := handlers.NewItemDeletePublic(serviceItemDelete, cfg.Log)
+	handlerItemCreate := handlers.NewItemCreatePublic(serviceItemCreate, cfg.Logger)
+	handlerItemGet := handlers.NewItemGetPublic(serviceItemGet, cfg.Logger)
+	handlerItemList := handlers.NewItemListPublic(serviceItemList, cfg.Logger)
+	handlerItemUpdate := handlers.NewItemUpdatePublic(serviceItemUpdate, cfg.Logger)
+	handlerItemDelete := handlers.NewItemDeletePublic(serviceItemDelete, cfg.Logger)
 
 	// =================================================================================================================
 	// ROUTER
 	// =================================================================================================================
 
-	router := httpf.NewRouter(cfg.Rest, cfg.Otel, cfg.HttpLogger, cfg.App.DowntimeStart)
+	router := httpf.NewRouter(cfg.Rest, cfg.Otel, cfg.RestLogger, cfg.App.DowntimeStart)
 
 	router.Get("/ping", handlerPing.ServeHTTP)
 	router.Get("/healthcheck", handlerHealth.ServeHTTP)
