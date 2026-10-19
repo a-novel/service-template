@@ -10,9 +10,6 @@ import (
 
 	"github.com/stretchr/testify/require"
 
-	"github.com/a-novel-kit/golib/postgres"
-
-	"github.com/a-novel/service-template/internal/config/configtest"
 	"github.com/a-novel/service-template/internal/handlers"
 )
 
@@ -22,41 +19,40 @@ func TestRestHealth(t *testing.T) {
 	testCases := []struct {
 		name string
 
-		request *http.Request
+		setup probeSetup
 
-		skipPostgres bool
-
-		expectStatus   int
-		expectResponse any
+		expectStatus int
+		expectHealth string
 	}{
 		{
-			name: "Success",
-
-			request: httptest.NewRequestWithContext(t.Context(), http.MethodPost, "/", nil),
-
-			expectResponse: map[string]any{
-				"client:postgres": map[string]any{
-					"status": handlers.RestHealthStatusUp,
-				},
-			},
+			name:         "Success",
+			setup:        probeHealthy,
 			expectStatus: http.StatusOK,
+			expectHealth: handlers.RestHealthStatusUp,
 		},
 		{
-			// Omitting postgres from the context makes the probe fail, so the entry reports
-			// status=down with HTTP 503. The exact match on expectResponse guards the public
-			// shape: it fails if any extra field, such as a re-introduced "err", leaks into it.
-			name: "Error/Degraded",
-
-			request: httptest.NewRequestWithContext(t.Context(), http.MethodPost, "/", nil),
-
-			skipPostgres: true,
-
-			expectResponse: map[string]any{
-				"client:postgres": map[string]any{
-					"status": handlers.RestHealthStatusDown,
-				},
-			},
+			name:         "Error/MissingPostgres",
+			setup:        probeWithoutPostgres,
 			expectStatus: http.StatusServiceUnavailable,
+			expectHealth: handlers.RestHealthStatusDown,
+		},
+		{
+			name:         "Error/ClosedPostgres",
+			setup:        probeClosedPostgres,
+			expectStatus: http.StatusServiceUnavailable,
+			expectHealth: handlers.RestHealthStatusDown,
+		},
+		{
+			name:         "Error/TransactionContext",
+			setup:        probeInTransaction,
+			expectStatus: http.StatusServiceUnavailable,
+			expectHealth: handlers.RestHealthStatusDown,
+		},
+		{
+			name:         "Error/CancelledProbe",
+			setup:        probeCancelled,
+			expectStatus: http.StatusServiceUnavailable,
+			expectHealth: handlers.RestHealthStatusDown,
 		},
 	}
 
@@ -64,31 +60,26 @@ func TestRestHealth(t *testing.T) {
 		t.Run(testCase.name, func(t *testing.T) {
 			t.Parallel()
 
-			handler := handlers.NewRestHealth()
-			w := httptest.NewRecorder()
+			ctx := newProbeContext(t, testCase.setup)
+			recorder := httptest.NewRecorder()
 
-			rCtx := testCase.request.Context()
-			if !testCase.skipPostgres {
-				var err error
+			handlers.NewRestHealth().ServeHTTP(
+				recorder, httptest.NewRequestWithContext(ctx, http.MethodGet, "/healthcheck", nil),
+			)
 
-				rCtx, err = postgres.NewContext(rCtx, configtest.PostgresPreset)
-				require.NoError(t, err)
-			}
+			response := recorder.Result()
+			require.Equal(t, testCase.expectStatus, response.StatusCode)
+			require.Contains(t, response.Header.Get("Content-Type"), "application/json")
 
-			handler.ServeHTTP(w, testCase.request.WithContext(rCtx))
+			body, err := io.ReadAll(response.Body)
+			require.NoError(t, errors.Join(err, response.Body.Close()))
 
-			res := w.Result()
-
-			require.Equal(t, testCase.expectStatus, res.StatusCode)
-
-			if testCase.expectResponse != nil {
-				data, err := io.ReadAll(res.Body)
-				require.NoError(t, errors.Join(err, res.Body.Close()))
-
-				var jsonRes any
-				require.NoError(t, json.Unmarshal(data, &jsonRes))
-				require.Equal(t, testCase.expectResponse, jsonRes)
-			}
+			var report any
+			require.NoError(t, json.Unmarshal(body, &report))
+			// Exact matching keeps raw dependency errors out of the public report.
+			require.Equal(t, map[string]any{
+				"client:postgres": map[string]any{"status": testCase.expectHealth},
+			}, report)
 		})
 	}
 }

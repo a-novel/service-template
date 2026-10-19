@@ -1,17 +1,21 @@
 package handlers_test
 
 import (
+	"context"
+	"net"
 	"testing"
+	"time"
 
 	"github.com/stretchr/testify/require"
+	"google.golang.org/grpc"
 	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/status"
+	"google.golang.org/grpc/test/bufconn"
 
-	"github.com/a-novel-kit/golib/postgres"
-
-	"github.com/a-novel/service-template/internal/config/configtest"
 	"github.com/a-novel/service-template/internal/handlers"
 	"github.com/a-novel/service-template/internal/handlers/protogen"
+	"github.com/a-novel/service-template/pkg/go"
 )
 
 func TestGrpcStatus(t *testing.T) {
@@ -20,55 +24,78 @@ func TestGrpcStatus(t *testing.T) {
 	testCases := []struct {
 		name string
 
-		skipPostgres bool
+		setup probeSetup
 
 		expect       *protogen.StatusResponse
 		expectStatus codes.Code
 	}{
 		{
-			name: "Success",
-
+			name:  "Success",
+			setup: probeHealthy,
 			expect: &protogen.StatusResponse{
 				Postgres: &protogen.DependencyHealth{
 					Status: protogen.DependencyStatus_DEPENDENCY_STATUS_UP,
 				},
 			},
+			expectStatus: codes.OK,
 		},
-		{
-			// Omitting postgres from the context makes the probe fail. The RPC then answers
-			// Unavailable with no report, so a raw dependency error never reaches the caller.
-			name: "Error/Unavailable",
-
-			skipPostgres: true,
-
-			expectStatus: codes.Unavailable,
-		},
+		{name: "Error/MissingPostgres", setup: probeWithoutPostgres, expectStatus: codes.Unavailable},
+		{name: "Error/ClosedPostgres", setup: probeClosedPostgres, expectStatus: codes.Unavailable},
+		{name: "Error/TransactionContext", setup: probeInTransaction, expectStatus: codes.Unavailable},
+		{name: "Error/CancelledProbe", setup: probeCancelled, expectStatus: codes.Unavailable},
 	}
 
 	for _, testCase := range testCases {
 		t.Run(testCase.name, func(t *testing.T) {
 			t.Parallel()
 
-			handler := handlers.NewGrpcStatus()
+			ctx := newProbeContext(t, testCase.setup)
 
-			ctx := t.Context()
+			response, err := handlers.NewGrpcStatus().Status(ctx, &protogen.StatusRequest{})
+			result, ok := status.FromError(err)
+			require.True(t, ok)
+			require.Equal(t, testCase.expectStatus, result.Code(), "got %s (%v)", result.Code(), err)
+			require.Equal(t, testCase.expect, response)
 
-			if !testCase.skipPostgres {
-				var err error
-
-				ctx, err = postgres.NewContext(ctx, configtest.PostgresPreset)
-				require.NoError(t, err)
+			if testCase.expectStatus != codes.OK {
+				// The message carries no raw dependency error.
+				require.Equal(t, "service dependencies unavailable", result.Message())
 			}
-
-			res, err := handler.Status(ctx, new(protogen.StatusRequest))
-			resSt, ok := status.FromError(err)
-			require.True(t, ok, resSt.Code().String())
-			require.Equal(
-				t,
-				testCase.expectStatus, resSt.Code(),
-				"expected status code %s, got %s (%v)", testCase.expectStatus, resSt.Code(), err,
-			)
-			require.Equal(t, testCase.expect, res)
 		})
 	}
+
+	t.Run("Transport/Unavailable", func(t *testing.T) {
+		t.Parallel()
+
+		listener := bufconn.Listen(1024 * 1024)
+		server := grpc.NewServer()
+		protogen.RegisterStatusServiceServer(server, handlers.NewGrpcStatus())
+
+		serveResult := make(chan error, 1)
+		go func() { serveResult <- server.Serve(listener) }()
+
+		t.Cleanup(func() {
+			server.Stop()
+			require.NoError(t, <-serveResult)
+		})
+
+		client, err := servicetemplate.NewClient(
+			"passthrough:///health-test",
+			grpc.WithTransportCredentials(insecure.NewCredentials()),
+			grpc.WithContextDialer(func(ctx context.Context, _ string) (net.Conn, error) {
+				return listener.DialContext(ctx)
+			}),
+		)
+		require.NoError(t, err)
+
+		defer client.Close()
+
+		ctx, cancel := context.WithTimeout(t.Context(), 5*time.Second)
+		defer cancel()
+
+		response, err := client.Status(ctx, &servicetemplate.StatusRequest{})
+		require.Nil(t, response)
+		require.Equal(t, codes.Unavailable, status.Code(err))
+		require.Equal(t, "service dependencies unavailable", status.Convert(err).Message())
+	})
 }
