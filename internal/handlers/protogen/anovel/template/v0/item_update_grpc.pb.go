@@ -28,6 +28,8 @@ const (
 //
 // ItemUpdateService replaces the mutable attributes of an existing item.
 type ItemUpdateServiceClient interface {
+	// Replaces the name and description of the item with the given ID, and returns it. Returns
+	// INVALID_ARGUMENT for a malformed ID or invalid attributes, and NOT_FOUND when no item has the ID.
 	ItemUpdate(ctx context.Context, in *ItemUpdateRequest, opts ...grpc.CallOption) (*ItemUpdateResponse, error)
 }
 
@@ -55,6 +57,8 @@ func (c *itemUpdateServiceClient) ItemUpdate(ctx context.Context, in *ItemUpdate
 //
 // ItemUpdateService replaces the mutable attributes of an existing item.
 type ItemUpdateServiceServer interface {
+	// Replaces the name and description of the item with the given ID, and returns it. Returns
+	// INVALID_ARGUMENT for a malformed ID or invalid attributes, and NOT_FOUND when no item has the ID.
 	ItemUpdate(context.Context, *ItemUpdateRequest) (*ItemUpdateResponse, error)
 	mustEmbedUnimplementedItemUpdateServiceServer()
 }

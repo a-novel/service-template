@@ -28,6 +28,8 @@ const (
 //
 // ItemListService returns a page of items.
 type ItemListServiceClient interface {
+	// Returns a page of items, newest first. Returns INVALID_ARGUMENT for a limit above 100 or a
+	// negative offset.
 	ItemList(ctx context.Context, in *ItemListRequest, opts ...grpc.CallOption) (*ItemListResponse, error)
 }
 
@@ -55,6 +57,8 @@ func (c *itemListServiceClient) ItemList(ctx context.Context, in *ItemListReques
 //
 // ItemListService returns a page of items.
 type ItemListServiceServer interface {
+	// Returns a page of items, newest first. Returns INVALID_ARGUMENT for a limit above 100 or a
+	// negative offset.
 	ItemList(context.Context, *ItemListRequest) (*ItemListResponse, error)
 	mustEmbedUnimplementedItemListServiceServer()
 }

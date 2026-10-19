@@ -28,6 +28,8 @@ const (
 //
 // ItemDeleteService deletes an item by its ID.
 type ItemDeleteServiceClient interface {
+	// Deletes the item with the given ID and returns it. Returns INVALID_ARGUMENT for a malformed ID,
+	// and NOT_FOUND when no item has it.
 	ItemDelete(ctx context.Context, in *ItemDeleteRequest, opts ...grpc.CallOption) (*ItemDeleteResponse, error)
 }
 
@@ -55,6 +57,8 @@ func (c *itemDeleteServiceClient) ItemDelete(ctx context.Context, in *ItemDelete
 //
 // ItemDeleteService deletes an item by its ID.
 type ItemDeleteServiceServer interface {
+	// Deletes the item with the given ID and returns it. Returns INVALID_ARGUMENT for a malformed ID,
+	// and NOT_FOUND when no item has it.
 	ItemDelete(context.Context, *ItemDeleteRequest) (*ItemDeleteResponse, error)
 	mustEmbedUnimplementedItemDeleteServiceServer()
 }

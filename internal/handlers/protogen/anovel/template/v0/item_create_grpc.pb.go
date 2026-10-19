@@ -28,6 +28,8 @@ const (
 //
 // ItemCreateService creates a new item from the supplied attributes.
 type ItemCreateServiceClient interface {
+	// Creates an item and returns it. Returns INVALID_ARGUMENT when the name is blank, or a field
+	// exceeds its length limit.
 	ItemCreate(ctx context.Context, in *ItemCreateRequest, opts ...grpc.CallOption) (*ItemCreateResponse, error)
 }
 
@@ -55,6 +57,8 @@ func (c *itemCreateServiceClient) ItemCreate(ctx context.Context, in *ItemCreate
 //
 // ItemCreateService creates a new item from the supplied attributes.
 type ItemCreateServiceServer interface {
+	// Creates an item and returns it. Returns INVALID_ARGUMENT when the name is blank, or a field
+	// exceeds its length limit.
 	ItemCreate(context.Context, *ItemCreateRequest) (*ItemCreateResponse, error)
 	mustEmbedUnimplementedItemCreateServiceServer()
 }

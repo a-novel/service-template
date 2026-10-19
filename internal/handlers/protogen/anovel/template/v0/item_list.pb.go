@@ -24,7 +24,7 @@ const (
 // ItemListRequest bounds the page of items to return.
 type ItemListRequest struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
-	// Maximum number of items to return.
+	// Maximum number of items to return, 100 at most. Zero or a negative value selects 20.
 	Limit int32 `protobuf:"varint,1,opt,name=limit,proto3" json:"limit,omitempty"`
 	// Number of leading items to skip before collecting the page.
 	Offset        int32 `protobuf:"varint,2,opt,name=offset,proto3" json:"offset,omitempty"`
@@ -78,8 +78,9 @@ func (x *ItemListRequest) GetOffset() int32 {
 
 // ItemListResponse returns the requested page of items, empty when none match.
 type ItemListResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Items         []*Item                `protobuf:"bytes,1,rep,name=items,proto3" json:"items,omitempty"`
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// The items of the page.
+	Items         []*Item `protobuf:"bytes,1,rep,name=items,proto3" json:"items,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }

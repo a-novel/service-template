@@ -80,8 +80,9 @@ func (DependencyStatus) EnumDescriptor() ([]byte, []int) {
 // internal hostnames, ports, or schema names. The error is recorded on the trace span for
 // operators.
 type DependencyHealth struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Status        DependencyStatus       `protobuf:"varint,1,opt,name=status,proto3,enum=anovel.template.v0.DependencyStatus" json:"status,omitempty"`
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Whether the dependency answered its probe.
+	Status        DependencyStatus `protobuf:"varint,1,opt,name=status,proto3,enum=anovel.template.v0.DependencyStatus" json:"status,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -162,8 +163,9 @@ func (*StatusRequest) Descriptor() ([]byte, []int) {
 
 // StatusResponse reports the health of each dependency the service relies on.
 type StatusResponse struct {
-	state         protoimpl.MessageState `protogen:"open.v1"`
-	Postgres      *DependencyHealth      `protobuf:"bytes,1,opt,name=postgres,proto3" json:"postgres,omitempty"`
+	state protoimpl.MessageState `protogen:"open.v1"`
+	// Health of the PostgreSQL database.
+	Postgres      *DependencyHealth `protobuf:"bytes,1,opt,name=postgres,proto3" json:"postgres,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }

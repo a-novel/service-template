@@ -28,6 +28,8 @@ const (
 //
 // ItemGetService retrieves a single item by its ID.
 type ItemGetServiceClient interface {
+	// Returns the item with the given ID. Returns INVALID_ARGUMENT for a malformed ID, and NOT_FOUND
+	// when no item has it.
 	ItemGet(ctx context.Context, in *ItemGetRequest, opts ...grpc.CallOption) (*ItemGetResponse, error)
 }
 
@@ -55,6 +57,8 @@ func (c *itemGetServiceClient) ItemGet(ctx context.Context, in *ItemGetRequest, 
 //
 // ItemGetService retrieves a single item by its ID.
 type ItemGetServiceServer interface {
+	// Returns the item with the given ID. Returns INVALID_ARGUMENT for a malformed ID, and NOT_FOUND
+	// when no item has it.
 	ItemGet(context.Context, *ItemGetRequest) (*ItemGetResponse, error)
 	mustEmbedUnimplementedItemGetServiceServer()
 }
