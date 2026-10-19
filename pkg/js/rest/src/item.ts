@@ -16,6 +16,7 @@ export const ItemSchema = z.object({
 /** An Item resource held by the template service. */
 export type Item = z.infer<typeof ItemSchema>;
 
+/** Validates the fields accepted when creating an Item. */
 export const ItemCreateRequestSchema = z.object({
   name: z.string(),
   description: z.string().optional(),
@@ -24,6 +25,7 @@ export const ItemCreateRequestSchema = z.object({
 /** Fields accepted when creating an Item. */
 export type ItemCreateRequest = z.infer<typeof ItemCreateRequestSchema>;
 
+/** Validates the identifier of the Item to fetch. */
 export const ItemGetRequestSchema = z.object({
   id: z.uuid(),
 });
@@ -31,6 +33,7 @@ export const ItemGetRequestSchema = z.object({
 /** Identifies the Item to fetch. */
 export type ItemGetRequest = z.infer<typeof ItemGetRequestSchema>;
 
+/** Validates a pagination window for listing Items. */
 export const ItemListRequestSchema = z.object({
   limit: z.int().min(1).max(100).optional(),
   offset: z.int().min(0).optional(),
@@ -39,6 +42,7 @@ export const ItemListRequestSchema = z.object({
 /** Pagination window for listing Items. */
 export type ItemListRequest = z.infer<typeof ItemListRequestSchema>;
 
+/** Validates the identifier and new field values of the Item to update. */
 export const ItemUpdateRequestSchema = z.object({
   id: z.uuid(),
   name: z.string(),
@@ -48,6 +52,7 @@ export const ItemUpdateRequestSchema = z.object({
 /** Identifies the Item to update along with its new field values. */
 export type ItemUpdateRequest = z.infer<typeof ItemUpdateRequestSchema>;
 
+/** Validates the identifier of the Item to delete. */
 export const ItemDeleteRequestSchema = z.object({
   id: z.uuid(),
 });
@@ -57,7 +62,7 @@ export type ItemDeleteRequest = z.infer<typeof ItemDeleteRequestSchema>;
 
 /** Creates a new Item and returns the stored record. */
 export async function itemCreate(api: TemplateApi, name: string, description?: string): Promise<Item> {
-  return await api.fetch("/items", ItemSchema, {
+  return await api.fetch("/v0/items", ItemSchema, {
     method: "POST",
     headers: HTTP_HEADERS.JSON,
     body: JSON.stringify({ name, description }),
@@ -68,7 +73,7 @@ export async function itemCreate(api: TemplateApi, name: string, description?: s
 export async function itemGet(api: TemplateApi, id: string): Promise<Item> {
   const params = new URLSearchParams();
   params.set("id", id);
-  return await api.fetch(`/item?${params.toString()}`, ItemSchema, { method: "GET", headers: HTTP_HEADERS.JSON });
+  return await api.fetch(`/v0/item?${params.toString()}`, ItemSchema, { method: "GET", headers: HTTP_HEADERS.JSON });
 }
 
 /** Lists Items; returns the first 100 from the start when limit and offset are omitted. */
@@ -76,7 +81,7 @@ export async function itemList(api: TemplateApi, limit?: number, offset?: number
   const params = new URLSearchParams();
   params.set("limit", `${limit || 100}`);
   params.set("offset", `${offset || 0}`);
-  return await api.fetch(`/items?${params.toString()}`, z.array(ItemSchema), {
+  return await api.fetch(`/v0/items?${params.toString()}`, z.array(ItemSchema), {
     method: "GET",
     headers: HTTP_HEADERS.JSON,
   });
@@ -84,7 +89,7 @@ export async function itemList(api: TemplateApi, limit?: number, offset?: number
 
 /** Updates an existing Item and returns the stored record. */
 export async function itemUpdate(api: TemplateApi, id: string, name: string, description?: string): Promise<Item> {
-  return await api.fetch(`/item`, ItemSchema, {
+  return await api.fetch("/v0/item", ItemSchema, {
     method: "PUT",
     headers: HTTP_HEADERS.JSON,
     body: JSON.stringify({ id, name, description }),
@@ -95,5 +100,5 @@ export async function itemUpdate(api: TemplateApi, id: string, name: string, des
 export async function itemDelete(api: TemplateApi, id: string): Promise<Item> {
   const params = new URLSearchParams();
   params.set("id", id);
-  return await api.fetch(`/item?${params.toString()}`, ItemSchema, { method: "DELETE", headers: HTTP_HEADERS.JSON });
+  return await api.fetch(`/v0/item?${params.toString()}`, ItemSchema, { method: "DELETE", headers: HTTP_HEADERS.JSON });
 }

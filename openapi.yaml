@@ -20,32 +20,30 @@ info:
     url: "https://raw.githubusercontent.com/a-novel/service-template/refs/heads/master/LICENSE"
 
 paths:
-  /ping:
+  /v0/ping:
     get:
       operationId: ping
       summary: Ping the server.
       description: |
         Checks whether the server is up and running. It always returns the same response.
 
-        Dependency health lives on the `/healthcheck` endpoint.
+        Dependency health lives on the `/v0/healthcheck` endpoint.
       tags: [health]
       security: []
       responses:
         "200":
           $ref: "#/components/responses/pong"
-        "418":
-          $ref: "#/components/responses/teapot"
         default:
           $ref: "#/components/responses/internalError"
 
-  /healthcheck:
+  /v0/healthcheck:
     get:
       operationId: healthcheck
       summary: Health diagnosis of the server.
       description: |
         Reaches out to every server dependency and reports whether each one responded.
         Returns HTTP 200 only when every dependency is healthy, otherwise HTTP 503 with the same
-        sanitized report. Use `/ping` for process-only liveness.
+        sanitized report. Use `/v0/ping` for process-only liveness.
       tags: [health]
       security: []
       responses:
@@ -55,12 +53,10 @@ paths:
           $ref: "#/components/responses/tooManyRequests"
         "503":
           $ref: "#/components/responses/healthUnavailable"
-        "418":
-          $ref: "#/components/responses/teapot"
         default:
           $ref: "#/components/responses/internalError"
 
-  /items:
+  /v0/items:
     post:
       operationId: itemCreate
       summary: Create a new item.
@@ -108,7 +104,7 @@ paths:
         default:
           $ref: "#/components/responses/internalError"
 
-  /item:
+  /v0/item:
     get:
       operationId: itemGet
       summary: Get an item by ID.
@@ -266,9 +262,6 @@ components:
 
     internalError:
       description: Something unexpected happened.
-
-    teapot:
-      description: I'm a teapot!
 
   schemas:
     invalidRequest:

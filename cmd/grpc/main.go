@@ -1,6 +1,5 @@
-// Command grpc serves the item API over gRPC. It is one of the service's
-// entrypoints; cmd/rest serves the same domain over HTTP and cmd/migrations
-// applies the database schema.
+// Command grpc serves the private item API over gRPC, for other services on the internal network.
+// cmd/rest serves the same domain over HTTP, and cmd/migrations applies the database schema.
 package main
 
 import (
@@ -27,7 +26,7 @@ import (
 	"github.com/a-novel/service-template/internal/core"
 	"github.com/a-novel/service-template/internal/dao"
 	"github.com/a-novel/service-template/internal/handlers"
-	"github.com/a-novel/service-template/internal/handlers/protogen"
+	templatev0 "github.com/a-novel/service-template/internal/handlers/protogen/anovel/template/v0"
 )
 
 func main() {
@@ -59,11 +58,11 @@ func main() {
 	// DAO
 	// =================================================================================================================
 
-	daoItemCreate := dao.NewItemCreate()
-	daoItemGet := dao.NewItemGet()
-	daoItemList := dao.NewItemList()
-	daoItemUpdate := dao.NewItemUpdate()
-	daoItemDelete := dao.NewItemDelete()
+	daoItemCreate := dao.NewPgItemCreate()
+	daoItemGet := dao.NewPgItemGet()
+	daoItemList := dao.NewPgItemList()
+	daoItemUpdate := dao.NewPgItemUpdate()
+	daoItemDelete := dao.NewPgItemDelete()
 
 	// =================================================================================================================
 	// SERVICES
@@ -80,11 +79,11 @@ func main() {
 	// =================================================================================================================
 
 	handlerStatus := handlers.NewGrpcStatus()
-	handlerItemCreate := handlers.NewItemCreate(serviceItemCreate)
-	handlerItemGet := handlers.NewItemGet(serviceItemGet)
-	handlerItemList := handlers.NewItemList(serviceItemList)
-	handlerItemUpdate := handlers.NewItemUpdate(serviceItemUpdate)
-	handlerItemDelete := handlers.NewItemDelete(serviceItemDelete)
+	handlerItemCreate := handlers.NewGrpcItemCreate(serviceItemCreate)
+	handlerItemGet := handlers.NewGrpcItemGet(serviceItemGet)
+	handlerItemList := handlers.NewGrpcItemList(serviceItemList)
+	handlerItemUpdate := handlers.NewGrpcItemUpdate(serviceItemUpdate)
+	handlerItemDelete := handlers.NewGrpcItemDelete(serviceItemDelete)
 
 	// =================================================================================================================
 	// SERVER
@@ -94,7 +93,7 @@ func main() {
 		return postgres.TransferContext(ctx, rpCtx)
 	}
 
-	server := grpcf.NewServer(ctx, cfg.Otel, cfg.Logger, cfg.App.DowntimeStart, ctxInterceptor)
+	server := grpcf.NewServer(ctx, cfg.Otel, cfg.GrpcLogger, cfg.App.DowntimeStart, ctxInterceptor)
 
 	healthcheck := grpcf.RegisterEchoServers(server)
 	healthcheck.SetServingStatus("", healthpb.HealthCheckResponse_SERVING)
@@ -104,12 +103,12 @@ func main() {
 		healthcheck.SetServingStatus("", healthpb.HealthCheckResponse_NOT_SERVING)
 	}()
 
-	protogen.RegisterStatusServiceServer(server, handlerStatus)
-	protogen.RegisterItemCreateServiceServer(server, handlerItemCreate)
-	protogen.RegisterItemGetServiceServer(server, handlerItemGet)
-	protogen.RegisterItemListServiceServer(server, handlerItemList)
-	protogen.RegisterItemUpdateServiceServer(server, handlerItemUpdate)
-	protogen.RegisterItemDeleteServiceServer(server, handlerItemDelete)
+	templatev0.RegisterStatusServiceServer(server, handlerStatus)
+	templatev0.RegisterItemCreateServiceServer(server, handlerItemCreate)
+	templatev0.RegisterItemGetServiceServer(server, handlerItemGet)
+	templatev0.RegisterItemListServiceServer(server, handlerItemList)
+	templatev0.RegisterItemUpdateServiceServer(server, handlerItemUpdate)
+	templatev0.RegisterItemDeleteServiceServer(server, handlerItemDelete)
 
 	reflection.Register(server)
 

@@ -16,7 +16,7 @@ import (
 	"github.com/a-novel/service-template/internal/models/migrations"
 )
 
-func TestItemDelete(t *testing.T) {
+func TestPgItemDelete(t *testing.T) {
 	t.Parallel()
 
 	testCases := []struct {
@@ -65,7 +65,7 @@ func TestItemDelete(t *testing.T) {
 		},
 	}
 
-	dao := dao.NewItemDelete()
+	daoItemDelete := dao.NewPgItemDelete()
 
 	for _, testCase := range testCases {
 		t.Run(testCase.name, func(t *testing.T) {
@@ -82,7 +82,7 @@ func TestItemDelete(t *testing.T) {
 					require.NoError(t, err)
 				}
 
-				result, err := dao.Exec(ctx, testCase.request)
+				result, err := daoItemDelete.Exec(ctx, testCase.request)
 				require.ErrorIs(t, err, testCase.expectErr)
 				require.Equal(t, testCase.expect, result)
 			})

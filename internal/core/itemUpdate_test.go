@@ -63,6 +63,12 @@ func TestItemUpdate(t *testing.T) {
 			},
 		},
 		{
+			name: "Error/InvalidID",
+
+			request:   &core.ItemUpdateRequest{ID: uuid.Nil, Name: "updated item"},
+			expectErr: core.ErrInvalidRequest,
+		},
+		{
 			name: "Error/EmptyName",
 
 			request:   &core.ItemUpdateRequest{ID: uuid.MustParse("00000000-0000-0000-0000-000000000001"), Name: ""},

@@ -14,7 +14,7 @@ import (
 	"github.com/a-novel/service-template/internal/core"
 	"github.com/a-novel/service-template/internal/handlers"
 	handlersmocks "github.com/a-novel/service-template/internal/handlers/mocks"
-	"github.com/a-novel/service-template/internal/handlers/protogen"
+	templatev0 "github.com/a-novel/service-template/internal/handlers/protogen/anovel/template/v0"
 )
 
 func TestGrpcItemDelete(t *testing.T) {
@@ -30,17 +30,17 @@ func TestGrpcItemDelete(t *testing.T) {
 	testCases := []struct {
 		name string
 
-		request *protogen.ItemDeleteRequest
+		request *templatev0.ItemDeleteRequest
 
 		serviceMock *serviceMock
 
-		expect       *protogen.ItemDeleteResponse
+		expect       *templatev0.ItemDeleteResponse
 		expectStatus codes.Code
 	}{
 		{
 			name: "Success",
 
-			request: &protogen.ItemDeleteRequest{
+			request: &templatev0.ItemDeleteRequest{
 				Id: "00000000-0000-0000-0000-000000000001",
 			},
 
@@ -55,8 +55,8 @@ func TestGrpcItemDelete(t *testing.T) {
 			},
 
 			expectStatus: codes.OK,
-			expect: &protogen.ItemDeleteResponse{
-				Item: &protogen.Item{
+			expect: &templatev0.ItemDeleteResponse{
+				Item: &templatev0.Item{
 					Id:          "00000000-0000-0000-0000-000000000001",
 					Name:        "test item",
 					Description: "test description",
@@ -68,7 +68,7 @@ func TestGrpcItemDelete(t *testing.T) {
 		{
 			name: "Error/InvalidID",
 
-			request: &protogen.ItemDeleteRequest{
+			request: &templatev0.ItemDeleteRequest{
 				Id: "not-a-uuid",
 			},
 
@@ -77,7 +77,7 @@ func TestGrpcItemDelete(t *testing.T) {
 		{
 			name: "Error/NotFound",
 
-			request: &protogen.ItemDeleteRequest{
+			request: &templatev0.ItemDeleteRequest{
 				Id: "00000000-0000-0000-0000-000000000001",
 			},
 
@@ -90,7 +90,7 @@ func TestGrpcItemDelete(t *testing.T) {
 		{
 			name: "Error/Internal",
 
-			request: &protogen.ItemDeleteRequest{
+			request: &templatev0.ItemDeleteRequest{
 				Id: "00000000-0000-0000-0000-000000000001",
 			},
 
@@ -106,7 +106,7 @@ func TestGrpcItemDelete(t *testing.T) {
 		t.Run(testCase.name, func(t *testing.T) {
 			t.Parallel()
 
-			service := handlersmocks.NewMockItemDeleteService(t)
+			service := handlersmocks.NewMockGrpcItemDeleteService(t)
 
 			if testCase.serviceMock != nil {
 				service.EXPECT().
@@ -116,7 +116,7 @@ func TestGrpcItemDelete(t *testing.T) {
 					Return(testCase.serviceMock.resp, testCase.serviceMock.err)
 			}
 
-			handler := handlers.NewItemDelete(service)
+			handler := handlers.NewGrpcItemDelete(service)
 
 			res, err := handler.ItemDelete(t.Context(), testCase.request)
 			resSt, ok := status.FromError(err)

@@ -10,31 +10,30 @@ import (
 	"github.com/a-novel-kit/golib/otel"
 
 	"github.com/a-novel/service-template/internal/core"
-	"github.com/a-novel/service-template/internal/handlers/protogen"
+	templatev0 "github.com/a-novel/service-template/internal/handlers/protogen/anovel/template/v0"
 )
 
-// ItemListService returns a page of items bounded by the request's limit and
-// offset. The core layer supplies the implementation.
-type ItemListService interface {
+// GrpcItemListService is the core operation [GrpcItemList] delegates to.
+type GrpcItemListService interface {
 	Exec(ctx context.Context, request *core.ItemListRequest) ([]*core.Item, error)
 }
 
-// ItemList is the gRPC handler for the ItemList RPC.
-type ItemList struct {
-	protogen.UnimplementedItemListServiceServer
+// GrpcItemList is the gRPC handler for the ItemList RPC.
+type GrpcItemList struct {
+	templatev0.UnimplementedItemListServiceServer
 
-	service ItemListService
+	service GrpcItemListService
 }
 
-func NewItemList(service ItemListService) *ItemList {
-	return &ItemList{service: service}
+func NewGrpcItemList(service GrpcItemListService) *GrpcItemList {
+	return &GrpcItemList{service: service}
 }
 
 // ItemList returns a page of items. A rejected request maps to InvalidArgument;
 // any other failure maps to Internal.
-func (handler *ItemList) ItemList(
-	ctx context.Context, request *protogen.ItemListRequest,
-) (*protogen.ItemListResponse, error) {
+func (handler *GrpcItemList) ItemList(
+	ctx context.Context, request *templatev0.ItemListRequest,
+) (*templatev0.ItemListResponse, error) {
 	ctx, span := otel.Tracer().Start(ctx, "grpc.ItemList")
 	defer span.End()
 
@@ -52,10 +51,10 @@ func (handler *ItemList) ItemList(
 		return nil, status.Error(codes.Internal, "internal error")
 	}
 
-	protoItems := make([]*protogen.Item, len(items))
+	protoItems := make([]*templatev0.Item, len(items))
 	for i, item := range items {
 		protoItems[i] = itemToProto(item)
 	}
 
-	return &protogen.ItemListResponse{Items: protoItems}, nil
+	return &templatev0.ItemListResponse{Items: protoItems}, nil
 }

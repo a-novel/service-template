@@ -1,5 +1,3 @@
-// Package env reads and parses the service's configuration from environment
-// variables, exposing each setting as a typed, ready-to-use value.
 package env
 
 import (
@@ -95,7 +93,7 @@ var (
 	// Grpc configures the gRPC server from the GRPC_* variables.
 	Grpc = grpcf.LoadServerConfig(getEnv, grpcf.ServerConfigDefault)
 	// Rest configures the REST server from the REST_* variables.
-	Rest = httpf.LoadServerConfig(getEnv, httpf.ServerConfigDefault)
+	Rest = httpf.LoadServerConfig(getEnv, restDefaults())
 
 	// GcloudProjectId names the Google Cloud project the service runs in. Setting
 	// it switches logging and tracing from the local console to Google Cloud.
@@ -107,3 +105,11 @@ var (
 	// until it is removed, the service refuses work. Nil when none is planned.
 	DowntimeStart = config.LoadEnv(downtimeStart, nil, downtime.ParseStart)
 )
+
+// restDefaults keeps golib's REST defaults but for the versioned ping path.
+func restDefaults() httpf.ServerConfig {
+	defaults := httpf.ServerConfigDefault
+	defaults.Liveness = "/v0/ping"
+
+	return defaults
+}

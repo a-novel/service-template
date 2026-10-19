@@ -17,18 +17,13 @@ type ItemListDao interface {
 	Exec(ctx context.Context, request *dao.ItemListRequest) ([]*dao.Item, error)
 }
 
-const (
-	// ItemListDefaultSize is applied to ItemListRequest.Limit when the caller
-	// leaves it unset (zero or negative).
-	ItemListDefaultSize = 20
-	// ItemListMaxSize caps the number of items returned per page. Keep the
-	// `max=` constraint on ItemListRequest.Limit in sync with this value.
-	ItemListMaxSize = 100
-)
+// ItemListDefaultSize is applied to ItemListRequest.Limit when the caller leaves it unset (zero or
+// negative).
+const ItemListDefaultSize = 20
 
 // ItemListRequest selects a page of items.
 type ItemListRequest struct {
-	// Limit defaults to ItemListDefaultSize when zero or negative.
+	// Limit caps the page at 100 items. It defaults to ItemListDefaultSize when zero or negative.
 	Limit  int `validate:"max=100"`
 	Offset int `validate:"min=0"`
 }

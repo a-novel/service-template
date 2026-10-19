@@ -16,7 +16,7 @@ import (
 	"github.com/a-novel/service-template/internal/models/migrations"
 )
 
-func TestItemUpdate(t *testing.T) {
+func TestPgItemUpdate(t *testing.T) {
 	t.Parallel()
 
 	testCases := []struct {
@@ -70,7 +70,7 @@ func TestItemUpdate(t *testing.T) {
 		},
 	}
 
-	dao := dao.NewItemUpdate()
+	daoItemUpdate := dao.NewPgItemUpdate()
 
 	for _, testCase := range testCases {
 		t.Run(testCase.name, func(t *testing.T) {
@@ -87,7 +87,7 @@ func TestItemUpdate(t *testing.T) {
 					require.NoError(t, err)
 				}
 
-				result, err := dao.Exec(ctx, testCase.request)
+				result, err := daoItemUpdate.Exec(ctx, testCase.request)
 				require.ErrorIs(t, err, testCase.expectErr)
 				require.Equal(t, testCase.expect, result)
 			})

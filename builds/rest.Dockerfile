@@ -1,6 +1,4 @@
-# Exposes the service as a REST server.
-#
-# It needs a database instance with the schema migrations already applied.
+# Runs the REST server. Requires a database with migrations already applied.
 FROM docker.io/library/golang:1.27.2-alpine AS builder
 
 ENV CGO_ENABLED=0
@@ -24,17 +22,14 @@ RUN --mount=type=cache,target=/go/pkg/mod \
 
 FROM docker.io/library/alpine:3.24.2
 
-WORKDIR /
-
 COPY --from=builder /rest /rest
 
 # Alpine ships BusyBox wget — no extra package needed for the healthcheck.
 HEALTHCHECK --interval=1s --timeout=5s --retries=10 --start-period=1s \
-  CMD ["wget", "-qO", "/dev/null", "http://localhost:8080/ping"]
+  CMD ["wget", "-qO", "/dev/null", "http://localhost:8080/v0/ping"]
 
 ENV REST_PORT=8080
 
-# REST port.
 EXPOSE 8080
 
 CMD ["/rest"]

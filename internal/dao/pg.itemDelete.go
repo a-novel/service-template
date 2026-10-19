@@ -16,25 +16,25 @@ import (
 //go:embed pg.itemDelete.sql
 var itemDeleteQuery string
 
-// ErrItemDeleteNotFound is returned by [ItemDelete.Exec] when no item matches the
+// ErrItemDeleteNotFound is returned by [PgItemDelete.Exec] when no item matches the
 // requested ID. It is joined onto the underlying sql.ErrNoRows so callers can branch
 // on it with errors.Is.
 var ErrItemDeleteNotFound = errors.New("item not found")
 
-// ItemDeleteRequest is the input to [ItemDelete.Exec].
+// ItemDeleteRequest is the input to [PgItemDelete.Exec].
 type ItemDeleteRequest struct {
 	ID uuid.UUID
 }
 
-// ItemDelete permanently removes an item by its ID.
-type ItemDelete struct{}
+// PgItemDelete permanently removes an item by its ID.
+type PgItemDelete struct{}
 
-func NewItemDelete() *ItemDelete {
-	return new(ItemDelete)
+func NewPgItemDelete() *PgItemDelete {
+	return &PgItemDelete{}
 }
 
-func (dao *ItemDelete) Exec(ctx context.Context, request *ItemDeleteRequest) (*Item, error) {
-	ctx, span := otel.Tracer().Start(ctx, "dao.ItemDelete")
+func (dao *PgItemDelete) Exec(ctx context.Context, request *ItemDeleteRequest) (*Item, error) {
+	ctx, span := otel.Tracer().Start(ctx, "dao.PgItemDelete")
 	defer span.End()
 
 	tx, err := postgres.GetContext(ctx)
@@ -42,7 +42,7 @@ func (dao *ItemDelete) Exec(ctx context.Context, request *ItemDeleteRequest) (*I
 		return nil, otel.ReportError(span, fmt.Errorf("get transaction: %w", err))
 	}
 
-	entity := new(Item)
+	entity := &Item{}
 
 	err = tx.NewRaw(itemDeleteQuery, request.ID).Scan(ctx, entity)
 	if err != nil {

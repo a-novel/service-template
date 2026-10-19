@@ -16,7 +16,7 @@ import (
 //go:embed pg.itemCreate.sql
 var itemCreateQuery string
 
-// ItemCreateRequest is the input to [ItemCreate.Exec].
+// ItemCreateRequest is the input to [PgItemCreate.Exec].
 type ItemCreateRequest struct {
 	ID          uuid.UUID
 	Name        string
@@ -24,15 +24,15 @@ type ItemCreateRequest struct {
 	Now         time.Time
 }
 
-// ItemCreate inserts a new item into the database.
-type ItemCreate struct{}
+// PgItemCreate inserts a new item into the database.
+type PgItemCreate struct{}
 
-func NewItemCreate() *ItemCreate {
-	return new(ItemCreate)
+func NewPgItemCreate() *PgItemCreate {
+	return &PgItemCreate{}
 }
 
-func (dao *ItemCreate) Exec(ctx context.Context, request *ItemCreateRequest) (*Item, error) {
-	ctx, span := otel.Tracer().Start(ctx, "dao.ItemCreate")
+func (dao *PgItemCreate) Exec(ctx context.Context, request *ItemCreateRequest) (*Item, error) {
+	ctx, span := otel.Tracer().Start(ctx, "dao.PgItemCreate")
 	defer span.End()
 
 	span.SetAttributes(attribute.String("item.id", request.ID.String()))
@@ -42,7 +42,7 @@ func (dao *ItemCreate) Exec(ctx context.Context, request *ItemCreateRequest) (*I
 		return nil, otel.ReportError(span, fmt.Errorf("get transaction: %w", err))
 	}
 
-	entity := new(Item)
+	entity := &Item{}
 
 	err = tx.NewRaw(itemCreateQuery, request.ID, request.Name, request.Description, request.Now).Scan(ctx, entity)
 	if err != nil {

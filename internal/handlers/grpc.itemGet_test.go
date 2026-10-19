@@ -14,7 +14,7 @@ import (
 	"github.com/a-novel/service-template/internal/core"
 	"github.com/a-novel/service-template/internal/handlers"
 	handlersmocks "github.com/a-novel/service-template/internal/handlers/mocks"
-	"github.com/a-novel/service-template/internal/handlers/protogen"
+	templatev0 "github.com/a-novel/service-template/internal/handlers/protogen/anovel/template/v0"
 )
 
 func TestGrpcItemGet(t *testing.T) {
@@ -30,17 +30,17 @@ func TestGrpcItemGet(t *testing.T) {
 	testCases := []struct {
 		name string
 
-		request *protogen.ItemGetRequest
+		request *templatev0.ItemGetRequest
 
 		serviceMock *serviceMock
 
-		expect       *protogen.ItemGetResponse
+		expect       *templatev0.ItemGetResponse
 		expectStatus codes.Code
 	}{
 		{
 			name: "Success",
 
-			request: &protogen.ItemGetRequest{
+			request: &templatev0.ItemGetRequest{
 				Id: "00000000-0000-0000-0000-000000000001",
 			},
 
@@ -55,8 +55,8 @@ func TestGrpcItemGet(t *testing.T) {
 			},
 
 			expectStatus: codes.OK,
-			expect: &protogen.ItemGetResponse{
-				Item: &protogen.Item{
+			expect: &templatev0.ItemGetResponse{
+				Item: &templatev0.Item{
 					Id:          "00000000-0000-0000-0000-000000000001",
 					Name:        "test item",
 					Description: "test description",
@@ -68,7 +68,7 @@ func TestGrpcItemGet(t *testing.T) {
 		{
 			name: "Error/InvalidID",
 
-			request: &protogen.ItemGetRequest{
+			request: &templatev0.ItemGetRequest{
 				Id: "not-a-uuid",
 			},
 
@@ -77,7 +77,7 @@ func TestGrpcItemGet(t *testing.T) {
 		{
 			name: "Error/NotFound",
 
-			request: &protogen.ItemGetRequest{
+			request: &templatev0.ItemGetRequest{
 				Id: "00000000-0000-0000-0000-000000000001",
 			},
 
@@ -90,7 +90,7 @@ func TestGrpcItemGet(t *testing.T) {
 		{
 			name: "Error/Internal",
 
-			request: &protogen.ItemGetRequest{
+			request: &templatev0.ItemGetRequest{
 				Id: "00000000-0000-0000-0000-000000000001",
 			},
 
@@ -106,7 +106,7 @@ func TestGrpcItemGet(t *testing.T) {
 		t.Run(testCase.name, func(t *testing.T) {
 			t.Parallel()
 
-			service := handlersmocks.NewMockItemGetService(t)
+			service := handlersmocks.NewMockGrpcItemGetService(t)
 
 			if testCase.serviceMock != nil {
 				service.EXPECT().
@@ -116,7 +116,7 @@ func TestGrpcItemGet(t *testing.T) {
 					Return(testCase.serviceMock.resp, testCase.serviceMock.err)
 			}
 
-			handler := handlers.NewItemGet(service)
+			handler := handlers.NewGrpcItemGet(service)
 
 			res, err := handler.ItemGet(t.Context(), testCase.request)
 			resSt, ok := status.FromError(err)

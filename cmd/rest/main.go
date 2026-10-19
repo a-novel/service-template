@@ -1,6 +1,5 @@
-// Command rest serves the item API over HTTP. It is one of the service's
-// entrypoints; cmd/grpc serves the same domain over gRPC and cmd/migrations
-// applies the database schema.
+// Command rest serves the public item API over HTTP. cmd/grpc serves the same domain to other
+// services over gRPC, and cmd/migrations applies the database schema.
 package main
 
 import (
@@ -13,6 +12,7 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/go-chi/chi/v5"
 	"github.com/samber/lo"
 
 	"github.com/a-novel-kit/golib/downtime"
@@ -56,11 +56,11 @@ func main() {
 	// DAO
 	// =================================================================================================================
 
-	daoItemCreate := dao.NewItemCreate()
-	daoItemGet := dao.NewItemGet()
-	daoItemList := dao.NewItemList()
-	daoItemUpdate := dao.NewItemUpdate()
-	daoItemDelete := dao.NewItemDelete()
+	daoItemCreate := dao.NewPgItemCreate()
+	daoItemGet := dao.NewPgItemGet()
+	daoItemList := dao.NewPgItemList()
+	daoItemUpdate := dao.NewPgItemUpdate()
+	daoItemDelete := dao.NewPgItemDelete()
 
 	// =================================================================================================================
 	// SERVICES
@@ -76,27 +76,29 @@ func main() {
 	// HANDLERS
 	// =================================================================================================================
 
-	handlerPing := handlers.NewPing()
+	handlerPing := handlers.NewRestPing()
 	handlerHealth := handlers.NewRestHealth()
-	handlerItemCreate := handlers.NewItemCreatePublic(serviceItemCreate, cfg.Log)
-	handlerItemGet := handlers.NewItemGetPublic(serviceItemGet, cfg.Log)
-	handlerItemList := handlers.NewItemListPublic(serviceItemList, cfg.Log)
-	handlerItemUpdate := handlers.NewItemUpdatePublic(serviceItemUpdate, cfg.Log)
-	handlerItemDelete := handlers.NewItemDeletePublic(serviceItemDelete, cfg.Log)
+	handlerItemCreate := handlers.NewRestItemCreate(serviceItemCreate, cfg.Logger)
+	handlerItemGet := handlers.NewRestItemGet(serviceItemGet, cfg.Logger)
+	handlerItemList := handlers.NewRestItemList(serviceItemList, cfg.Logger)
+	handlerItemUpdate := handlers.NewRestItemUpdate(serviceItemUpdate, cfg.Logger)
+	handlerItemDelete := handlers.NewRestItemDelete(serviceItemDelete, cfg.Logger)
 
 	// =================================================================================================================
 	// ROUTER
 	// =================================================================================================================
 
-	router := httpf.NewRouter(cfg.Rest, cfg.Otel, cfg.HttpLogger, cfg.App.DowntimeStart)
+	router := httpf.NewRouter(cfg.Rest, cfg.Otel, cfg.RestLogger, cfg.App.DowntimeStart)
 
-	router.Get("/ping", handlerPing.ServeHTTP)
-	router.Get("/healthcheck", handlerHealth.ServeHTTP)
-	router.Post("/items", handlerItemCreate.ServeHTTP)
-	router.Get("/items", handlerItemList.ServeHTTP)
-	router.Get("/item", handlerItemGet.ServeHTTP)
-	router.Put("/item", handlerItemUpdate.ServeHTTP)
-	router.Delete("/item", handlerItemDelete.ServeHTTP)
+	router.Route("/v0", func(api chi.Router) {
+		api.Get("/ping", handlerPing.ServeHTTP)
+		api.Get("/healthcheck", handlerHealth.ServeHTTP)
+		api.Post("/items", handlerItemCreate.ServeHTTP)
+		api.Get("/items", handlerItemList.ServeHTTP)
+		api.Get("/item", handlerItemGet.ServeHTTP)
+		api.Put("/item", handlerItemUpdate.ServeHTTP)
+		api.Delete("/item", handlerItemDelete.ServeHTTP)
+	})
 
 	// =================================================================================================================
 	// RUN

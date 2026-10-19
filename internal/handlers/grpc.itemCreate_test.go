@@ -14,7 +14,7 @@ import (
 	"github.com/a-novel/service-template/internal/core"
 	"github.com/a-novel/service-template/internal/handlers"
 	handlersmocks "github.com/a-novel/service-template/internal/handlers/mocks"
-	"github.com/a-novel/service-template/internal/handlers/protogen"
+	templatev0 "github.com/a-novel/service-template/internal/handlers/protogen/anovel/template/v0"
 )
 
 func TestGrpcItemCreate(t *testing.T) {
@@ -30,17 +30,17 @@ func TestGrpcItemCreate(t *testing.T) {
 	testCases := []struct {
 		name string
 
-		request *protogen.ItemCreateRequest
+		request *templatev0.ItemCreateRequest
 
 		serviceMock *serviceMock
 
-		expect       *protogen.ItemCreateResponse
+		expect       *templatev0.ItemCreateResponse
 		expectStatus codes.Code
 	}{
 		{
 			name: "Success",
 
-			request: &protogen.ItemCreateRequest{
+			request: &templatev0.ItemCreateRequest{
 				Name:        "test item",
 				Description: "test description",
 			},
@@ -56,8 +56,8 @@ func TestGrpcItemCreate(t *testing.T) {
 			},
 
 			expectStatus: codes.OK,
-			expect: &protogen.ItemCreateResponse{
-				Item: &protogen.Item{
+			expect: &templatev0.ItemCreateResponse{
+				Item: &templatev0.Item{
 					Id:          "00000000-0000-0000-0000-000000000001",
 					Name:        "test item",
 					Description: "test description",
@@ -69,7 +69,7 @@ func TestGrpcItemCreate(t *testing.T) {
 		{
 			name: "Error/InvalidArgument",
 
-			request: &protogen.ItemCreateRequest{
+			request: &templatev0.ItemCreateRequest{
 				Name: "",
 			},
 
@@ -82,7 +82,7 @@ func TestGrpcItemCreate(t *testing.T) {
 		{
 			name: "Error/Internal",
 
-			request: &protogen.ItemCreateRequest{
+			request: &templatev0.ItemCreateRequest{
 				Name: "test item",
 			},
 
@@ -98,7 +98,7 @@ func TestGrpcItemCreate(t *testing.T) {
 		t.Run(testCase.name, func(t *testing.T) {
 			t.Parallel()
 
-			service := handlersmocks.NewMockItemCreateService(t)
+			service := handlersmocks.NewMockGrpcItemCreateService(t)
 
 			if testCase.serviceMock != nil {
 				service.EXPECT().
@@ -109,7 +109,7 @@ func TestGrpcItemCreate(t *testing.T) {
 					Return(testCase.serviceMock.resp, testCase.serviceMock.err)
 			}
 
-			handler := handlers.NewItemCreate(service)
+			handler := handlers.NewGrpcItemCreate(service)
 
 			res, err := handler.ItemCreate(t.Context(), testCase.request)
 			resSt, ok := status.FromError(err)

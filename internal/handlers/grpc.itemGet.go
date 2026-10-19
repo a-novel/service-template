@@ -11,32 +11,31 @@ import (
 	"github.com/a-novel-kit/golib/otel"
 
 	"github.com/a-novel/service-template/internal/core"
-	"github.com/a-novel/service-template/internal/handlers/protogen"
+	templatev0 "github.com/a-novel/service-template/internal/handlers/protogen/anovel/template/v0"
 )
 
-// ItemGetService returns the item identified by the request. The core layer
-// supplies the implementation.
-type ItemGetService interface {
+// GrpcItemGetService is the core operation [GrpcItemGet] delegates to.
+type GrpcItemGetService interface {
 	Exec(ctx context.Context, request *core.ItemGetRequest) (*core.Item, error)
 }
 
-// ItemGet is the gRPC handler for the ItemGet RPC.
-type ItemGet struct {
-	protogen.UnimplementedItemGetServiceServer
+// GrpcItemGet is the gRPC handler for the ItemGet RPC.
+type GrpcItemGet struct {
+	templatev0.UnimplementedItemGetServiceServer
 
-	service ItemGetService
+	service GrpcItemGetService
 }
 
-func NewItemGet(service ItemGetService) *ItemGet {
-	return &ItemGet{service: service}
+func NewGrpcItemGet(service GrpcItemGetService) *GrpcItemGet {
+	return &GrpcItemGet{service: service}
 }
 
 // ItemGet returns the item with the given ID. A malformed ID or rejected request
 // maps to InvalidArgument, a missing item to NotFound, and any other failure to
 // Internal.
-func (handler *ItemGet) ItemGet(
-	ctx context.Context, request *protogen.ItemGetRequest,
-) (*protogen.ItemGetResponse, error) {
+func (handler *GrpcItemGet) ItemGet(
+	ctx context.Context, request *templatev0.ItemGetRequest,
+) (*templatev0.ItemGetResponse, error) {
 	ctx, span := otel.Tracer().Start(ctx, "grpc.ItemGet")
 	defer span.End()
 
@@ -60,5 +59,5 @@ func (handler *ItemGet) ItemGet(
 		return nil, status.Error(codes.Internal, "internal error")
 	}
 
-	return &protogen.ItemGetResponse{Item: itemToProto(item)}, nil
+	return &templatev0.ItemGetResponse{Item: itemToProto(item)}, nil
 }

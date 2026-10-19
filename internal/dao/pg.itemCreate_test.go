@@ -15,7 +15,7 @@ import (
 	"github.com/a-novel/service-template/internal/models/migrations"
 )
 
-func TestItemCreate(t *testing.T) {
+func TestPgItemCreate(t *testing.T) {
 	t.Parallel()
 
 	testCases := []struct {
@@ -62,7 +62,7 @@ func TestItemCreate(t *testing.T) {
 		},
 	}
 
-	dao := dao.NewItemCreate()
+	daoItemCreate := dao.NewPgItemCreate()
 
 	for _, testCase := range testCases {
 		t.Run(testCase.name, func(t *testing.T) {
@@ -71,7 +71,7 @@ func TestItemCreate(t *testing.T) {
 			postgrestest.RunDBTest(t, configtest.PostgresPreset, migrations.Migrations, func(ctx context.Context, t *testing.T) {
 				t.Helper()
 
-				result, err := dao.Exec(ctx, testCase.request)
+				result, err := daoItemCreate.Exec(ctx, testCase.request)
 				require.ErrorIs(t, err, testCase.expectErr)
 				require.Equal(t, testCase.expect, result)
 			})

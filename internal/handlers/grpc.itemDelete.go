@@ -11,32 +11,31 @@ import (
 	"github.com/a-novel-kit/golib/otel"
 
 	"github.com/a-novel/service-template/internal/core"
-	"github.com/a-novel/service-template/internal/handlers/protogen"
+	templatev0 "github.com/a-novel/service-template/internal/handlers/protogen/anovel/template/v0"
 )
 
-// ItemDeleteService deletes the item identified by the request and returns the
-// removed record. The core layer supplies the implementation.
-type ItemDeleteService interface {
+// GrpcItemDeleteService is the core operation [GrpcItemDelete] delegates to.
+type GrpcItemDeleteService interface {
 	Exec(ctx context.Context, request *core.ItemDeleteRequest) (*core.Item, error)
 }
 
-// ItemDelete is the gRPC handler for the ItemDelete RPC.
-type ItemDelete struct {
-	protogen.UnimplementedItemDeleteServiceServer
+// GrpcItemDelete is the gRPC handler for the ItemDelete RPC.
+type GrpcItemDelete struct {
+	templatev0.UnimplementedItemDeleteServiceServer
 
-	service ItemDeleteService
+	service GrpcItemDeleteService
 }
 
-func NewItemDelete(service ItemDeleteService) *ItemDelete {
-	return &ItemDelete{service: service}
+func NewGrpcItemDelete(service GrpcItemDeleteService) *GrpcItemDelete {
+	return &GrpcItemDelete{service: service}
 }
 
 // ItemDelete deletes the item with the given ID and returns the removed record.
 // A malformed ID or rejected request maps to InvalidArgument, a missing item to
 // NotFound, and any other failure to Internal.
-func (handler *ItemDelete) ItemDelete(
-	ctx context.Context, request *protogen.ItemDeleteRequest,
-) (*protogen.ItemDeleteResponse, error) {
+func (handler *GrpcItemDelete) ItemDelete(
+	ctx context.Context, request *templatev0.ItemDeleteRequest,
+) (*templatev0.ItemDeleteResponse, error) {
 	ctx, span := otel.Tracer().Start(ctx, "grpc.ItemDelete")
 	defer span.End()
 
@@ -60,5 +59,5 @@ func (handler *ItemDelete) ItemDelete(
 		return nil, status.Error(codes.Internal, "internal error")
 	}
 
-	return &protogen.ItemDeleteResponse{Item: itemToProto(item)}, nil
+	return &templatev0.ItemDeleteResponse{Item: itemToProto(item)}, nil
 }

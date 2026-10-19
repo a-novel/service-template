@@ -1,6 +1,5 @@
-// Command migrations applies the service's database schema migrations and exits.
-// The cmd/grpc and cmd/rest entrypoints serve the item API once the schema is in
-// place.
+// Command migrations applies the service's database schema migrations and exits. The cmd/grpc and
+// cmd/rest servers serve the item API once the schema is in place.
 package main
 
 import (
