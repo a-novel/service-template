@@ -13,7 +13,7 @@ import (
 	"github.com/a-novel/service-template/internal/core"
 )
 
-// RestItemDeleteService is the core operation the delete endpoint delegates to.
+// RestItemDeleteService is the core operation [RestItemDelete] delegates to.
 type RestItemDeleteService interface {
 	Exec(ctx context.Context, request *core.ItemDeleteRequest) (*core.Item, error)
 }

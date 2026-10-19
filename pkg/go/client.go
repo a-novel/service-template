@@ -35,6 +35,8 @@ type (
 // A Client issues the service's gRPC calls, one method per RPC. Construct one
 // with [NewClient] and call Close when finished to release the connection.
 type Client interface {
+	// UnaryEcho answers a fixed message without touching any dependency, so it checks the
+	// connection alone.
 	UnaryEcho(
 		ctx context.Context, req *golibproto.UnaryEchoRequest, opts ...grpc.CallOption,
 	) (*golibproto.UnaryEchoResponse, error)
@@ -42,10 +44,15 @@ type Client interface {
 	// dependency probe fails. Set a request deadline.
 	Status(ctx context.Context, req *StatusRequest, opts ...grpc.CallOption) (*StatusResponse, error)
 
+	// ItemCreate creates an item and returns it.
 	ItemCreate(ctx context.Context, req *ItemCreateRequest, opts ...grpc.CallOption) (*ItemCreateResponse, error)
+	// ItemGet returns the item with the given ID.
 	ItemGet(ctx context.Context, req *ItemGetRequest, opts ...grpc.CallOption) (*ItemGetResponse, error)
+	// ItemList returns a page of items, newest first.
 	ItemList(ctx context.Context, req *ItemListRequest, opts ...grpc.CallOption) (*ItemListResponse, error)
+	// ItemUpdate replaces the name and description of an item and returns it.
 	ItemUpdate(ctx context.Context, req *ItemUpdateRequest, opts ...grpc.CallOption) (*ItemUpdateResponse, error)
+	// ItemDelete deletes an item and returns it.
 	ItemDelete(ctx context.Context, req *ItemDeleteRequest, opts ...grpc.CallOption) (*ItemDeleteResponse, error)
 
 	// Close releases the underlying gRPC connection. Call it once the client is

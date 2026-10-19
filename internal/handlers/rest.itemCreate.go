@@ -11,7 +11,7 @@ import (
 	"github.com/a-novel/service-template/internal/core"
 )
 
-// RestItemCreateService is the core operation the create endpoint delegates to.
+// RestItemCreateService is the core operation [RestItemCreate] delegates to.
 type RestItemCreateService interface {
 	Exec(ctx context.Context, request *core.ItemCreateRequest) (*core.Item, error)
 }

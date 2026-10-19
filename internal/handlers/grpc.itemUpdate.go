@@ -14,8 +14,7 @@ import (
 	templatev0 "github.com/a-novel/service-template/internal/handlers/protogen/anovel/template/v0"
 )
 
-// GrpcItemUpdateService applies the request's changes to the identified item and
-// returns the updated record. The core layer supplies the implementation.
+// GrpcItemUpdateService is the core operation [GrpcItemUpdate] delegates to.
 type GrpcItemUpdateService interface {
 	Exec(ctx context.Context, request *core.ItemUpdateRequest) (*core.Item, error)
 }

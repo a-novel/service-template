@@ -13,7 +13,7 @@ import (
 	"github.com/a-novel/service-template/internal/core"
 )
 
-// RestItemGetService is the core operation the get endpoint delegates to.
+// RestItemGetService is the core operation [RestItemGet] delegates to.
 type RestItemGetService interface {
 	Exec(ctx context.Context, request *core.ItemGetRequest) (*core.Item, error)
 }

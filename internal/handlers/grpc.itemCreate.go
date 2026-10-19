@@ -13,8 +13,7 @@ import (
 	templatev0 "github.com/a-novel/service-template/internal/handlers/protogen/anovel/template/v0"
 )
 
-// GrpcItemCreateService creates an item from the request and returns the stored
-// record. The core layer supplies the implementation.
+// GrpcItemCreateService is the core operation [GrpcItemCreate] delegates to.
 type GrpcItemCreateService interface {
 	Exec(ctx context.Context, request *core.ItemCreateRequest) (*core.Item, error)
 }

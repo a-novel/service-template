@@ -1,6 +1,5 @@
-// Command grpc serves the item API over gRPC. It is one of the service's
-// entrypoints; cmd/rest serves the same domain over HTTP and cmd/migrations
-// applies the database schema.
+// Command grpc serves the private item API over gRPC, for other services on the internal network.
+// cmd/rest serves the same domain over HTTP, and cmd/migrations applies the database schema.
 package main
 
 import (

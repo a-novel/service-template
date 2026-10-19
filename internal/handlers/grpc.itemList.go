@@ -13,8 +13,7 @@ import (
 	templatev0 "github.com/a-novel/service-template/internal/handlers/protogen/anovel/template/v0"
 )
 
-// GrpcItemListService returns a page of items bounded by the request's limit and
-// offset. The core layer supplies the implementation.
+// GrpcItemListService is the core operation [GrpcItemList] delegates to.
 type GrpcItemListService interface {
 	Exec(ctx context.Context, request *core.ItemListRequest) ([]*core.Item, error)
 }

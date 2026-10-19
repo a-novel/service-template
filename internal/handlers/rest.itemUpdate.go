@@ -13,7 +13,7 @@ import (
 	"github.com/a-novel/service-template/internal/core"
 )
 
-// RestItemUpdateService is the core operation the update endpoint delegates to.
+// RestItemUpdateService is the core operation [RestItemUpdate] delegates to.
 type RestItemUpdateService interface {
 	Exec(ctx context.Context, request *core.ItemUpdateRequest) (*core.Item, error)
 }

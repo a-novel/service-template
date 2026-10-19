@@ -14,8 +14,7 @@ import (
 	templatev0 "github.com/a-novel/service-template/internal/handlers/protogen/anovel/template/v0"
 )
 
-// GrpcItemGetService returns the item identified by the request. The core layer
-// supplies the implementation.
+// GrpcItemGetService is the core operation [GrpcItemGet] delegates to.
 type GrpcItemGetService interface {
 	Exec(ctx context.Context, request *core.ItemGetRequest) (*core.Item, error)
 }

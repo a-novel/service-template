@@ -14,8 +14,7 @@ import (
 	templatev0 "github.com/a-novel/service-template/internal/handlers/protogen/anovel/template/v0"
 )
 
-// GrpcItemDeleteService deletes the item identified by the request and returns the
-// removed record. The core layer supplies the implementation.
+// GrpcItemDeleteService is the core operation [GrpcItemDelete] delegates to.
 type GrpcItemDeleteService interface {
 	Exec(ctx context.Context, request *core.ItemDeleteRequest) (*core.Item, error)
 }
