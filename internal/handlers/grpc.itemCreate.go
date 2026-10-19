@@ -3,7 +3,6 @@ package handlers
 import (
 	"context"
 	"errors"
-	"time"
 
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
@@ -54,16 +53,4 @@ func (handler *GrpcItemCreate) ItemCreate(
 	}
 
 	return &protogen.ItemCreateResponse{Item: itemToProto(item)}, nil
-}
-
-// itemToProto converts a core item into its protobuf form, encoding timestamps
-// as RFC 3339 strings.
-func itemToProto(item *core.Item) *protogen.Item {
-	return &protogen.Item{
-		Id:          item.ID.String(),
-		Name:        item.Name,
-		Description: item.Description,
-		CreatedAt:   item.CreatedAt.Format(time.RFC3339),
-		UpdatedAt:   item.UpdatedAt.Format(time.RFC3339),
-	}
 }
