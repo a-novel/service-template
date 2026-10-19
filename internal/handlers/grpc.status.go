@@ -35,8 +35,10 @@ func (handler *GrpcStatus) Status(ctx context.Context, _ *protogen.StatusRequest
 	ctx, span := otel.Tracer().Start(ctx, "grpc.Status")
 	defer span.End()
 
-	// reportPostgres records a failure on its own span.
-	if handler.reportPostgres(ctx) != nil {
+	err := handler.reportPostgres(ctx)
+	if err != nil {
+		_ = otel.ReportError(span, err)
+
 		return nil, status.Error(codes.Unavailable, "service dependencies unavailable")
 	}
 
