@@ -64,19 +64,24 @@ describe("itemGet", () => {
 });
 
 describe("itemList", () => {
-  it("returns a list of items", async () => {
+  it("lists a created item", async () => {
     const api = new TemplateApi(process.env.REST_URL!);
-    const items = await itemList(api);
+    const created = await itemCreate(api, "item to list");
 
-    expect(Array.isArray(items)).toBe(true);
+    const items = await itemList(api);
+    expect(items.map((item) => item.id)).toContain(created.id);
+
+    await itemDelete(api, created.id);
   });
 
-  it("respects limit and offset", async () => {
+  it("returns at most limit items", async () => {
     const api = new TemplateApi(process.env.REST_URL!);
-    const items = await itemList(api, 10, 0);
+    const created = await itemCreate(api, "item to page");
 
-    expect(Array.isArray(items)).toBe(true);
-    expect(items.length).toBeLessThanOrEqual(10);
+    const items = await itemList(api, 1, 0);
+    expect(items).toHaveLength(1);
+
+    await itemDelete(api, created.id);
   });
 });
 
