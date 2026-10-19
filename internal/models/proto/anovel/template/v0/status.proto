@@ -1,5 +1,7 @@
 syntax = "proto3";
 
+package anovel.template.v0;
+
 // StatusService reports the health of the gRPC server's dependencies.
 service StatusService {
   rpc Status(StatusRequest) returns (StatusResponse);

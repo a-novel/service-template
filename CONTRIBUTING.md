@@ -18,12 +18,12 @@ eval "$(a-novel run env service-template)"
 Check it is alive:
 
 ```bash
-curl http://localhost:${SERVICE_TEMPLATE_REST_PORT}/ping          # REST liveness
-curl http://localhost:${SERVICE_TEMPLATE_REST_PORT}/healthcheck   # REST: Postgres dependency
-grpcurl -plaintext localhost:${SERVICE_TEMPLATE_GRPC_PORT} StatusService/Status   # gRPC dependency
+curl http://localhost:${SERVICE_TEMPLATE_REST_PORT}/v0/ping          # REST liveness
+curl http://localhost:${SERVICE_TEMPLATE_REST_PORT}/v0/healthcheck   # REST: Postgres dependency
+grpcurl -plaintext localhost:${SERVICE_TEMPLATE_GRPC_PORT} anovel.template.v0.StatusService/Status   # gRPC dependency
 ```
 
-The `item` CRUD routes (`/items`, `/item`, the `Item*Service` RPCs) are placeholder wiring to fork, not a feature; their request/response shapes live in [`openapi.yaml`](./openapi.yaml) and [`internal/models/proto/`](./internal/models/proto/).
+The `item` CRUD routes (`/v0/items`, `/v0/item`, the `anovel.template.v0.Item*Service` RPCs) are placeholder wiring to fork, not a feature; their request/response shapes live in [`openapi.yaml`](./openapi.yaml) and [`internal/models/proto/anovel/template/v0/`](./internal/models/proto/anovel/template/v0/).
 
 ---
 

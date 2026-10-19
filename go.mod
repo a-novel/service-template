@@ -4,6 +4,7 @@ go 1.27.2
 
 require (
 	github.com/a-novel-kit/golib v0.46.0
+	github.com/go-chi/chi/v5 v5.4.0
 	github.com/go-playground/validator/v10 v10.30.5
 	github.com/google/uuid v1.6.0
 	github.com/gorilla/schema v1.4.1
@@ -38,7 +39,6 @@ require (
 	github.com/getsentry/sentry-go v0.50.0 // indirect
 	github.com/getsentry/sentry-go/otel v0.50.0 // indirect
 	github.com/getsentry/sentry-go/otel/otlp v0.50.0 // indirect
-	github.com/go-chi/chi/v5 v5.4.0 // indirect
 	github.com/go-chi/cors v1.2.2 // indirect
 	github.com/go-chi/httprate v0.16.1 // indirect
 	github.com/go-logr/logr v1.4.4 // indirect

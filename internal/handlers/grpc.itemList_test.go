@@ -14,7 +14,7 @@ import (
 	"github.com/a-novel/service-template/internal/core"
 	"github.com/a-novel/service-template/internal/handlers"
 	handlersmocks "github.com/a-novel/service-template/internal/handlers/mocks"
-	"github.com/a-novel/service-template/internal/handlers/protogen"
+	templatev0 "github.com/a-novel/service-template/internal/handlers/protogen/anovel/template/v0"
 )
 
 func TestGrpcItemList(t *testing.T) {
@@ -30,17 +30,17 @@ func TestGrpcItemList(t *testing.T) {
 	testCases := []struct {
 		name string
 
-		request *protogen.ItemListRequest
+		request *templatev0.ItemListRequest
 
 		serviceMock *serviceMock
 
-		expect       *protogen.ItemListResponse
+		expect       *templatev0.ItemListResponse
 		expectStatus codes.Code
 	}{
 		{
 			name: "Success",
 
-			request: &protogen.ItemListRequest{
+			request: &templatev0.ItemListRequest{
 				Limit:  10,
 				Offset: 0,
 			},
@@ -63,8 +63,8 @@ func TestGrpcItemList(t *testing.T) {
 			},
 
 			expectStatus: codes.OK,
-			expect: &protogen.ItemListResponse{
-				Items: []*protogen.Item{
+			expect: &templatev0.ItemListResponse{
+				Items: []*templatev0.Item{
 					{
 						Id:        "00000000-0000-0000-0000-000000000001",
 						Name:      "item one",
@@ -83,7 +83,7 @@ func TestGrpcItemList(t *testing.T) {
 		{
 			name: "Error/InvalidArgument",
 
-			request: &protogen.ItemListRequest{
+			request: &templatev0.ItemListRequest{
 				Limit:  0,
 				Offset: 0,
 			},
@@ -97,7 +97,7 @@ func TestGrpcItemList(t *testing.T) {
 		{
 			name: "Error/Internal",
 
-			request: &protogen.ItemListRequest{
+			request: &templatev0.ItemListRequest{
 				Limit:  10,
 				Offset: 0,
 			},

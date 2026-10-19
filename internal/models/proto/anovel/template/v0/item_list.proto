@@ -1,6 +1,8 @@
 syntax = "proto3";
 
-import "item.proto";
+package anovel.template.v0;
+
+import "anovel/template/v0/item.proto";
 
 // ItemListService returns a page of items.
 service ItemListService {

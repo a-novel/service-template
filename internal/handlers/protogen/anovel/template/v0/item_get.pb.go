@@ -2,9 +2,9 @@
 // versions:
 // 	protoc-gen-go v1.36.12
 // 	protoc        (unknown)
-// source: item_get.proto
+// source: anovel/template/v0/item_get.proto
 
-package protogen
+package v0
 
 import (
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
@@ -31,7 +31,7 @@ type ItemGetRequest struct {
 
 func (x *ItemGetRequest) Reset() {
 	*x = ItemGetRequest{}
-	mi := &file_item_get_proto_msgTypes[0]
+	mi := &file_anovel_template_v0_item_get_proto_msgTypes[0]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -43,7 +43,7 @@ func (x *ItemGetRequest) String() string {
 func (*ItemGetRequest) ProtoMessage() {}
 
 func (x *ItemGetRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_item_get_proto_msgTypes[0]
+	mi := &file_anovel_template_v0_item_get_proto_msgTypes[0]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -56,7 +56,7 @@ func (x *ItemGetRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ItemGetRequest.ProtoReflect.Descriptor instead.
 func (*ItemGetRequest) Descriptor() ([]byte, []int) {
-	return file_item_get_proto_rawDescGZIP(), []int{0}
+	return file_anovel_template_v0_item_get_proto_rawDescGZIP(), []int{0}
 }
 
 func (x *ItemGetRequest) GetId() string {
@@ -76,7 +76,7 @@ type ItemGetResponse struct {
 
 func (x *ItemGetResponse) Reset() {
 	*x = ItemGetResponse{}
-	mi := &file_item_get_proto_msgTypes[1]
+	mi := &file_anovel_template_v0_item_get_proto_msgTypes[1]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -88,7 +88,7 @@ func (x *ItemGetResponse) String() string {
 func (*ItemGetResponse) ProtoMessage() {}
 
 func (x *ItemGetResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_item_get_proto_msgTypes[1]
+	mi := &file_anovel_template_v0_item_get_proto_msgTypes[1]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -101,7 +101,7 @@ func (x *ItemGetResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use ItemGetResponse.ProtoReflect.Descriptor instead.
 func (*ItemGetResponse) Descriptor() ([]byte, []int) {
-	return file_item_get_proto_rawDescGZIP(), []int{1}
+	return file_anovel_template_v0_item_get_proto_rawDescGZIP(), []int{1}
 }
 
 func (x *ItemGetResponse) GetItem() *Item {
@@ -111,41 +111,41 @@ func (x *ItemGetResponse) GetItem() *Item {
 	return nil
 }
 
-var File_item_get_proto protoreflect.FileDescriptor
+var File_anovel_template_v0_item_get_proto protoreflect.FileDescriptor
 
-const file_item_get_proto_rawDesc = "" +
+const file_anovel_template_v0_item_get_proto_rawDesc = "" +
 	"\n" +
-	"\x0eitem_get.proto\x1a\n" +
-	"item.proto\" \n" +
+	"!anovel/template/v0/item_get.proto\x12\x12anovel.template.v0\x1a\x1danovel/template/v0/item.proto\" \n" +
 	"\x0eItemGetRequest\x12\x0e\n" +
-	"\x02id\x18\x01 \x01(\tR\x02id\",\n" +
-	"\x0fItemGetResponse\x12\x19\n" +
-	"\x04item\x18\x01 \x01(\v2\x05.ItemR\x04item2>\n" +
-	"\x0eItemGetService\x12,\n" +
-	"\aItemGet\x12\x0f.ItemGetRequest\x1a\x10.ItemGetResponseBYB\fItemGetProtoP\x01ZGgithub.com/a-novel/service-template/internal/handlers/protogen;protogenb\x06proto3"
+	"\x02id\x18\x01 \x01(\tR\x02id\"?\n" +
+	"\x0fItemGetResponse\x12,\n" +
+	"\x04item\x18\x01 \x01(\v2\x18.anovel.template.v0.ItemR\x04item2d\n" +
+	"\x0eItemGetService\x12R\n" +
+	"\aItemGet\x12\".anovel.template.v0.ItemGetRequest\x1a#.anovel.template.v0.ItemGetResponseB\xe3\x01\n" +
+	"\x16com.anovel.template.v0B\fItemGetProtoP\x01ZQgithub.com/a-novel/service-template/internal/handlers/protogen/anovel/template/v0\xa2\x02\x03ATV\xaa\x02\x12Anovel.Template.V0\xca\x02\x12Anovel\\Template\\V0\xe2\x02\x1eAnovel\\Template\\V0\\GPBMetadata\xea\x02\x14Anovel::Template::V0b\x06proto3"
 
 var (
-	file_item_get_proto_rawDescOnce sync.Once
-	file_item_get_proto_rawDescData []byte
+	file_anovel_template_v0_item_get_proto_rawDescOnce sync.Once
+	file_anovel_template_v0_item_get_proto_rawDescData []byte
 )
 
-func file_item_get_proto_rawDescGZIP() []byte {
-	file_item_get_proto_rawDescOnce.Do(func() {
-		file_item_get_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_item_get_proto_rawDesc), len(file_item_get_proto_rawDesc)))
+func file_anovel_template_v0_item_get_proto_rawDescGZIP() []byte {
+	file_anovel_template_v0_item_get_proto_rawDescOnce.Do(func() {
+		file_anovel_template_v0_item_get_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_anovel_template_v0_item_get_proto_rawDesc), len(file_anovel_template_v0_item_get_proto_rawDesc)))
 	})
-	return file_item_get_proto_rawDescData
+	return file_anovel_template_v0_item_get_proto_rawDescData
 }
 
-var file_item_get_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
-var file_item_get_proto_goTypes = []any{
-	(*ItemGetRequest)(nil),  // 0: ItemGetRequest
-	(*ItemGetResponse)(nil), // 1: ItemGetResponse
-	(*Item)(nil),            // 2: Item
+var file_anovel_template_v0_item_get_proto_msgTypes = make([]protoimpl.MessageInfo, 2)
+var file_anovel_template_v0_item_get_proto_goTypes = []any{
+	(*ItemGetRequest)(nil),  // 0: anovel.template.v0.ItemGetRequest
+	(*ItemGetResponse)(nil), // 1: anovel.template.v0.ItemGetResponse
+	(*Item)(nil),            // 2: anovel.template.v0.Item
 }
-var file_item_get_proto_depIdxs = []int32{
-	2, // 0: ItemGetResponse.item:type_name -> Item
-	0, // 1: ItemGetService.ItemGet:input_type -> ItemGetRequest
-	1, // 2: ItemGetService.ItemGet:output_type -> ItemGetResponse
+var file_anovel_template_v0_item_get_proto_depIdxs = []int32{
+	2, // 0: anovel.template.v0.ItemGetResponse.item:type_name -> anovel.template.v0.Item
+	0, // 1: anovel.template.v0.ItemGetService.ItemGet:input_type -> anovel.template.v0.ItemGetRequest
+	1, // 2: anovel.template.v0.ItemGetService.ItemGet:output_type -> anovel.template.v0.ItemGetResponse
 	2, // [2:3] is the sub-list for method output_type
 	1, // [1:2] is the sub-list for method input_type
 	1, // [1:1] is the sub-list for extension type_name
@@ -153,27 +153,27 @@ var file_item_get_proto_depIdxs = []int32{
 	0, // [0:1] is the sub-list for field type_name
 }
 
-func init() { file_item_get_proto_init() }
-func file_item_get_proto_init() {
-	if File_item_get_proto != nil {
+func init() { file_anovel_template_v0_item_get_proto_init() }
+func file_anovel_template_v0_item_get_proto_init() {
+	if File_anovel_template_v0_item_get_proto != nil {
 		return
 	}
-	file_item_proto_init()
+	file_anovel_template_v0_item_proto_init()
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
-			RawDescriptor: unsafe.Slice(unsafe.StringData(file_item_get_proto_rawDesc), len(file_item_get_proto_rawDesc)),
+			RawDescriptor: unsafe.Slice(unsafe.StringData(file_anovel_template_v0_item_get_proto_rawDesc), len(file_anovel_template_v0_item_get_proto_rawDesc)),
 			NumEnums:      0,
 			NumMessages:   2,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
-		GoTypes:           file_item_get_proto_goTypes,
-		DependencyIndexes: file_item_get_proto_depIdxs,
-		MessageInfos:      file_item_get_proto_msgTypes,
+		GoTypes:           file_anovel_template_v0_item_get_proto_goTypes,
+		DependencyIndexes: file_anovel_template_v0_item_get_proto_depIdxs,
+		MessageInfos:      file_anovel_template_v0_item_get_proto_msgTypes,
 	}.Build()
-	File_item_get_proto = out.File
-	file_item_get_proto_goTypes = nil
-	file_item_get_proto_depIdxs = nil
+	File_anovel_template_v0_item_get_proto = out.File
+	file_anovel_template_v0_item_get_proto_goTypes = nil
+	file_anovel_template_v0_item_get_proto_depIdxs = nil
 }

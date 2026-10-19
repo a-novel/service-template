@@ -44,7 +44,7 @@ func TestRestItemUpdate(t *testing.T) {
 		{
 			name: "Success",
 
-			request: httptest.NewRequestWithContext(t.Context(), http.MethodPut, "/item", strings.NewReader(`{
+			request: httptest.NewRequestWithContext(t.Context(), http.MethodPut, "/v0/item", strings.NewReader(`{
 				"id": "00000000-0000-0000-0000-000000000001",
 				"name": "updated item",
 				"description": "updated description"
@@ -77,14 +77,14 @@ func TestRestItemUpdate(t *testing.T) {
 		{
 			name: "Error/InvalidBody",
 
-			request: httptest.NewRequestWithContext(t.Context(), http.MethodPut, "/item", strings.NewReader(`not json`)),
+			request: httptest.NewRequestWithContext(t.Context(), http.MethodPut, "/v0/item", strings.NewReader(`not json`)),
 
 			expectStatus: http.StatusBadRequest,
 		},
 		{
 			name: "Error/InvalidID",
 
-			request: httptest.NewRequestWithContext(t.Context(), http.MethodPut, "/item", strings.NewReader(`{
+			request: httptest.NewRequestWithContext(t.Context(), http.MethodPut, "/v0/item", strings.NewReader(`{
 				"id": "not-a-uuid",
 				"name": "updated item"
 			}`)),
@@ -94,7 +94,7 @@ func TestRestItemUpdate(t *testing.T) {
 		{
 			name: "Error/EmptyName",
 
-			request: httptest.NewRequestWithContext(t.Context(), http.MethodPut, "/item", strings.NewReader(`{
+			request: httptest.NewRequestWithContext(t.Context(), http.MethodPut, "/v0/item", strings.NewReader(`{
 				"id": "00000000-0000-0000-0000-000000000001",
 				"name": ""
 			}`)),
@@ -112,7 +112,7 @@ func TestRestItemUpdate(t *testing.T) {
 		{
 			name: "Error/NotFound",
 
-			request: httptest.NewRequestWithContext(t.Context(), http.MethodPut, "/item", strings.NewReader(`{
+			request: httptest.NewRequestWithContext(t.Context(), http.MethodPut, "/v0/item", strings.NewReader(`{
 				"id": "00000000-0000-0000-0000-000000000001",
 				"name": "updated item"
 			}`)),
@@ -130,7 +130,7 @@ func TestRestItemUpdate(t *testing.T) {
 		{
 			name: "Error/Internal",
 
-			request: httptest.NewRequestWithContext(t.Context(), http.MethodPut, "/item", strings.NewReader(`{
+			request: httptest.NewRequestWithContext(t.Context(), http.MethodPut, "/v0/item", strings.NewReader(`{
 				"id": "00000000-0000-0000-0000-000000000001",
 				"name": "updated item"
 			}`)),

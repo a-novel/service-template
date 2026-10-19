@@ -2,9 +2,9 @@
 // versions:
 // - protoc-gen-go-grpc v1.6.2
 // - protoc             (unknown)
-// source: item_list.proto
+// source: anovel/template/v0/item_list.proto
 
-package protogen
+package v0
 
 import (
 	context "context"
@@ -19,7 +19,7 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	ItemListService_ItemList_FullMethodName = "/ItemListService/ItemList"
+	ItemListService_ItemList_FullMethodName = "/anovel.template.v0.ItemListService/ItemList"
 )
 
 // ItemListServiceClient is the client API for ItemListService service.
@@ -112,7 +112,7 @@ func _ItemListService_ItemList_Handler(srv interface{}, ctx context.Context, dec
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var ItemListService_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "ItemListService",
+	ServiceName: "anovel.template.v0.ItemListService",
 	HandlerType: (*ItemListServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
@@ -121,5 +121,5 @@ var ItemListService_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "item_list.proto",
+	Metadata: "anovel/template/v0/item_list.proto",
 }

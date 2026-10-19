@@ -2,9 +2,9 @@
 // versions:
 // - protoc-gen-go-grpc v1.6.2
 // - protoc             (unknown)
-// source: item_create.proto
+// source: anovel/template/v0/item_create.proto
 
-package protogen
+package v0
 
 import (
 	context "context"
@@ -19,7 +19,7 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	ItemCreateService_ItemCreate_FullMethodName = "/ItemCreateService/ItemCreate"
+	ItemCreateService_ItemCreate_FullMethodName = "/anovel.template.v0.ItemCreateService/ItemCreate"
 )
 
 // ItemCreateServiceClient is the client API for ItemCreateService service.
@@ -112,7 +112,7 @@ func _ItemCreateService_ItemCreate_Handler(srv interface{}, ctx context.Context,
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var ItemCreateService_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "ItemCreateService",
+	ServiceName: "anovel.template.v0.ItemCreateService",
 	HandlerType: (*ItemCreateServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
@@ -121,5 +121,5 @@ var ItemCreateService_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "item_create.proto",
+	Metadata: "anovel/template/v0/item_create.proto",
 }

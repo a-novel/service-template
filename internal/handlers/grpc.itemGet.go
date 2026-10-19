@@ -11,7 +11,7 @@ import (
 	"github.com/a-novel-kit/golib/otel"
 
 	"github.com/a-novel/service-template/internal/core"
-	"github.com/a-novel/service-template/internal/handlers/protogen"
+	templatev0 "github.com/a-novel/service-template/internal/handlers/protogen/anovel/template/v0"
 )
 
 // GrpcItemGetService returns the item identified by the request. The core layer
@@ -22,7 +22,7 @@ type GrpcItemGetService interface {
 
 // GrpcItemGet is the gRPC handler for the ItemGet RPC.
 type GrpcItemGet struct {
-	protogen.UnimplementedItemGetServiceServer
+	templatev0.UnimplementedItemGetServiceServer
 
 	service GrpcItemGetService
 }
@@ -35,8 +35,8 @@ func NewGrpcItemGet(service GrpcItemGetService) *GrpcItemGet {
 // maps to InvalidArgument, a missing item to NotFound, and any other failure to
 // Internal.
 func (handler *GrpcItemGet) ItemGet(
-	ctx context.Context, request *protogen.ItemGetRequest,
-) (*protogen.ItemGetResponse, error) {
+	ctx context.Context, request *templatev0.ItemGetRequest,
+) (*templatev0.ItemGetResponse, error) {
 	ctx, span := otel.Tracer().Start(ctx, "grpc.ItemGet")
 	defer span.End()
 
@@ -60,5 +60,5 @@ func (handler *GrpcItemGet) ItemGet(
 		return nil, status.Error(codes.Internal, "internal error")
 	}
 
-	return &protogen.ItemGetResponse{Item: itemToProto(item)}, nil
+	return &templatev0.ItemGetResponse{Item: itemToProto(item)}, nil
 }

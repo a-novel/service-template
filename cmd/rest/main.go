@@ -13,6 +13,7 @@ import (
 	"syscall"
 	"time"
 
+	"github.com/go-chi/chi/v5"
 	"github.com/samber/lo"
 
 	"github.com/a-novel-kit/golib/downtime"
@@ -90,13 +91,15 @@ func main() {
 
 	router := httpf.NewRouter(cfg.Rest, cfg.Otel, cfg.RestLogger, cfg.App.DowntimeStart)
 
-	router.Get("/ping", handlerPing.ServeHTTP)
-	router.Get("/healthcheck", handlerHealth.ServeHTTP)
-	router.Post("/items", handlerItemCreate.ServeHTTP)
-	router.Get("/items", handlerItemList.ServeHTTP)
-	router.Get("/item", handlerItemGet.ServeHTTP)
-	router.Put("/item", handlerItemUpdate.ServeHTTP)
-	router.Delete("/item", handlerItemDelete.ServeHTTP)
+	router.Route("/v0", func(api chi.Router) {
+		api.Get("/ping", handlerPing.ServeHTTP)
+		api.Get("/healthcheck", handlerHealth.ServeHTTP)
+		api.Post("/items", handlerItemCreate.ServeHTTP)
+		api.Get("/items", handlerItemList.ServeHTTP)
+		api.Get("/item", handlerItemGet.ServeHTTP)
+		api.Put("/item", handlerItemUpdate.ServeHTTP)
+		api.Delete("/item", handlerItemDelete.ServeHTTP)
+	})
 
 	// =================================================================================================================
 	// RUN

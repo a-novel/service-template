@@ -2,9 +2,9 @@
 // versions:
 // - protoc-gen-go-grpc v1.6.2
 // - protoc             (unknown)
-// source: item_delete.proto
+// source: anovel/template/v0/item_delete.proto
 
-package protogen
+package v0
 
 import (
 	context "context"
@@ -19,7 +19,7 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	ItemDeleteService_ItemDelete_FullMethodName = "/ItemDeleteService/ItemDelete"
+	ItemDeleteService_ItemDelete_FullMethodName = "/anovel.template.v0.ItemDeleteService/ItemDelete"
 )
 
 // ItemDeleteServiceClient is the client API for ItemDeleteService service.
@@ -112,7 +112,7 @@ func _ItemDeleteService_ItemDelete_Handler(srv interface{}, ctx context.Context,
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var ItemDeleteService_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "ItemDeleteService",
+	ServiceName: "anovel.template.v0.ItemDeleteService",
 	HandlerType: (*ItemDeleteServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
@@ -121,5 +121,5 @@ var ItemDeleteService_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "item_delete.proto",
+	Metadata: "anovel/template/v0/item_delete.proto",
 }

@@ -2,9 +2,9 @@
 // versions:
 // 	protoc-gen-go v1.36.12
 // 	protoc        (unknown)
-// source: status.proto
+// source: anovel/template/v0/status.proto
 
-package protogen
+package v0
 
 import (
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
@@ -58,11 +58,11 @@ func (x DependencyStatus) String() string {
 }
 
 func (DependencyStatus) Descriptor() protoreflect.EnumDescriptor {
-	return file_status_proto_enumTypes[0].Descriptor()
+	return file_anovel_template_v0_status_proto_enumTypes[0].Descriptor()
 }
 
 func (DependencyStatus) Type() protoreflect.EnumType {
-	return &file_status_proto_enumTypes[0]
+	return &file_anovel_template_v0_status_proto_enumTypes[0]
 }
 
 func (x DependencyStatus) Number() protoreflect.EnumNumber {
@@ -71,7 +71,7 @@ func (x DependencyStatus) Number() protoreflect.EnumNumber {
 
 // Deprecated: Use DependencyStatus.Descriptor instead.
 func (DependencyStatus) EnumDescriptor() ([]byte, []int) {
-	return file_status_proto_rawDescGZIP(), []int{0}
+	return file_anovel_template_v0_status_proto_rawDescGZIP(), []int{0}
 }
 
 // DependencyHealth reports the health of a single external dependency.
@@ -81,14 +81,14 @@ func (DependencyStatus) EnumDescriptor() ([]byte, []int) {
 // operators.
 type DependencyHealth struct {
 	state         protoimpl.MessageState `protogen:"open.v1"`
-	Status        DependencyStatus       `protobuf:"varint,1,opt,name=status,proto3,enum=DependencyStatus" json:"status,omitempty"`
+	Status        DependencyStatus       `protobuf:"varint,1,opt,name=status,proto3,enum=anovel.template.v0.DependencyStatus" json:"status,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
 
 func (x *DependencyHealth) Reset() {
 	*x = DependencyHealth{}
-	mi := &file_status_proto_msgTypes[0]
+	mi := &file_anovel_template_v0_status_proto_msgTypes[0]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -100,7 +100,7 @@ func (x *DependencyHealth) String() string {
 func (*DependencyHealth) ProtoMessage() {}
 
 func (x *DependencyHealth) ProtoReflect() protoreflect.Message {
-	mi := &file_status_proto_msgTypes[0]
+	mi := &file_anovel_template_v0_status_proto_msgTypes[0]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -113,7 +113,7 @@ func (x *DependencyHealth) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use DependencyHealth.ProtoReflect.Descriptor instead.
 func (*DependencyHealth) Descriptor() ([]byte, []int) {
-	return file_status_proto_rawDescGZIP(), []int{0}
+	return file_anovel_template_v0_status_proto_rawDescGZIP(), []int{0}
 }
 
 func (x *DependencyHealth) GetStatus() DependencyStatus {
@@ -132,7 +132,7 @@ type StatusRequest struct {
 
 func (x *StatusRequest) Reset() {
 	*x = StatusRequest{}
-	mi := &file_status_proto_msgTypes[1]
+	mi := &file_anovel_template_v0_status_proto_msgTypes[1]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -144,7 +144,7 @@ func (x *StatusRequest) String() string {
 func (*StatusRequest) ProtoMessage() {}
 
 func (x *StatusRequest) ProtoReflect() protoreflect.Message {
-	mi := &file_status_proto_msgTypes[1]
+	mi := &file_anovel_template_v0_status_proto_msgTypes[1]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -157,7 +157,7 @@ func (x *StatusRequest) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use StatusRequest.ProtoReflect.Descriptor instead.
 func (*StatusRequest) Descriptor() ([]byte, []int) {
-	return file_status_proto_rawDescGZIP(), []int{1}
+	return file_anovel_template_v0_status_proto_rawDescGZIP(), []int{1}
 }
 
 // StatusResponse reports the health of each dependency the service relies on.
@@ -170,7 +170,7 @@ type StatusResponse struct {
 
 func (x *StatusResponse) Reset() {
 	*x = StatusResponse{}
-	mi := &file_status_proto_msgTypes[2]
+	mi := &file_anovel_template_v0_status_proto_msgTypes[2]
 	ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 	ms.StoreMessageInfo(mi)
 }
@@ -182,7 +182,7 @@ func (x *StatusResponse) String() string {
 func (*StatusResponse) ProtoMessage() {}
 
 func (x *StatusResponse) ProtoReflect() protoreflect.Message {
-	mi := &file_status_proto_msgTypes[2]
+	mi := &file_anovel_template_v0_status_proto_msgTypes[2]
 	if x != nil {
 		ms := protoimpl.X.MessageStateOf(protoimpl.Pointer(x))
 		if ms.LoadMessageInfo() == nil {
@@ -195,7 +195,7 @@ func (x *StatusResponse) ProtoReflect() protoreflect.Message {
 
 // Deprecated: Use StatusResponse.ProtoReflect.Descriptor instead.
 func (*StatusResponse) Descriptor() ([]byte, []int) {
-	return file_status_proto_rawDescGZIP(), []int{2}
+	return file_anovel_template_v0_status_proto_rawDescGZIP(), []int{2}
 }
 
 func (x *StatusResponse) GetPostgres() *DependencyHealth {
@@ -205,48 +205,49 @@ func (x *StatusResponse) GetPostgres() *DependencyHealth {
 	return nil
 }
 
-var File_status_proto protoreflect.FileDescriptor
+var File_anovel_template_v0_status_proto protoreflect.FileDescriptor
 
-const file_status_proto_rawDesc = "" +
+const file_anovel_template_v0_status_proto_rawDesc = "" +
 	"\n" +
-	"\fstatus.proto\"H\n" +
-	"\x10DependencyHealth\x12)\n" +
-	"\x06status\x18\x01 \x01(\x0e2\x11.DependencyStatusR\x06statusJ\x04\b\x02\x10\x03R\x03err\"\x0f\n" +
-	"\rStatusRequest\"?\n" +
-	"\x0eStatusResponse\x12-\n" +
-	"\bpostgres\x18\x01 \x01(\v2\x11.DependencyHealthR\bpostgres*k\n" +
+	"\x1fanovel/template/v0/status.proto\x12\x12anovel.template.v0\"[\n" +
+	"\x10DependencyHealth\x12<\n" +
+	"\x06status\x18\x01 \x01(\x0e2$.anovel.template.v0.DependencyStatusR\x06statusJ\x04\b\x02\x10\x03R\x03err\"\x0f\n" +
+	"\rStatusRequest\"R\n" +
+	"\x0eStatusResponse\x12@\n" +
+	"\bpostgres\x18\x01 \x01(\v2$.anovel.template.v0.DependencyHealthR\bpostgres*k\n" +
 	"\x10DependencyStatus\x12!\n" +
 	"\x1dDEPENDENCY_STATUS_UNSPECIFIED\x10\x00\x12\x18\n" +
 	"\x14DEPENDENCY_STATUS_UP\x10\x01\x12\x1a\n" +
-	"\x16DEPENDENCY_STATUS_DOWN\x10\x022:\n" +
-	"\rStatusService\x12)\n" +
-	"\x06Status\x12\x0e.StatusRequest\x1a\x0f.StatusResponseBXB\vStatusProtoP\x01ZGgithub.com/a-novel/service-template/internal/handlers/protogen;protogenb\x06proto3"
+	"\x16DEPENDENCY_STATUS_DOWN\x10\x022`\n" +
+	"\rStatusService\x12O\n" +
+	"\x06Status\x12!.anovel.template.v0.StatusRequest\x1a\".anovel.template.v0.StatusResponseB\xe2\x01\n" +
+	"\x16com.anovel.template.v0B\vStatusProtoP\x01ZQgithub.com/a-novel/service-template/internal/handlers/protogen/anovel/template/v0\xa2\x02\x03ATV\xaa\x02\x12Anovel.Template.V0\xca\x02\x12Anovel\\Template\\V0\xe2\x02\x1eAnovel\\Template\\V0\\GPBMetadata\xea\x02\x14Anovel::Template::V0b\x06proto3"
 
 var (
-	file_status_proto_rawDescOnce sync.Once
-	file_status_proto_rawDescData []byte
+	file_anovel_template_v0_status_proto_rawDescOnce sync.Once
+	file_anovel_template_v0_status_proto_rawDescData []byte
 )
 
-func file_status_proto_rawDescGZIP() []byte {
-	file_status_proto_rawDescOnce.Do(func() {
-		file_status_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_status_proto_rawDesc), len(file_status_proto_rawDesc)))
+func file_anovel_template_v0_status_proto_rawDescGZIP() []byte {
+	file_anovel_template_v0_status_proto_rawDescOnce.Do(func() {
+		file_anovel_template_v0_status_proto_rawDescData = protoimpl.X.CompressGZIP(unsafe.Slice(unsafe.StringData(file_anovel_template_v0_status_proto_rawDesc), len(file_anovel_template_v0_status_proto_rawDesc)))
 	})
-	return file_status_proto_rawDescData
+	return file_anovel_template_v0_status_proto_rawDescData
 }
 
-var file_status_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
-var file_status_proto_msgTypes = make([]protoimpl.MessageInfo, 3)
-var file_status_proto_goTypes = []any{
-	(DependencyStatus)(0),    // 0: DependencyStatus
-	(*DependencyHealth)(nil), // 1: DependencyHealth
-	(*StatusRequest)(nil),    // 2: StatusRequest
-	(*StatusResponse)(nil),   // 3: StatusResponse
+var file_anovel_template_v0_status_proto_enumTypes = make([]protoimpl.EnumInfo, 1)
+var file_anovel_template_v0_status_proto_msgTypes = make([]protoimpl.MessageInfo, 3)
+var file_anovel_template_v0_status_proto_goTypes = []any{
+	(DependencyStatus)(0),    // 0: anovel.template.v0.DependencyStatus
+	(*DependencyHealth)(nil), // 1: anovel.template.v0.DependencyHealth
+	(*StatusRequest)(nil),    // 2: anovel.template.v0.StatusRequest
+	(*StatusResponse)(nil),   // 3: anovel.template.v0.StatusResponse
 }
-var file_status_proto_depIdxs = []int32{
-	0, // 0: DependencyHealth.status:type_name -> DependencyStatus
-	1, // 1: StatusResponse.postgres:type_name -> DependencyHealth
-	2, // 2: StatusService.Status:input_type -> StatusRequest
-	3, // 3: StatusService.Status:output_type -> StatusResponse
+var file_anovel_template_v0_status_proto_depIdxs = []int32{
+	0, // 0: anovel.template.v0.DependencyHealth.status:type_name -> anovel.template.v0.DependencyStatus
+	1, // 1: anovel.template.v0.StatusResponse.postgres:type_name -> anovel.template.v0.DependencyHealth
+	2, // 2: anovel.template.v0.StatusService.Status:input_type -> anovel.template.v0.StatusRequest
+	3, // 3: anovel.template.v0.StatusService.Status:output_type -> anovel.template.v0.StatusResponse
 	3, // [3:4] is the sub-list for method output_type
 	2, // [2:3] is the sub-list for method input_type
 	2, // [2:2] is the sub-list for extension type_name
@@ -254,27 +255,27 @@ var file_status_proto_depIdxs = []int32{
 	0, // [0:2] is the sub-list for field type_name
 }
 
-func init() { file_status_proto_init() }
-func file_status_proto_init() {
-	if File_status_proto != nil {
+func init() { file_anovel_template_v0_status_proto_init() }
+func file_anovel_template_v0_status_proto_init() {
+	if File_anovel_template_v0_status_proto != nil {
 		return
 	}
 	type x struct{}
 	out := protoimpl.TypeBuilder{
 		File: protoimpl.DescBuilder{
 			GoPackagePath: reflect.TypeOf(x{}).PkgPath(),
-			RawDescriptor: unsafe.Slice(unsafe.StringData(file_status_proto_rawDesc), len(file_status_proto_rawDesc)),
+			RawDescriptor: unsafe.Slice(unsafe.StringData(file_anovel_template_v0_status_proto_rawDesc), len(file_anovel_template_v0_status_proto_rawDesc)),
 			NumEnums:      1,
 			NumMessages:   3,
 			NumExtensions: 0,
 			NumServices:   1,
 		},
-		GoTypes:           file_status_proto_goTypes,
-		DependencyIndexes: file_status_proto_depIdxs,
-		EnumInfos:         file_status_proto_enumTypes,
-		MessageInfos:      file_status_proto_msgTypes,
+		GoTypes:           file_anovel_template_v0_status_proto_goTypes,
+		DependencyIndexes: file_anovel_template_v0_status_proto_depIdxs,
+		EnumInfos:         file_anovel_template_v0_status_proto_enumTypes,
+		MessageInfos:      file_anovel_template_v0_status_proto_msgTypes,
 	}.Build()
-	File_status_proto = out.File
-	file_status_proto_goTypes = nil
-	file_status_proto_depIdxs = nil
+	File_anovel_template_v0_status_proto = out.File
+	file_anovel_template_v0_status_proto_goTypes = nil
+	file_anovel_template_v0_status_proto_depIdxs = nil
 }

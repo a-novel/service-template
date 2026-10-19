@@ -27,7 +27,7 @@ import (
 	"github.com/a-novel/service-template/internal/core"
 	"github.com/a-novel/service-template/internal/dao"
 	"github.com/a-novel/service-template/internal/handlers"
-	"github.com/a-novel/service-template/internal/handlers/protogen"
+	templatev0 "github.com/a-novel/service-template/internal/handlers/protogen/anovel/template/v0"
 )
 
 func main() {
@@ -104,12 +104,12 @@ func main() {
 		healthcheck.SetServingStatus("", healthpb.HealthCheckResponse_NOT_SERVING)
 	}()
 
-	protogen.RegisterStatusServiceServer(server, handlerStatus)
-	protogen.RegisterItemCreateServiceServer(server, handlerItemCreate)
-	protogen.RegisterItemGetServiceServer(server, handlerItemGet)
-	protogen.RegisterItemListServiceServer(server, handlerItemList)
-	protogen.RegisterItemUpdateServiceServer(server, handlerItemUpdate)
-	protogen.RegisterItemDeleteServiceServer(server, handlerItemDelete)
+	templatev0.RegisterStatusServiceServer(server, handlerStatus)
+	templatev0.RegisterItemCreateServiceServer(server, handlerItemCreate)
+	templatev0.RegisterItemGetServiceServer(server, handlerItemGet)
+	templatev0.RegisterItemListServiceServer(server, handlerItemList)
+	templatev0.RegisterItemUpdateServiceServer(server, handlerItemUpdate)
+	templatev0.RegisterItemDeleteServiceServer(server, handlerItemDelete)
 
 	reflection.Register(server)
 

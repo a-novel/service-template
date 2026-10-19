@@ -2,9 +2,9 @@
 // versions:
 // - protoc-gen-go-grpc v1.6.2
 // - protoc             (unknown)
-// source: item_get.proto
+// source: anovel/template/v0/item_get.proto
 
-package protogen
+package v0
 
 import (
 	context "context"
@@ -19,7 +19,7 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	ItemGetService_ItemGet_FullMethodName = "/ItemGetService/ItemGet"
+	ItemGetService_ItemGet_FullMethodName = "/anovel.template.v0.ItemGetService/ItemGet"
 )
 
 // ItemGetServiceClient is the client API for ItemGetService service.
@@ -112,7 +112,7 @@ func _ItemGetService_ItemGet_Handler(srv interface{}, ctx context.Context, dec f
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var ItemGetService_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "ItemGetService",
+	ServiceName: "anovel.template.v0.ItemGetService",
 	HandlerType: (*ItemGetServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
@@ -121,5 +121,5 @@ var ItemGetService_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "item_get.proto",
+	Metadata: "anovel/template/v0/item_get.proto",
 }

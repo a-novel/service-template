@@ -11,7 +11,7 @@ import (
 	"github.com/a-novel-kit/golib/otel"
 
 	"github.com/a-novel/service-template/internal/core"
-	"github.com/a-novel/service-template/internal/handlers/protogen"
+	templatev0 "github.com/a-novel/service-template/internal/handlers/protogen/anovel/template/v0"
 )
 
 // GrpcItemDeleteService deletes the item identified by the request and returns the
@@ -22,7 +22,7 @@ type GrpcItemDeleteService interface {
 
 // GrpcItemDelete is the gRPC handler for the ItemDelete RPC.
 type GrpcItemDelete struct {
-	protogen.UnimplementedItemDeleteServiceServer
+	templatev0.UnimplementedItemDeleteServiceServer
 
 	service GrpcItemDeleteService
 }
@@ -35,8 +35,8 @@ func NewGrpcItemDelete(service GrpcItemDeleteService) *GrpcItemDelete {
 // A malformed ID or rejected request maps to InvalidArgument, a missing item to
 // NotFound, and any other failure to Internal.
 func (handler *GrpcItemDelete) ItemDelete(
-	ctx context.Context, request *protogen.ItemDeleteRequest,
-) (*protogen.ItemDeleteResponse, error) {
+	ctx context.Context, request *templatev0.ItemDeleteRequest,
+) (*templatev0.ItemDeleteResponse, error) {
 	ctx, span := otel.Tracer().Start(ctx, "grpc.ItemDelete")
 	defer span.End()
 
@@ -60,5 +60,5 @@ func (handler *GrpcItemDelete) ItemDelete(
 		return nil, status.Error(codes.Internal, "internal error")
 	}
 
-	return &protogen.ItemDeleteResponse{Item: itemToProto(item)}, nil
+	return &templatev0.ItemDeleteResponse{Item: itemToProto(item)}, nil
 }

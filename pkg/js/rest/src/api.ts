@@ -41,7 +41,7 @@ export class TemplateApi {
 
   /** Liveness probe; resolves when the service is reachable. */
   async ping(): Promise<void> {
-    await this.fetchVoid("/ping", { method: "GET" });
+    await this.fetchVoid("/v0/ping", { method: "GET" });
   }
 
   /**
@@ -49,6 +49,6 @@ export class TemplateApi {
    * is healthy. Throws on HTTP 503 when a dependency probe fails, or on another non-2xx response.
    */
   async health(): Promise<Record<string, HealthDependency>> {
-    return await this.fetch("/healthcheck", undefined, { method: "GET" });
+    return await this.fetch("/v0/healthcheck", undefined, { method: "GET" });
   }
 }

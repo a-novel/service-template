@@ -1,5 +1,7 @@
 syntax = "proto3";
 
+package anovel.template.v0;
+
 // An Item is the placeholder resource the template exposes through its item RPCs.
 message Item {
   // Unique identifier, formatted as a UUID.

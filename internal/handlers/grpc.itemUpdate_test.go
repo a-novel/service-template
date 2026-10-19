@@ -14,7 +14,7 @@ import (
 	"github.com/a-novel/service-template/internal/core"
 	"github.com/a-novel/service-template/internal/handlers"
 	handlersmocks "github.com/a-novel/service-template/internal/handlers/mocks"
-	"github.com/a-novel/service-template/internal/handlers/protogen"
+	templatev0 "github.com/a-novel/service-template/internal/handlers/protogen/anovel/template/v0"
 )
 
 func TestGrpcItemUpdate(t *testing.T) {
@@ -30,17 +30,17 @@ func TestGrpcItemUpdate(t *testing.T) {
 	testCases := []struct {
 		name string
 
-		request *protogen.ItemUpdateRequest
+		request *templatev0.ItemUpdateRequest
 
 		serviceMock *serviceMock
 
-		expect       *protogen.ItemUpdateResponse
+		expect       *templatev0.ItemUpdateResponse
 		expectStatus codes.Code
 	}{
 		{
 			name: "Success",
 
-			request: &protogen.ItemUpdateRequest{
+			request: &templatev0.ItemUpdateRequest{
 				Id:          "00000000-0000-0000-0000-000000000001",
 				Name:        "updated item",
 				Description: "updated description",
@@ -57,8 +57,8 @@ func TestGrpcItemUpdate(t *testing.T) {
 			},
 
 			expectStatus: codes.OK,
-			expect: &protogen.ItemUpdateResponse{
-				Item: &protogen.Item{
+			expect: &templatev0.ItemUpdateResponse{
+				Item: &templatev0.Item{
 					Id:          "00000000-0000-0000-0000-000000000001",
 					Name:        "updated item",
 					Description: "updated description",
@@ -70,7 +70,7 @@ func TestGrpcItemUpdate(t *testing.T) {
 		{
 			name: "Error/InvalidID",
 
-			request: &protogen.ItemUpdateRequest{
+			request: &templatev0.ItemUpdateRequest{
 				Id:   "not-a-uuid",
 				Name: "updated item",
 			},
@@ -80,7 +80,7 @@ func TestGrpcItemUpdate(t *testing.T) {
 		{
 			name: "Error/InvalidArgument",
 
-			request: &protogen.ItemUpdateRequest{
+			request: &templatev0.ItemUpdateRequest{
 				Id:   "00000000-0000-0000-0000-000000000001",
 				Name: "",
 			},
@@ -94,7 +94,7 @@ func TestGrpcItemUpdate(t *testing.T) {
 		{
 			name: "Error/NotFound",
 
-			request: &protogen.ItemUpdateRequest{
+			request: &templatev0.ItemUpdateRequest{
 				Id:   "00000000-0000-0000-0000-000000000001",
 				Name: "updated item",
 			},
@@ -108,7 +108,7 @@ func TestGrpcItemUpdate(t *testing.T) {
 		{
 			name: "Error/Internal",
 
-			request: &protogen.ItemUpdateRequest{
+			request: &templatev0.ItemUpdateRequest{
 				Id:   "00000000-0000-0000-0000-000000000001",
 				Name: "updated item",
 			},

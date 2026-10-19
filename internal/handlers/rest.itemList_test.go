@@ -43,7 +43,7 @@ func TestRestItemList(t *testing.T) {
 		{
 			name: "Success",
 
-			request: httptest.NewRequestWithContext(t.Context(), http.MethodGet, "/items?limit=10&offset=0", nil),
+			request: httptest.NewRequestWithContext(t.Context(), http.MethodGet, "/v0/items?limit=10&offset=0", nil),
 
 			serviceMock: &serviceMock{
 				req: &core.ItemListRequest{Limit: 10, Offset: 0},
@@ -82,7 +82,7 @@ func TestRestItemList(t *testing.T) {
 		{
 			name: "Error/Internal",
 
-			request: httptest.NewRequestWithContext(t.Context(), http.MethodGet, "/items?limit=10&offset=0", nil),
+			request: httptest.NewRequestWithContext(t.Context(), http.MethodGet, "/v0/items?limit=10&offset=0", nil),
 
 			serviceMock: &serviceMock{
 				req: &core.ItemListRequest{Limit: 10, Offset: 0},

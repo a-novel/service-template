@@ -14,7 +14,7 @@ import (
 	"google.golang.org/grpc/test/bufconn"
 
 	"github.com/a-novel/service-template/internal/handlers"
-	"github.com/a-novel/service-template/internal/handlers/protogen"
+	templatev0 "github.com/a-novel/service-template/internal/handlers/protogen/anovel/template/v0"
 	"github.com/a-novel/service-template/pkg/go"
 )
 
@@ -26,15 +26,15 @@ func TestGrpcStatus(t *testing.T) {
 
 		setup probeSetup
 
-		expect       *protogen.StatusResponse
+		expect       *templatev0.StatusResponse
 		expectStatus codes.Code
 	}{
 		{
 			name:  "Success",
 			setup: probeHealthy,
-			expect: &protogen.StatusResponse{
-				Postgres: &protogen.DependencyHealth{
-					Status: protogen.DependencyStatus_DEPENDENCY_STATUS_UP,
+			expect: &templatev0.StatusResponse{
+				Postgres: &templatev0.DependencyHealth{
+					Status: templatev0.DependencyStatus_DEPENDENCY_STATUS_UP,
 				},
 			},
 			expectStatus: codes.OK,
@@ -51,7 +51,7 @@ func TestGrpcStatus(t *testing.T) {
 
 			ctx := newProbeContext(t, testCase.setup)
 
-			response, err := handlers.NewGrpcStatus().Status(ctx, &protogen.StatusRequest{})
+			response, err := handlers.NewGrpcStatus().Status(ctx, &templatev0.StatusRequest{})
 			result, ok := status.FromError(err)
 			require.True(t, ok)
 			require.Equal(t, testCase.expectStatus, result.Code(), "got %s (%v)", result.Code(), err)
@@ -69,7 +69,7 @@ func TestGrpcStatus(t *testing.T) {
 
 		listener := bufconn.Listen(1024 * 1024)
 		server := grpc.NewServer()
-		protogen.RegisterStatusServiceServer(server, handlers.NewGrpcStatus())
+		templatev0.RegisterStatusServiceServer(server, handlers.NewGrpcStatus())
 
 		serveResult := make(chan error, 1)
 		go func() { serveResult <- server.Serve(listener) }()

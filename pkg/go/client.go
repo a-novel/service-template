@@ -9,27 +9,27 @@ import (
 
 	golibproto "github.com/a-novel-kit/golib/grpcf/proto/gen"
 
-	"github.com/a-novel/service-template/internal/handlers/protogen"
+	templatev0 "github.com/a-novel/service-template/internal/handlers/protogen/anovel/template/v0"
 )
 
 // Request, response, and entity types are re-exported from the service's generated
 // protobuf definitions, so callers never import the service's internal packages.
 type (
-	StatusRequest  = protogen.StatusRequest
-	StatusResponse = protogen.StatusResponse
+	StatusRequest  = templatev0.StatusRequest
+	StatusResponse = templatev0.StatusResponse
 
-	ItemCreateRequest  = protogen.ItemCreateRequest
-	ItemCreateResponse = protogen.ItemCreateResponse
-	ItemGetRequest     = protogen.ItemGetRequest
-	ItemGetResponse    = protogen.ItemGetResponse
-	ItemListRequest    = protogen.ItemListRequest
-	ItemListResponse   = protogen.ItemListResponse
-	ItemUpdateRequest  = protogen.ItemUpdateRequest
-	ItemUpdateResponse = protogen.ItemUpdateResponse
-	ItemDeleteRequest  = protogen.ItemDeleteRequest
-	ItemDeleteResponse = protogen.ItemDeleteResponse
+	ItemCreateRequest  = templatev0.ItemCreateRequest
+	ItemCreateResponse = templatev0.ItemCreateResponse
+	ItemGetRequest     = templatev0.ItemGetRequest
+	ItemGetResponse    = templatev0.ItemGetResponse
+	ItemListRequest    = templatev0.ItemListRequest
+	ItemListResponse   = templatev0.ItemListResponse
+	ItemUpdateRequest  = templatev0.ItemUpdateRequest
+	ItemUpdateResponse = templatev0.ItemUpdateResponse
+	ItemDeleteRequest  = templatev0.ItemDeleteRequest
+	ItemDeleteResponse = templatev0.ItemDeleteResponse
 
-	Item = protogen.Item
+	Item = templatev0.Item
 )
 
 // A Client issues the service's gRPC calls, one method per RPC. Construct one
@@ -55,12 +55,12 @@ type Client interface {
 
 type client struct {
 	golibproto.EchoServiceClient
-	protogen.StatusServiceClient
-	protogen.ItemCreateServiceClient
-	protogen.ItemGetServiceClient
-	protogen.ItemListServiceClient
-	protogen.ItemUpdateServiceClient
-	protogen.ItemDeleteServiceClient
+	templatev0.StatusServiceClient
+	templatev0.ItemCreateServiceClient
+	templatev0.ItemGetServiceClient
+	templatev0.ItemListServiceClient
+	templatev0.ItemUpdateServiceClient
+	templatev0.ItemDeleteServiceClient
 
 	conn *grpc.ClientConn
 }
@@ -85,12 +85,12 @@ func NewClient(addr string, opts ...grpc.DialOption) (Client, error) {
 
 	return &client{
 		EchoServiceClient:       golibproto.NewEchoServiceClient(conn),
-		StatusServiceClient:     protogen.NewStatusServiceClient(conn),
-		ItemCreateServiceClient: protogen.NewItemCreateServiceClient(conn),
-		ItemGetServiceClient:    protogen.NewItemGetServiceClient(conn),
-		ItemListServiceClient:   protogen.NewItemListServiceClient(conn),
-		ItemUpdateServiceClient: protogen.NewItemUpdateServiceClient(conn),
-		ItemDeleteServiceClient: protogen.NewItemDeleteServiceClient(conn),
+		StatusServiceClient:     templatev0.NewStatusServiceClient(conn),
+		ItemCreateServiceClient: templatev0.NewItemCreateServiceClient(conn),
+		ItemGetServiceClient:    templatev0.NewItemGetServiceClient(conn),
+		ItemListServiceClient:   templatev0.NewItemListServiceClient(conn),
+		ItemUpdateServiceClient: templatev0.NewItemUpdateServiceClient(conn),
+		ItemDeleteServiceClient: templatev0.NewItemDeleteServiceClient(conn),
 		conn:                    conn,
 	}, nil
 }

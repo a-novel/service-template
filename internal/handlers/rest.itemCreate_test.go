@@ -44,7 +44,7 @@ func TestRestItemCreate(t *testing.T) {
 		{
 			name: "Success",
 
-			request: httptest.NewRequestWithContext(t.Context(), http.MethodPost, "/items", strings.NewReader(`{
+			request: httptest.NewRequestWithContext(t.Context(), http.MethodPost, "/v0/items", strings.NewReader(`{
 				"name": "test item",
 				"description": "test description"
 			}`)),
@@ -75,14 +75,14 @@ func TestRestItemCreate(t *testing.T) {
 		{
 			name: "Error/InvalidBody",
 
-			request: httptest.NewRequestWithContext(t.Context(), http.MethodPost, "/items", strings.NewReader(`not json`)),
+			request: httptest.NewRequestWithContext(t.Context(), http.MethodPost, "/v0/items", strings.NewReader(`not json`)),
 
 			expectStatus: http.StatusBadRequest,
 		},
 		{
 			name: "Error/EmptyName",
 
-			request: httptest.NewRequestWithContext(t.Context(), http.MethodPost, "/items", strings.NewReader(`{
+			request: httptest.NewRequestWithContext(t.Context(), http.MethodPost, "/v0/items", strings.NewReader(`{
 				"name": ""
 			}`)),
 
@@ -96,7 +96,7 @@ func TestRestItemCreate(t *testing.T) {
 		{
 			name: "Error/Internal",
 
-			request: httptest.NewRequestWithContext(t.Context(), http.MethodPost, "/items", strings.NewReader(`{
+			request: httptest.NewRequestWithContext(t.Context(), http.MethodPost, "/v0/items", strings.NewReader(`{
 				"name": "test item"
 			}`)),
 

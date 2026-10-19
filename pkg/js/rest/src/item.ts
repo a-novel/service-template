@@ -57,7 +57,7 @@ export type ItemDeleteRequest = z.infer<typeof ItemDeleteRequestSchema>;
 
 /** Creates a new Item and returns the stored record. */
 export async function itemCreate(api: TemplateApi, name: string, description?: string): Promise<Item> {
-  return await api.fetch("/items", ItemSchema, {
+  return await api.fetch("/v0/items", ItemSchema, {
     method: "POST",
     headers: HTTP_HEADERS.JSON,
     body: JSON.stringify({ name, description }),
@@ -68,7 +68,7 @@ export async function itemCreate(api: TemplateApi, name: string, description?: s
 export async function itemGet(api: TemplateApi, id: string): Promise<Item> {
   const params = new URLSearchParams();
   params.set("id", id);
-  return await api.fetch(`/item?${params.toString()}`, ItemSchema, { method: "GET", headers: HTTP_HEADERS.JSON });
+  return await api.fetch(`/v0/item?${params.toString()}`, ItemSchema, { method: "GET", headers: HTTP_HEADERS.JSON });
 }
 
 /** Lists Items; returns the first 100 from the start when limit and offset are omitted. */
@@ -76,7 +76,7 @@ export async function itemList(api: TemplateApi, limit?: number, offset?: number
   const params = new URLSearchParams();
   params.set("limit", `${limit || 100}`);
   params.set("offset", `${offset || 0}`);
-  return await api.fetch(`/items?${params.toString()}`, z.array(ItemSchema), {
+  return await api.fetch(`/v0/items?${params.toString()}`, z.array(ItemSchema), {
     method: "GET",
     headers: HTTP_HEADERS.JSON,
   });
@@ -84,7 +84,7 @@ export async function itemList(api: TemplateApi, limit?: number, offset?: number
 
 /** Updates an existing Item and returns the stored record. */
 export async function itemUpdate(api: TemplateApi, id: string, name: string, description?: string): Promise<Item> {
-  return await api.fetch(`/item`, ItemSchema, {
+  return await api.fetch("/v0/item", ItemSchema, {
     method: "PUT",
     headers: HTTP_HEADERS.JSON,
     body: JSON.stringify({ id, name, description }),
@@ -95,5 +95,5 @@ export async function itemUpdate(api: TemplateApi, id: string, name: string, des
 export async function itemDelete(api: TemplateApi, id: string): Promise<Item> {
   const params = new URLSearchParams();
   params.set("id", id);
-  return await api.fetch(`/item?${params.toString()}`, ItemSchema, { method: "DELETE", headers: HTTP_HEADERS.JSON });
+  return await api.fetch(`/v0/item?${params.toString()}`, ItemSchema, { method: "DELETE", headers: HTTP_HEADERS.JSON });
 }

@@ -64,7 +64,7 @@ func TestRestHealth(t *testing.T) {
 			recorder := httptest.NewRecorder()
 
 			handlers.NewRestHealth().ServeHTTP(
-				recorder, httptest.NewRequestWithContext(ctx, http.MethodGet, "/healthcheck", nil),
+				recorder, httptest.NewRequestWithContext(ctx, http.MethodGet, "/v0/healthcheck", nil),
 			)
 
 			response := recorder.Result()

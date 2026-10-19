@@ -2,9 +2,9 @@
 // versions:
 // - protoc-gen-go-grpc v1.6.2
 // - protoc             (unknown)
-// source: item_update.proto
+// source: anovel/template/v0/item_update.proto
 
-package protogen
+package v0
 
 import (
 	context "context"
@@ -19,7 +19,7 @@ import (
 const _ = grpc.SupportPackageIsVersion9
 
 const (
-	ItemUpdateService_ItemUpdate_FullMethodName = "/ItemUpdateService/ItemUpdate"
+	ItemUpdateService_ItemUpdate_FullMethodName = "/anovel.template.v0.ItemUpdateService/ItemUpdate"
 )
 
 // ItemUpdateServiceClient is the client API for ItemUpdateService service.
@@ -112,7 +112,7 @@ func _ItemUpdateService_ItemUpdate_Handler(srv interface{}, ctx context.Context,
 // It's only intended for direct use with grpc.RegisterService,
 // and not to be introspected or modified (even as a copy)
 var ItemUpdateService_ServiceDesc = grpc.ServiceDesc{
-	ServiceName: "ItemUpdateService",
+	ServiceName: "anovel.template.v0.ItemUpdateService",
 	HandlerType: (*ItemUpdateServiceServer)(nil),
 	Methods: []grpc.MethodDesc{
 		{
@@ -121,5 +121,5 @@ var ItemUpdateService_ServiceDesc = grpc.ServiceDesc{
 		},
 	},
 	Streams:  []grpc.StreamDesc{},
-	Metadata: "item_update.proto",
+	Metadata: "anovel/template/v0/item_update.proto",
 }

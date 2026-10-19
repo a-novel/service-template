@@ -46,7 +46,7 @@ func TestRestItemDelete(t *testing.T) {
 			request: httptest.NewRequestWithContext(
 				t.Context(),
 				http.MethodDelete,
-				"/item?id=00000000-0000-0000-0000-000000000001",
+				"/v0/item?id=00000000-0000-0000-0000-000000000001",
 				nil,
 			),
 
@@ -78,7 +78,7 @@ func TestRestItemDelete(t *testing.T) {
 			request: httptest.NewRequestWithContext(
 				t.Context(),
 				http.MethodDelete,
-				"/item?id=not-a-uuid",
+				"/v0/item?id=not-a-uuid",
 				nil,
 			),
 
@@ -90,7 +90,7 @@ func TestRestItemDelete(t *testing.T) {
 			request: httptest.NewRequestWithContext(
 				t.Context(),
 				http.MethodDelete,
-				"/item?id=00000000-0000-0000-0000-000000000001",
+				"/v0/item?id=00000000-0000-0000-0000-000000000001",
 				nil,
 			),
 
@@ -109,7 +109,7 @@ func TestRestItemDelete(t *testing.T) {
 			request: httptest.NewRequestWithContext(
 				t.Context(),
 				http.MethodDelete,
-				"/item?id=00000000-0000-0000-0000-000000000001",
+				"/v0/item?id=00000000-0000-0000-0000-000000000001",
 				nil,
 			),
 

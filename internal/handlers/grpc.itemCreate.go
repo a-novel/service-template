@@ -10,7 +10,7 @@ import (
 	"github.com/a-novel-kit/golib/otel"
 
 	"github.com/a-novel/service-template/internal/core"
-	"github.com/a-novel/service-template/internal/handlers/protogen"
+	templatev0 "github.com/a-novel/service-template/internal/handlers/protogen/anovel/template/v0"
 )
 
 // GrpcItemCreateService creates an item from the request and returns the stored
@@ -21,7 +21,7 @@ type GrpcItemCreateService interface {
 
 // GrpcItemCreate is the gRPC handler for the ItemCreate RPC.
 type GrpcItemCreate struct {
-	protogen.UnimplementedItemCreateServiceServer
+	templatev0.UnimplementedItemCreateServiceServer
 
 	service GrpcItemCreateService
 }
@@ -33,8 +33,8 @@ func NewGrpcItemCreate(service GrpcItemCreateService) *GrpcItemCreate {
 // ItemCreate creates an item and returns it. A rejected request maps to
 // InvalidArgument; any other failure maps to Internal.
 func (handler *GrpcItemCreate) ItemCreate(
-	ctx context.Context, request *protogen.ItemCreateRequest,
-) (*protogen.ItemCreateResponse, error) {
+	ctx context.Context, request *templatev0.ItemCreateRequest,
+) (*templatev0.ItemCreateResponse, error) {
 	ctx, span := otel.Tracer().Start(ctx, "grpc.ItemCreate")
 	defer span.End()
 
@@ -52,5 +52,5 @@ func (handler *GrpcItemCreate) ItemCreate(
 		return nil, status.Error(codes.Internal, "internal error")
 	}
 
-	return &protogen.ItemCreateResponse{Item: itemToProto(item)}, nil
+	return &templatev0.ItemCreateResponse{Item: itemToProto(item)}, nil
 }

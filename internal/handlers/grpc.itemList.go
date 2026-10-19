@@ -10,7 +10,7 @@ import (
 	"github.com/a-novel-kit/golib/otel"
 
 	"github.com/a-novel/service-template/internal/core"
-	"github.com/a-novel/service-template/internal/handlers/protogen"
+	templatev0 "github.com/a-novel/service-template/internal/handlers/protogen/anovel/template/v0"
 )
 
 // GrpcItemListService returns a page of items bounded by the request's limit and
@@ -21,7 +21,7 @@ type GrpcItemListService interface {
 
 // GrpcItemList is the gRPC handler for the ItemList RPC.
 type GrpcItemList struct {
-	protogen.UnimplementedItemListServiceServer
+	templatev0.UnimplementedItemListServiceServer
 
 	service GrpcItemListService
 }
@@ -33,8 +33,8 @@ func NewGrpcItemList(service GrpcItemListService) *GrpcItemList {
 // ItemList returns a page of items. A rejected request maps to InvalidArgument;
 // any other failure maps to Internal.
 func (handler *GrpcItemList) ItemList(
-	ctx context.Context, request *protogen.ItemListRequest,
-) (*protogen.ItemListResponse, error) {
+	ctx context.Context, request *templatev0.ItemListRequest,
+) (*templatev0.ItemListResponse, error) {
 	ctx, span := otel.Tracer().Start(ctx, "grpc.ItemList")
 	defer span.End()
 
@@ -52,10 +52,10 @@ func (handler *GrpcItemList) ItemList(
 		return nil, status.Error(codes.Internal, "internal error")
 	}
 
-	protoItems := make([]*protogen.Item, len(items))
+	protoItems := make([]*templatev0.Item, len(items))
 	for i, item := range items {
 		protoItems[i] = itemToProto(item)
 	}
 
-	return &protogen.ItemListResponse{Items: protoItems}, nil
+	return &templatev0.ItemListResponse{Items: protoItems}, nil
 }

@@ -11,7 +11,7 @@ import (
 	"github.com/a-novel-kit/golib/otel"
 
 	"github.com/a-novel/service-template/internal/core"
-	"github.com/a-novel/service-template/internal/handlers/protogen"
+	templatev0 "github.com/a-novel/service-template/internal/handlers/protogen/anovel/template/v0"
 )
 
 // GrpcItemUpdateService applies the request's changes to the identified item and
@@ -22,7 +22,7 @@ type GrpcItemUpdateService interface {
 
 // GrpcItemUpdate is the gRPC handler for the ItemUpdate RPC.
 type GrpcItemUpdate struct {
-	protogen.UnimplementedItemUpdateServiceServer
+	templatev0.UnimplementedItemUpdateServiceServer
 
 	service GrpcItemUpdateService
 }
@@ -35,8 +35,8 @@ func NewGrpcItemUpdate(service GrpcItemUpdateService) *GrpcItemUpdate {
 // returns the updated record. A malformed ID or rejected request maps to
 // InvalidArgument, a missing item to NotFound, and any other failure to Internal.
 func (handler *GrpcItemUpdate) ItemUpdate(
-	ctx context.Context, request *protogen.ItemUpdateRequest,
-) (*protogen.ItemUpdateResponse, error) {
+	ctx context.Context, request *templatev0.ItemUpdateRequest,
+) (*templatev0.ItemUpdateResponse, error) {
 	ctx, span := otel.Tracer().Start(ctx, "grpc.ItemUpdate")
 	defer span.End()
 
@@ -64,5 +64,5 @@ func (handler *GrpcItemUpdate) ItemUpdate(
 		return nil, status.Error(codes.Internal, "internal error")
 	}
 
-	return &protogen.ItemUpdateResponse{Item: itemToProto(item)}, nil
+	return &templatev0.ItemUpdateResponse{Item: itemToProto(item)}, nil
 }

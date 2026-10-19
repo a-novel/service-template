@@ -34,7 +34,7 @@ This repository is a starting point for a new A-Novel backend service, not a ser
 - **DAO** — `internal/dao/pg.item.go` (bun model), `pg.itemCreate.{go,sql}` and the `Get`/`List`/`Update`/`Delete` siblings, plus their `*_test.go`.
 - **Core** — `internal/core/item*.go` and tests; `internal/core/validate.go` only if your fields need validators beyond the registered `notblank`.
 - **Handlers** — REST `internal/handlers/http.item*.go`, gRPC `internal/handlers/grpc.item*.go`, plus tests.
-- **Proto** — `internal/models/proto/item*.proto` (then `pnpm generate` to refresh `internal/handlers/protogen/`).
+- **Proto** — `internal/models/proto/anovel/template/v0/item*.proto` (then `pnpm generate` to refresh `internal/handlers/protogen/`).
 - **API surface** — `openapi.yaml` (+ regenerate `openapi.html`), `pkg/go/client.go`, `pkg/js/rest/src/item.ts` + `index.ts`, and `pkg/js/test/`.
 - **Wiring** — constructor calls and route registrations in `cmd/rest/main.go` and `cmd/grpc/main.go`.
 
@@ -51,7 +51,7 @@ This is an example service whose only domain object is `item` — a named entity
 The service ships two APIs:
 
 - A **private gRPC API** (`cmd/grpc`) — `StatusService` plus the `Item{Create,Get,List,Update,Delete}Service` RPCs — for internal, private-network service-to-service traffic. The server implements no application-layer authentication: access control is enforced externally (network policy, ingress, service mesh).
-- A **public REST API** (`cmd/rest`) — `/ping`, `/healthcheck`, and the `/items` + `/item` CRUD routes — for any HTTP client.
+- A **public REST API** (`cmd/rest`) — `/v0/ping`, `/v0/healthcheck`, and the `/v0/items` + `/v0/item` CRUD routes — for any HTTP client.
 
 ## Deploying
 
@@ -171,8 +171,8 @@ REST tuning (images `rest`, `standalone-rest`):
 | ----------------------------- | ------------------------------------------------------------------------------------------------------- | -------------------------------- |
 | `REST_MAX_REQUEST_SIZE`       | Maximum request body size, in bytes.                                                                    | `16384` (16KiB)                  |
 | `REST_CLIENT_IP_HEADER`       | Header a trusted proxy sets to the visitor IP. Set it only when every request comes through that proxy. | TCP peer                         |
-| `REST_LIVENESS_PATH`          | Ping path, which still answers during a planned downtime and skips the rate limit.                      | `/ping`                          |
-| `REST_RATE_LIMITS_ENABLED`    | Rate-limit each visitor on every route but `/ping`. Turn off only in test stacks.                       | `true`                           |
+| `REST_LIVENESS_PATH`          | Ping path, which still answers during a planned downtime and skips the rate limit.                      | `/v0/ping`                       |
+| `REST_RATE_LIMITS_ENABLED`    | Rate-limit each visitor on every route but the ping. Turn off only in test stacks.                      | `true`                           |
 | `REST_RATE_LIMIT`             | Requests each visitor sends to each route, as `<requests>/<window>`.                                    | `5/1s`                           |
 | `REST_TIMEOUT_READ`           | Read timeout.                                                                                           | `15s`                            |
 | `REST_TIMEOUT_READ_HEADER`    | Header read timeout.                                                                                    | `3s`                             |
