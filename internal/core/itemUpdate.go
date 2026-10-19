@@ -21,9 +21,11 @@ type ItemUpdateDao interface {
 
 // ItemUpdateRequest carries the target item ID and its new field values.
 type ItemUpdateRequest struct {
-	ID          uuid.UUID
-	Name        string `validate:"required,notblank,max=256"`
-	Description string `validate:"max=1024"`
+	// ID of the item. uuid.Nil is rejected as an unset identifier, usually a
+	// missing request field.
+	ID          uuid.UUID `validate:"required"`
+	Name        string    `validate:"required,notblank,max=256"`
+	Description string    `validate:"max=1024"`
 }
 
 // ItemUpdate validates and updates an existing item's fields.

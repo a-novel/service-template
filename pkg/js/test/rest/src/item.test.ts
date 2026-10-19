@@ -100,7 +100,7 @@ describe("itemUpdate", () => {
 
   it("returns 404 for non-existent item", async () => {
     const api = new TemplateApi(process.env.REST_URL!);
-    await expectStatus(itemUpdate(api, "00000000-0000-0000-0000-000000000000", "name"), 404);
+    await expectStatus(itemUpdate(api, "00000000-0000-0000-0000-000000000001", "name"), 404);
   });
 
   it("returns 400 for empty name", async () => {
