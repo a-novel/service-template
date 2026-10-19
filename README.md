@@ -126,7 +126,7 @@ services:
     networks: [api]
 
   service-template:
-    image: ghcr.io/a-novel/service-template/grpc:v0.0.0 # or .../rest:v0.0.0 for the public REST API
+    image: ghcr.io/a-novel/service-template/grpc:v0.0.0 # or ghcr.io/a-novel/service-template/rest:v0.0.0
     ports: ["${GRPC_PORT}:8080"] # the container always listens on 8080; map ${REST_PORT} for the rest image
     depends_on:
       postgres-template: { condition: service_healthy }
