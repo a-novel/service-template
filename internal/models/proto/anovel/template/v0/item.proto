@@ -6,7 +6,9 @@ package anovel.template.v0;
 message Item {
   // Unique identifier, formatted as a UUID.
   string id = 1;
+  // Name of the item.
   string name = 2;
+  // Description of the item, empty when it has none.
   string description = 3;
   // Creation timestamp, formatted as RFC 3339.
   string created_at = 4;
