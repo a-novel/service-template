@@ -33,8 +33,6 @@ paths:
       responses:
         "200":
           $ref: "#/components/responses/pong"
-        "418":
-          $ref: "#/components/responses/teapot"
         default:
           $ref: "#/components/responses/internalError"
 
@@ -55,8 +53,6 @@ paths:
           $ref: "#/components/responses/tooManyRequests"
         "503":
           $ref: "#/components/responses/healthUnavailable"
-        "418":
-          $ref: "#/components/responses/teapot"
         default:
           $ref: "#/components/responses/internalError"
 
@@ -266,9 +262,6 @@ components:
 
     internalError:
       description: Something unexpected happened.
-
-    teapot:
-      description: I'm a teapot!
 
   schemas:
     invalidRequest:
