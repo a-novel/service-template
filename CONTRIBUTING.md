@@ -1,6 +1,6 @@
 # Contributing to service-template
 
-This document covers what is specific to the template. The architecture, layers and conventions every service shares are in the [service & architecture concepts](https://github.com/a-novel/.github/blob/master/CONTRIBUTING.md). Platform setup and daily commands are in the [developer guide](https://a-novel-kit.github.io/stack/).
+This document covers what is specific to the template. The [taxonomy](https://github.com/a-novel/.github/blob/master/docs/taxonomy.md#inside-a-service-layers-and-contracts) explains the layers every service shares. Platform setup and daily commands are in the [developer guide](https://a-novel-kit.github.io/stack/).
 
 The template is a fork target: an `item` resource implements the common service contracts end to end, with no feature of its own. The [README](./README.md#using-this-template) covers how to fork it.
 
@@ -62,10 +62,7 @@ Each `item` operation writes once, so none of them takes a transactor.
 
 **Pass the callback's `ctx` down, never the outer one.** A data-access object resolves its database handle from the context, and the transaction lives on the context the callback receives. An inner call given the outer context runs on the connection pool and commits on its own, while the block still reports success.
 
-The shared library's documentation is the contract for two more rules:
-
-- **Never call an external service inside `WithinTx`.** An open transaction holds a pooled connection for its whole lifetime. Holding one through a third-party call exhausts the pool and blocks vacuuming. Persist what the call needs, close the transaction, make the call, then open a new transaction to record the result. `postgres.InTx(ctx)` reports whether a transaction is open, so a data-access object that makes an outbound call can refuse to run inside one.
-- **A nested `WithinTx` joins the transaction in progress.** A rollback anywhere then discards the whole outermost unit of work, including work the outer caller believed was safe. A nested call also ignores its own `sql.TxOptions`, so an operation that needs a specific isolation level must be the outermost transaction.
+The golib [`transaction` package](https://pkg.go.dev/github.com/a-novel-kit/golib/transaction) holds two more rules. Call no external service inside `WithinTx`. A nested `WithinTx` joins the transaction in progress, so a rollback anywhere discards the whole unit of work. `postgres.InTx(ctx)` reports whether a transaction is open, so a data-access object that makes an outbound call can refuse to run inside one.
 
 Unit-test a service that takes a transactor with `transactiontest.NewTransactor`, which runs the callback inline. `NewFailingTransactor` covers the path where the transaction never opens: asserting that no dependency is reached proves the writes sit inside the transaction. A test that needs a real rollback needs a real database. Use `postgrestest.RunDBTest` for it, since the passthrough transaction of `postgrestest.RunTransactionalTest` cannot tell a working transactor from a broken one.
 
