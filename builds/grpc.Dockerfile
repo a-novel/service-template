@@ -22,7 +22,6 @@ COPY ./cmd/grpc ./cmd/grpc
 COPY ./internal/handlers ./internal/handlers
 COPY ./internal/dao ./internal/dao
 COPY ./internal/core ./internal/core
-COPY ./internal/models ./internal/models
 COPY ./internal/config ./internal/config
 
 # -ldflags="-s -w" strips the symbol table and DWARF for a smaller binary; -trimpath
