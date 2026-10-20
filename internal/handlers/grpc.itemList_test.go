@@ -117,11 +117,13 @@ func TestGrpcItemList(t *testing.T) {
 			service := handlersmocks.NewMockGrpcItemListService(t)
 
 			if testCase.serviceMock != nil {
+				serviceRequest := &core.ItemListRequest{
+					Limit:  int(testCase.request.GetLimit()),
+					Offset: int(testCase.request.GetOffset()),
+				}
+
 				service.EXPECT().
-					Exec(mock.Anything, &core.ItemListRequest{
-						Limit:  int(testCase.request.GetLimit()),
-						Offset: int(testCase.request.GetOffset()),
-					}).
+					Exec(mock.Anything, serviceRequest).
 					Return(testCase.serviceMock.resp, testCase.serviceMock.err)
 			}
 
