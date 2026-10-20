@@ -85,7 +85,7 @@ The service runs as published OCI images plus a PostgreSQL database. Both server
 | `service-template/grpc`            | Private item CRUD + status API. Internal network only.                      |
 | `service-template/rest`            | Public item CRUD + health API.                                              |
 | `service-template/jobs/migrations` | One-shot schema migration job; runs to completion before the servers start. |
-| `service-template/database`        | Pre-tuned PostgreSQL image — or bring your own Postgres.                    |
+| `service-template/database`        | PostgreSQL with pgBackRest, or bring your own Postgres.                     |
 
 Pin every image to the same release tag. A production deployment runs `database`, then `migrations` to completion, then any number of `grpc` and/or `rest` replicas. Provide `POSTGRES_USER`, `POSTGRES_PASSWORD`, and `POSTGRES_DATABASE` through the orchestrator; store the password as a secret.
 
