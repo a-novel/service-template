@@ -18,6 +18,12 @@ type RestItemGetService interface {
 	Exec(ctx context.Context, request *core.ItemGetRequest) (*core.Item, error)
 }
 
+// itemGetErrors maps a failed item lookup to its status.
+var itemGetErrors = httpf.ErrMap{
+	core.ErrItemGetNotFound: http.StatusNotFound,
+	core.ErrInvalidRequest:  http.StatusBadRequest,
+}
+
 // RestItemGetRequest carries the query parameters accepted by the get endpoint.
 type RestItemGetRequest struct {
 	ID uuid.UUID `schema:"id"`
@@ -48,11 +54,7 @@ func (handler *RestItemGet) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	item, err := handler.service.Exec(ctx, &core.ItemGetRequest{ID: request.ID})
 	if err != nil {
-		statuses := httpf.ErrMap{
-			core.ErrItemGetNotFound: http.StatusNotFound,
-			core.ErrInvalidRequest:  http.StatusBadRequest,
-		}
-		httpf.HandleError(ctx, handler.logger, w, span, statuses, err)
+		httpf.HandleError(ctx, handler.logger, w, span, itemGetErrors, err)
 
 		return
 	}

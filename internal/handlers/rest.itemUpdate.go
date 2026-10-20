@@ -18,6 +18,12 @@ type RestItemUpdateService interface {
 	Exec(ctx context.Context, request *core.ItemUpdateRequest) (*core.Item, error)
 }
 
+// itemUpdateErrors maps a refused item update to its status.
+var itemUpdateErrors = httpf.ErrMap{
+	core.ErrItemUpdateNotFound: http.StatusNotFound,
+	core.ErrInvalidRequest:     http.StatusBadRequest,
+}
+
 // RestItemUpdateRequest is the JSON body accepted by the update endpoint.
 type RestItemUpdateRequest struct {
 	ID          uuid.UUID `json:"id"`
@@ -55,11 +61,7 @@ func (handler *RestItemUpdate) ServeHTTP(w http.ResponseWriter, r *http.Request)
 		Description: request.Description,
 	})
 	if err != nil {
-		statuses := httpf.ErrMap{
-			core.ErrItemUpdateNotFound: http.StatusNotFound,
-			core.ErrInvalidRequest:     http.StatusBadRequest,
-		}
-		httpf.HandleError(ctx, handler.logger, w, span, statuses, err)
+		httpf.HandleError(ctx, handler.logger, w, span, itemUpdateErrors, err)
 
 		return
 	}
