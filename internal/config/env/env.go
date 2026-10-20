@@ -18,21 +18,22 @@ func getEnv(name string) string {
 	return os.Getenv(prefix + name)
 }
 
-// Default values applied when an environment variable is unset.
 const (
+	// AppNameDefault names the application in logs and traces when APP_NAME is unset.
 	AppNameDefault = "service-template"
 
-	// PostgresMaxOpenConnsDefault keeps the pool well under a stock PostgreSQL
-	// max_connections of 100 once multiplied by a service's replica count, leaving
-	// room for the migration job and a psql session. Go's own default is unlimited,
-	// which turns a spike into connection refusals for everything on that database
-	// rather than queueing inside this process.
+	// PostgresMaxOpenConnsDefault keeps the pool well under a stock PostgreSQL max_connections of 100
+	// once multiplied by a service's replica count, leaving room for the migration job and a psql
+	// session. Go's own default is unlimited, which turns a spike into connection refusals for
+	// everything on that database. The limit queues the spike inside this process instead.
 	PostgresMaxOpenConnsDefault = 20
-	// PostgresMaxIdleConnsDefault matches the open limit so a burst does not close
-	// connections it is about to reopen.
+	// PostgresMaxIdleConnsDefault matches the open limit, so a burst keeps the connections it is about
+	// to reuse.
 	PostgresMaxIdleConnsDefault = 20
-	PostgresPortDefault         = 5432
-	PostgresTLSEnabledDefault   = true
+	// PostgresPortDefault is PostgreSQL's standard port.
+	PostgresPortDefault = 5432
+	// PostgresTLSEnabledDefault encrypts the connection unless a deployment turns it off.
+	PostgresTLSEnabledDefault = true
 )
 
 var (

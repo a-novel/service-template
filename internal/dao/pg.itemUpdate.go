@@ -27,7 +27,8 @@ type ItemUpdateRequest struct {
 	ID          uuid.UUID
 	Name        string
 	Description string
-	Now         time.Time
+	// Now is the instant stored as updated_at.
+	Now time.Time
 }
 
 // PgItemUpdate modifies the name and description of an existing item.
