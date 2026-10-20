@@ -10,10 +10,8 @@ info:
   title: Service Template API
   summary: Generic CRUD service template.
   description: |
-    A template service exposing a simple CRUD REST API for a placeholder `item` resource.
-
-    This template is intended to be forked and adapted for specific use cases by replacing
-    the `item` resource with the actual domain model.
+    The public REST API of the service template, with CRUD operations on a placeholder `item`
+    resource. A fork replaces `item` with its own domain model.
   version: v0.0.0
   license:
     name: AGPL-3.0
@@ -41,9 +39,9 @@ paths:
       operationId: healthcheck
       summary: Health diagnosis of the server.
       description: |
-        Reaches out to every server dependency and reports whether each one responded.
-        Returns HTTP 200 only when every dependency is healthy, otherwise HTTP 503 with the same
-        sanitized report. Use `/v0/ping` for process-only liveness.
+        Probes every server dependency and reports whether each one answered. Returns HTTP 200
+        when every dependency is up, and HTTP 503 with the same report otherwise. `/v0/ping`
+        checks the process alone.
       tags: [health]
       security: []
       responses:
@@ -86,7 +84,7 @@ paths:
       operationId: itemList
       summary: List items.
       description: |
-        Returns a paginated list of items, ordered by creation date descending.
+        Returns a page of items, newest first.
       tags: [item]
       security: []
       parameters:
@@ -181,7 +179,7 @@ paths:
 components:
   responses:
     pong:
-      description: "101100001100101011001010"
+      description: Server is alive.
       content:
         text/plain:
           schema:
@@ -200,8 +198,8 @@ components:
 
     healthUnavailable:
       description: |
-        At least one dependency probe failed. Raw probe errors are not exposed. During a planned
-        downtime, a problem body tagged `downtime` instead.
+        At least one dependency probe failed. During a planned downtime, the body is a problem
+        tagged `downtime` instead.
       content:
         application/problem+json:
           schema:
@@ -322,7 +320,7 @@ components:
               const: true
     healthReport:
       type: object
-      description: Sanitized dependency statuses. Every dependency must be up for HTTP 200.
+      description: The status of each dependency. Every dependency must be up for HTTP 200.
       required: ["client:postgres"]
       properties:
         "client:postgres":
@@ -330,9 +328,8 @@ components:
     healthStatus:
       type: object
       description: |
-        Status of a single dependency entry, as observed by the server. It carries the
-        state alone, so an unauthenticated caller cannot infer infrastructure details
-        from a degraded dependency; richer diagnostics are recorded on server-side traces.
+        The status of one dependency, as the server observed it. The endpoint is unauthenticated,
+        so the entry carries the state alone. Diagnostics stay on server-side traces.
       required: [status]
       additionalProperties: false
       examples:
@@ -341,7 +338,7 @@ components:
       properties:
         status:
           type: string
-          description: Exposes whether the server managed to connect to the dependency.
+          description: Whether the server reached the dependency.
           enum: [up, down]
 
     item:
