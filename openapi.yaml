@@ -300,8 +300,11 @@ components:
                 - { "name": "notblank" }
     plannedDowntimeProblem:
       type: object
-      description: The answer to a request refused during a planned downtime.
+      description: |
+        An RFC 9457 problem details body answering a request refused during a planned downtime. Clients
+        ignore extension members they do not know.
       required: [type, title, status, tags]
+      additionalProperties: true
       properties:
         type:
           type: string
@@ -322,6 +325,8 @@ components:
       type: object
       description: The status of each dependency. Every dependency must be up for HTTP 200.
       required: ["client:postgres"]
+      additionalProperties:
+        $ref: "#/components/schemas/healthStatus"
       properties:
         "client:postgres":
           $ref: "#/components/schemas/healthStatus"
@@ -345,6 +350,7 @@ components:
       type: object
       description: A placeholder item resource.
       required: [id, name, createdAt, updatedAt]
+      additionalProperties: false
       examples:
         - {
             "id": "00000000-0000-0000-0000-000000000001",
@@ -383,6 +389,7 @@ components:
       type: object
       description: Request body for creating a new item.
       required: [name]
+      additionalProperties: false
       examples:
         - { "name": "My Item", "description": "A short description." }
       properties:
@@ -399,6 +406,7 @@ components:
       type: object
       description: Request body for updating an existing item.
       required: [id, name]
+      additionalProperties: false
       examples:
         - { "id": "00000000-0000-0000-0000-000000000001", "name": "Updated Item", "description": "New description." }
       properties:
