@@ -15,7 +15,7 @@
   ],
   "scripts": {
     "build": "pnpm build:rest",
-    "build:rest": "vite build -c pkg/js/rest/vite.config.ts && tsc --build pkg/js/rest/tsconfig.build.json",
+    "build:rest": "vite build -c pkg/js/rest/vite.config.ts && tsc -p pkg/js/rest/tsconfig.build.json",
     "format": "pnpm format:go && pnpm format:proto && pnpm format:js",
     "format:go": "go mod tidy && go tool -modfile=golangci-lint.mod golangci-lint run ./... --fix",
     "format:js": "prettier --write . --config prettier.config.ts",

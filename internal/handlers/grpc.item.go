@@ -8,13 +8,13 @@ import (
 )
 
 // itemToProto converts a core item into its protobuf form, encoding timestamps
-// as RFC 3339 strings.
+// as RFC 3339 strings that keep their fractional seconds.
 func itemToProto(item *core.Item) *templatev0.Item {
 	return &templatev0.Item{
 		Id:          item.ID.String(),
 		Name:        item.Name,
 		Description: item.Description,
-		CreatedAt:   item.CreatedAt.Format(time.RFC3339),
-		UpdatedAt:   item.UpdatedAt.Format(time.RFC3339),
+		CreatedAt:   item.CreatedAt.Format(time.RFC3339Nano),
+		UpdatedAt:   item.UpdatedAt.Format(time.RFC3339Nano),
 	}
 }
