@@ -51,12 +51,14 @@ func (service *ItemUpdate) Exec(ctx context.Context, request *ItemUpdateRequest)
 		return nil, otel.ReportError(span, errors.Join(err, ErrInvalidRequest))
 	}
 
-	entity, err := service.dao.Exec(ctx, &dao.ItemUpdateRequest{
+	daoRequest := &dao.ItemUpdateRequest{
 		ID:          request.ID,
 		Name:        request.Name,
 		Description: request.Description,
 		Now:         time.Now(),
-	})
+	}
+
+	entity, err := service.dao.Exec(ctx, daoRequest)
 	if err != nil {
 		return nil, otel.ReportError(span, fmt.Errorf("update item: %w", err))
 	}

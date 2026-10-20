@@ -55,11 +55,13 @@ func (handler *RestItemUpdate) ServeHTTP(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	item, err := handler.service.Exec(ctx, &core.ItemUpdateRequest{
+	serviceRequest := &core.ItemUpdateRequest{
 		ID:          request.ID,
 		Name:        request.Name,
 		Description: request.Description,
-	})
+	}
+
+	item, err := handler.service.Exec(ctx, serviceRequest)
 	if err != nil {
 		httpf.HandleError(ctx, handler.logger, w, span, itemUpdateErrors, err)
 

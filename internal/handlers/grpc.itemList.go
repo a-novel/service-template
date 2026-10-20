@@ -38,10 +38,12 @@ func (handler *GrpcItemList) ItemList(
 	ctx, span := otel.Tracer().Start(ctx, "grpc.ItemList")
 	defer span.End()
 
-	items, err := handler.service.Exec(ctx, &core.ItemListRequest{
+	serviceRequest := &core.ItemListRequest{
 		Limit:  int(request.GetLimit()),
 		Offset: int(request.GetOffset()),
-	})
+	}
+
+	items, err := handler.service.Exec(ctx, serviceRequest)
 	if errors.Is(err, core.ErrInvalidRequest) {
 		return nil, status.Error(codes.InvalidArgument, "invalid request")
 	}

@@ -57,10 +57,12 @@ func (service *ItemList) Exec(ctx context.Context, request *ItemListRequest) ([]
 		return nil, otel.ReportError(span, errors.Join(err, ErrInvalidRequest))
 	}
 
-	entities, err := service.dao.Exec(ctx, &dao.ItemListRequest{
+	daoRequest := &dao.ItemListRequest{
 		Limit:  limit,
 		Offset: request.Offset,
-	})
+	}
+
+	entities, err := service.dao.Exec(ctx, daoRequest)
 	if err != nil {
 		return nil, otel.ReportError(span, fmt.Errorf("list items: %w", err))
 	}

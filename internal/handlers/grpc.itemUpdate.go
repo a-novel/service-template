@@ -44,11 +44,13 @@ func (handler *GrpcItemUpdate) ItemUpdate(
 		return nil, status.Error(codes.InvalidArgument, "invalid item id")
 	}
 
-	item, err := handler.service.Exec(ctx, &core.ItemUpdateRequest{
+	serviceRequest := &core.ItemUpdateRequest{
 		ID:          id,
 		Name:        request.GetName(),
 		Description: request.GetDescription(),
-	})
+	}
+
+	item, err := handler.service.Exec(ctx, serviceRequest)
 	if errors.Is(err, core.ErrInvalidRequest) {
 		return nil, status.Error(codes.InvalidArgument, "invalid request")
 	}
