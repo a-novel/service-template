@@ -16,50 +16,6 @@ export const ItemSchema = z.object({
 /** An Item resource held by the template service. */
 export type Item = z.infer<typeof ItemSchema>;
 
-/** Validates the fields accepted when creating an Item. */
-export const ItemCreateRequestSchema = z.object({
-  name: z.string(),
-  description: z.string().optional(),
-});
-
-/** Fields accepted when creating an Item. */
-export type ItemCreateRequest = z.infer<typeof ItemCreateRequestSchema>;
-
-/** Validates the identifier of the Item to fetch. */
-export const ItemGetRequestSchema = z.object({
-  id: z.uuid(),
-});
-
-/** Identifies the Item to fetch. */
-export type ItemGetRequest = z.infer<typeof ItemGetRequestSchema>;
-
-/** Validates a pagination window for listing Items. */
-export const ItemListRequestSchema = z.object({
-  limit: z.int().min(1).max(100).optional(),
-  offset: z.int().min(0).optional(),
-});
-
-/** Pagination window for listing Items. */
-export type ItemListRequest = z.infer<typeof ItemListRequestSchema>;
-
-/** Validates the identifier and new field values of the Item to update. */
-export const ItemUpdateRequestSchema = z.object({
-  id: z.uuid(),
-  name: z.string(),
-  description: z.string().optional(),
-});
-
-/** Identifies the Item to update along with its new field values. */
-export type ItemUpdateRequest = z.infer<typeof ItemUpdateRequestSchema>;
-
-/** Validates the identifier of the Item to delete. */
-export const ItemDeleteRequestSchema = z.object({
-  id: z.uuid(),
-});
-
-/** Identifies the Item to delete. */
-export type ItemDeleteRequest = z.infer<typeof ItemDeleteRequestSchema>;
-
 /** Creates a new Item and returns the stored record. */
 export async function itemCreate(api: TemplateApi, name: string, description?: string): Promise<Item> {
   return await api.fetch("/v0/items", ItemSchema, {
