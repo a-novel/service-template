@@ -55,10 +55,11 @@ func (handler *RestItemUpdate) ServeHTTP(w http.ResponseWriter, r *http.Request)
 		Description: request.Description,
 	})
 	if err != nil {
-		httpf.HandleError(ctx, handler.logger, w, span, httpf.ErrMap{
+		statuses := httpf.ErrMap{
 			core.ErrItemUpdateNotFound: http.StatusNotFound,
 			core.ErrInvalidRequest:     http.StatusBadRequest,
-		}, err)
+		}
+		httpf.HandleError(ctx, handler.logger, w, span, statuses, err)
 
 		return
 	}

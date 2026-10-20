@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 
+	"github.com/samber/lo"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
@@ -51,10 +52,7 @@ func (handler *GrpcItemList) ItemList(
 		return nil, status.Error(codes.Internal, "internal error")
 	}
 
-	protoItems := make([]*templatev0.Item, len(items))
-	for i, item := range items {
-		protoItems[i] = itemToProto(item)
-	}
-
-	return &templatev0.ItemListResponse{Items: protoItems}, nil
+	return &templatev0.ItemListResponse{
+		Items: lo.Map(items, func(item *core.Item, _ int) *templatev0.Item { return itemToProto(item) }),
+	}, nil
 }

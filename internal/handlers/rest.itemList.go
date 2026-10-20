@@ -53,9 +53,7 @@ func (handler *RestItemList) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		Offset: request.Offset,
 	})
 	if err != nil {
-		httpf.HandleError(ctx, handler.logger, w, span, httpf.ErrMap{
-			core.ErrInvalidRequest: http.StatusBadRequest,
-		}, err)
+		httpf.HandleError(ctx, handler.logger, w, span, httpf.ErrMap{core.ErrInvalidRequest: http.StatusBadRequest}, err)
 
 		return
 	}

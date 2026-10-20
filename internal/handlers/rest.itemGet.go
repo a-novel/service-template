@@ -48,10 +48,11 @@ func (handler *RestItemGet) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 
 	item, err := handler.service.Exec(ctx, &core.ItemGetRequest{ID: request.ID})
 	if err != nil {
-		httpf.HandleError(ctx, handler.logger, w, span, httpf.ErrMap{
+		statuses := httpf.ErrMap{
 			core.ErrItemGetNotFound: http.StatusNotFound,
 			core.ErrInvalidRequest:  http.StatusBadRequest,
-		}, err)
+		}
+		httpf.HandleError(ctx, handler.logger, w, span, statuses, err)
 
 		return
 	}
