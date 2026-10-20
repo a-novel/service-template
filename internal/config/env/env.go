@@ -18,43 +18,22 @@ func getEnv(name string) string {
 	return os.Getenv(prefix + name)
 }
 
-// Default values applied when an environment variable is unset.
 const (
+	// AppNameDefault names the application in logs and traces when APP_NAME is unset.
 	AppNameDefault = "service-template"
 
-	// PostgresMaxOpenConnsDefault keeps the pool well under a stock PostgreSQL
-	// max_connections of 100 once multiplied by a service's replica count, leaving
-	// room for the migration job and a psql session. Go's own default is unlimited,
-	// which turns a spike into connection refusals for everything on that database
-	// rather than queueing inside this process.
+	// PostgresMaxOpenConnsDefault keeps the pool well under a stock PostgreSQL max_connections of 100
+	// once multiplied by a service's replica count, leaving room for the migration job and a psql
+	// session. Go's own default is unlimited, which turns a spike into connection refusals for
+	// everything on that database. The limit queues the spike inside this process instead.
 	PostgresMaxOpenConnsDefault = 20
-	// PostgresMaxIdleConnsDefault matches the open limit so a burst does not close
-	// connections it is about to reopen.
+	// PostgresMaxIdleConnsDefault matches the open limit, so a burst keeps the connections it is about
+	// to reuse.
 	PostgresMaxIdleConnsDefault = 20
-	PostgresPortDefault         = 5432
-	PostgresTLSEnabledDefault   = true
-)
-
-// Raw values for environment variables.
-var (
-	postgresDsn          = getEnv("POSTGRES_DSN")
-	postgresHost         = getEnv("POSTGRES_HOST")
-	postgresPort         = getEnv("POSTGRES_PORT")
-	postgresUser         = getEnv("POSTGRES_USER")
-	postgresPassword     = getEnv("POSTGRES_PASSWORD")
-	postgresDatabase     = getEnv("POSTGRES_DATABASE")
-	postgresTLSEnabled   = getEnv("POSTGRES_TLS_ENABLED")
-	postgresMaxOpenConns = getEnv("POSTGRES_MAX_OPEN_CONNS")
-	postgresMaxIdleConns = getEnv("POSTGRES_MAX_IDLE_CONNS")
-
-	appName = getEnv("APP_NAME")
-	otel    = getEnv("OTEL")
-
-	grpcUrl = getEnv("GRPC_URL")
-
-	gcloudProjectId = getEnv("GCLOUD_PROJECT_ID")
-
-	downtimeStart = getEnv("DOWNTIME_START")
+	// PostgresPortDefault is PostgreSQL's standard port.
+	PostgresPortDefault = 5432
+	// PostgresTLSEnabledDefault encrypts the connection unless a deployment turns it off.
+	PostgresTLSEnabledDefault = true
 )
 
 var (
@@ -62,48 +41,45 @@ var (
 	//	postgres://<user>:<password>@<host>:<port>/<database>
 	//
 	// Configure the discrete PostgreSQL fields for new deployments.
-	PostgresDsn = postgresDsn
+	PostgresDsn = getEnv("POSTGRES_DSN")
 	// PostgresHost is the PostgreSQL server hostname or IP address.
-	PostgresHost = postgresHost
+	PostgresHost = getEnv("POSTGRES_HOST")
 	// PostgresPort is the PostgreSQL server port.
-	PostgresPort = config.LoadEnv(postgresPort, PostgresPortDefault, config.IntParser)
+	PostgresPort = config.LoadEnv(getEnv("POSTGRES_PORT"), PostgresPortDefault, config.IntParser)
 	// PostgresUser is the PostgreSQL login role.
-	PostgresUser = postgresUser
+	PostgresUser = getEnv("POSTGRES_USER")
 	// PostgresPassword is the PostgreSQL login credential.
-	PostgresPassword = postgresPassword
+	PostgresPassword = getEnv("POSTGRES_PASSWORD")
 	// PostgresDatabase is the PostgreSQL database name.
-	PostgresDatabase = postgresDatabase
+	PostgresDatabase = getEnv("POSTGRES_DATABASE")
 	// PostgresTLSEnabled controls transport encryption for the PostgreSQL connection.
-	PostgresTLSEnabled = config.LoadEnv(postgresTLSEnabled, PostgresTLSEnabledDefault, config.BoolParser)
+	PostgresTLSEnabled = config.LoadEnv(getEnv("POSTGRES_TLS_ENABLED"), PostgresTLSEnabledDefault, config.BoolParser)
 
 	// PostgresMaxOpenConns is the maximum number of open connections to the database.
-	PostgresMaxOpenConns = config.LoadEnv(postgresMaxOpenConns, PostgresMaxOpenConnsDefault, config.IntParser)
+	PostgresMaxOpenConns = config.LoadEnv(getEnv("POSTGRES_MAX_OPEN_CONNS"), PostgresMaxOpenConnsDefault, config.IntParser)
 	// PostgresMaxIdleConns is the maximum number of connections kept open while idle.
-	PostgresMaxIdleConns = config.LoadEnv(postgresMaxIdleConns, PostgresMaxIdleConnsDefault, config.IntParser)
+	PostgresMaxIdleConns = config.LoadEnv(getEnv("POSTGRES_MAX_IDLE_CONNS"), PostgresMaxIdleConnsDefault, config.IntParser)
 
 	// AppName is the name of the application, as it appears in logs and tracing.
-	AppName = config.LoadEnv(appName, AppNameDefault, config.StringParser)
-	// Otel enables OpenTelemetry instrumentation.
-	//
-	// See: https://opentelemetry.io/
-	Otel = config.LoadEnv(otel, false, config.BoolParser)
+	AppName = config.LoadEnv(getEnv("APP_NAME"), AppNameDefault, config.StringParser)
+	// Otel enables OpenTelemetry tracing.
+	Otel = config.LoadEnv(getEnv("OTEL"), false, config.BoolParser)
 
-	// GrpcUrl is the URL of the gRPC service, typically <host>:<port>.
-	GrpcUrl = grpcUrl
+	// GrpcUrl is the address of the gRPC service, in the form <host>:<port>. The Go client tests
+	// dial it.
+	GrpcUrl = getEnv("GRPC_URL")
 	// Grpc configures the gRPC server from the GRPC_* variables.
 	Grpc = grpcf.LoadServerConfig(getEnv, grpcf.ServerConfigDefault)
 	// Rest configures the REST server from the REST_* variables.
 	Rest = httpf.LoadServerConfig(getEnv, restDefaults())
 
-	// GcloudProjectId names the Google Cloud project the service runs in. Setting
-	// it switches logging and tracing from the local console to Google Cloud.
-	//
-	// See: https://docs.cloud.google.com/resource-manager/docs/creating-managing-projects
-	GcloudProjectId = gcloudProjectId
+	// GcloudProjectId is the Google Cloud project the service runs in. When set, logs and traces
+	// go to Google Cloud. When empty, they go to standard output.
+	GcloudProjectId = getEnv("GCLOUD_PROJECT_ID")
 
 	// DowntimeStart is when a planned downtime of this service starts, in RFC 3339. From then
 	// until it is removed, the service refuses work. Nil when none is planned.
-	DowntimeStart = config.LoadEnv(downtimeStart, nil, downtime.ParseStart)
+	DowntimeStart = config.LoadEnv(getEnv("DOWNTIME_START"), nil, downtime.ParseStart)
 )
 
 // restDefaults keeps golib's REST defaults but for the versioned ping path.

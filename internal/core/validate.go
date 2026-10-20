@@ -13,7 +13,7 @@ var validate = validator.New(validator.WithRequiredStructEnabled())
 var ErrInvalidRequest = errors.New("invalid request")
 
 // ValidateNotBlank reports whether a string holds a non-whitespace character, rejecting values that
-// are empty or whitespace-only. Register it with the "notblank" struct tag.
+// are empty or whitespace-only. The package registers it under the "notblank" struct tag at init.
 func ValidateNotBlank(fl validator.FieldLevel) bool {
 	return strings.TrimSpace(fl.Field().String()) != ""
 }

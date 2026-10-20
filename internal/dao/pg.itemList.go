@@ -20,8 +20,7 @@ type ItemListRequest struct {
 	Offset int
 }
 
-// PgItemList retrieves a paginated list of items ordered by creation date (newest first), with the id
-// as a tiebreaker so the ordering is total. Offset pagination is only coherent over a total order.
+// PgItemList retrieves a page of items, newest first.
 type PgItemList struct{}
 
 func NewPgItemList() *PgItemList {

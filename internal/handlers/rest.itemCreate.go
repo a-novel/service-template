@@ -16,6 +16,11 @@ type RestItemCreateService interface {
 	Exec(ctx context.Context, request *core.ItemCreateRequest) (*core.Item, error)
 }
 
+// itemCreateErrors maps a refused item creation to its status.
+var itemCreateErrors = httpf.ErrMap{
+	core.ErrInvalidRequest: http.StatusBadRequest,
+}
+
 // RestItemCreateRequest is the JSON body accepted by the create endpoint.
 type RestItemCreateRequest struct {
 	Name        string `json:"name"`
@@ -46,14 +51,14 @@ func (handler *RestItemCreate) ServeHTTP(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	item, err := handler.service.Exec(ctx, &core.ItemCreateRequest{
+	serviceRequest := &core.ItemCreateRequest{
 		Name:        request.Name,
 		Description: request.Description,
-	})
+	}
+
+	item, err := handler.service.Exec(ctx, serviceRequest)
 	if err != nil {
-		httpf.HandleError(ctx, handler.logger, w, span, httpf.ErrMap{
-			core.ErrInvalidRequest: http.StatusBadRequest,
-		}, err)
+		httpf.HandleError(ctx, handler.logger, w, span, itemCreateErrors, err)
 
 		return
 	}

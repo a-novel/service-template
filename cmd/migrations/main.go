@@ -1,5 +1,5 @@
-// Command migrations applies the service's database schema migrations and exits. The cmd/grpc and
-// cmd/rest servers serve the item API once the schema is in place.
+// Command migrations applies the pending database schema migrations, then exits. The cmd/grpc and
+// cmd/rest servers start once it completes.
 package main
 
 import (

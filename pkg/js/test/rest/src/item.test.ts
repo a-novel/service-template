@@ -3,9 +3,10 @@ import { describe, expect, it } from "vitest";
 import { expectStatus } from "@a-novel-kit/nodelib-test/http";
 import { TemplateApi, itemCreate, itemDelete, itemGet, itemList, itemUpdate } from "@a-novel/service-template-rest";
 
+const api = new TemplateApi(process.env.REST_URL!);
+
 describe("itemCreate", () => {
   it("creates a new item", async () => {
-    const api = new TemplateApi(process.env.REST_URL!);
     const item = await itemCreate(api, "test item", "test description");
 
     expect(item.id).toBeTruthy();
@@ -18,7 +19,6 @@ describe("itemCreate", () => {
   });
 
   it("creates an item without description", async () => {
-    const api = new TemplateApi(process.env.REST_URL!);
     const item = await itemCreate(api, "no description item");
 
     expect(item.id).toBeTruthy();
@@ -28,12 +28,10 @@ describe("itemCreate", () => {
   });
 
   it("returns 400 for empty name", async () => {
-    const api = new TemplateApi(process.env.REST_URL!);
     await expectStatus(itemCreate(api, ""), 400);
   });
 
   it("names the invalid field of a rejected item", async () => {
-    const api = new TemplateApi(process.env.REST_URL!);
     await expect(itemCreate(api, "   ")).rejects.toThrow(
       '{"type":"about:blank","title":"Bad Request","status":400,"tags":{"invalidFields":{"name":"notblank"}}}'
     );
@@ -42,7 +40,6 @@ describe("itemCreate", () => {
 
 describe("itemGet", () => {
   it("retrieves an existing item", async () => {
-    const api = new TemplateApi(process.env.REST_URL!);
     const created = await itemCreate(api, "item to get");
 
     const item = await itemGet(api, created.id);
@@ -53,19 +50,16 @@ describe("itemGet", () => {
   });
 
   it("returns 400 for invalid ID format", async () => {
-    const api = new TemplateApi(process.env.REST_URL!);
     await expectStatus(itemGet(api, "not-a-uuid"), 400);
   });
 
   it("returns 404 for non-existent item", async () => {
-    const api = new TemplateApi(process.env.REST_URL!);
     await expectStatus(itemGet(api, "00000000-0000-0000-0000-000000000001"), 404);
   });
 });
 
 describe("itemList", () => {
   it("lists a created item", async () => {
-    const api = new TemplateApi(process.env.REST_URL!);
     const created = await itemCreate(api, "item to list");
 
     const items = await itemList(api);
@@ -75,7 +69,6 @@ describe("itemList", () => {
   });
 
   it("returns at most limit items", async () => {
-    const api = new TemplateApi(process.env.REST_URL!);
     const created = await itemCreate(api, "item to page");
 
     const items = await itemList(api, 1, 0);
@@ -87,7 +80,6 @@ describe("itemList", () => {
 
 describe("itemUpdate", () => {
   it("updates an existing item", async () => {
-    const api = new TemplateApi(process.env.REST_URL!);
     const created = await itemCreate(api, "item to update");
 
     const updated = await itemUpdate(api, created.id, "updated name", "updated description");
@@ -99,17 +91,14 @@ describe("itemUpdate", () => {
   });
 
   it("returns 400 for invalid ID format", async () => {
-    const api = new TemplateApi(process.env.REST_URL!);
     await expectStatus(itemUpdate(api, "not-a-uuid", "name"), 400);
   });
 
   it("returns 404 for non-existent item", async () => {
-    const api = new TemplateApi(process.env.REST_URL!);
     await expectStatus(itemUpdate(api, "00000000-0000-0000-0000-000000000001", "name"), 404);
   });
 
   it("returns 400 for empty name", async () => {
-    const api = new TemplateApi(process.env.REST_URL!);
     const created = await itemCreate(api, "item for empty name test");
 
     await expectStatus(itemUpdate(api, created.id, ""), 400);
@@ -120,7 +109,6 @@ describe("itemUpdate", () => {
 
 describe("itemDelete", () => {
   it("deletes an existing item", async () => {
-    const api = new TemplateApi(process.env.REST_URL!);
     const created = await itemCreate(api, "item to delete");
 
     const deleted = await itemDelete(api, created.id);
@@ -130,12 +118,10 @@ describe("itemDelete", () => {
   });
 
   it("returns 400 for invalid ID format", async () => {
-    const api = new TemplateApi(process.env.REST_URL!);
     await expectStatus(itemDelete(api, "not-a-uuid"), 400);
   });
 
   it("returns 404 for non-existent item", async () => {
-    const api = new TemplateApi(process.env.REST_URL!);
     await expectStatus(itemDelete(api, "00000000-0000-0000-0000-000000000001"), 404);
   });
 });

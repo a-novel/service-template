@@ -128,12 +128,14 @@ func TestGrpcItemUpdate(t *testing.T) {
 			service := handlersmocks.NewMockGrpcItemUpdateService(t)
 
 			if testCase.serviceMock != nil {
+				serviceRequest := &core.ItemUpdateRequest{
+					ID:          uuid.MustParse(testCase.request.GetId()),
+					Name:        testCase.request.GetName(),
+					Description: testCase.request.GetDescription(),
+				}
+
 				service.EXPECT().
-					Exec(mock.Anything, &core.ItemUpdateRequest{
-						ID:          uuid.MustParse(testCase.request.GetId()),
-						Name:        testCase.request.GetName(),
-						Description: testCase.request.GetDescription(),
-					}).
+					Exec(mock.Anything, serviceRequest).
 					Return(testCase.serviceMock.resp, testCase.serviceMock.err)
 			}
 

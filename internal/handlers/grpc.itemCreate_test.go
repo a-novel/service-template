@@ -101,11 +101,13 @@ func TestGrpcItemCreate(t *testing.T) {
 			service := handlersmocks.NewMockGrpcItemCreateService(t)
 
 			if testCase.serviceMock != nil {
+				serviceRequest := &core.ItemCreateRequest{
+					Name:        testCase.request.GetName(),
+					Description: testCase.request.GetDescription(),
+				}
+
 				service.EXPECT().
-					Exec(mock.Anything, &core.ItemCreateRequest{
-						Name:        testCase.request.GetName(),
-						Description: testCase.request.GetDescription(),
-					}).
+					Exec(mock.Anything, serviceRequest).
 					Return(testCase.serviceMock.resp, testCase.serviceMock.err)
 			}
 

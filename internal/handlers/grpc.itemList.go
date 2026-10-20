@@ -4,6 +4,7 @@ import (
 	"context"
 	"errors"
 
+	"github.com/samber/lo"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
@@ -37,10 +38,12 @@ func (handler *GrpcItemList) ItemList(
 	ctx, span := otel.Tracer().Start(ctx, "grpc.ItemList")
 	defer span.End()
 
-	items, err := handler.service.Exec(ctx, &core.ItemListRequest{
+	serviceRequest := &core.ItemListRequest{
 		Limit:  int(request.GetLimit()),
 		Offset: int(request.GetOffset()),
-	})
+	}
+
+	items, err := handler.service.Exec(ctx, serviceRequest)
 	if errors.Is(err, core.ErrInvalidRequest) {
 		return nil, status.Error(codes.InvalidArgument, "invalid request")
 	}
@@ -51,10 +54,7 @@ func (handler *GrpcItemList) ItemList(
 		return nil, status.Error(codes.Internal, "internal error")
 	}
 
-	protoItems := make([]*templatev0.Item, len(items))
-	for i, item := range items {
-		protoItems[i] = itemToProto(item)
-	}
-
-	return &templatev0.ItemListResponse{Items: protoItems}, nil
+	return &templatev0.ItemListResponse{
+		Items: lo.Map(items, func(item *core.Item, _ int) *templatev0.Item { return itemToProto(item) }),
+	}, nil
 }

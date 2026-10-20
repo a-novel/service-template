@@ -13,7 +13,6 @@ COPY ./cmd/rest ./cmd/rest
 COPY ./internal/handlers ./internal/handlers
 COPY ./internal/dao ./internal/dao
 COPY ./internal/core ./internal/core
-COPY ./internal/models ./internal/models
 COPY ./internal/config ./internal/config
 
 RUN --mount=type=cache,target=/go/pkg/mod \
@@ -24,7 +23,7 @@ FROM docker.io/library/alpine:3.24.2
 
 COPY --from=builder /rest /rest
 
-# Alpine ships BusyBox wget — no extra package needed for the healthcheck.
+# The healthcheck uses the wget of Alpine's BusyBox.
 HEALTHCHECK --interval=1s --timeout=5s --retries=10 --start-period=1s \
   CMD ["wget", "-qO", "/dev/null", "http://localhost:8080/v0/ping"]
 

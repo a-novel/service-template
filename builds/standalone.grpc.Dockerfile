@@ -1,6 +1,5 @@
-# Standalone gRPC server image for local development. Applies migrations automatically before
-# starting the server, so the database needs no pre-initialization.
-# Production deployments use the base gRPC image (grpc.Dockerfile).
+# Runs the migrations, then the gRPC server, in one image for local development and tests.
+# A production deployment runs the grpc.Dockerfile image after the migrations job instead.
 FROM docker.io/library/golang:1.27.2-alpine AS builder
 
 ENV CGO_ENABLED=0
@@ -11,8 +10,7 @@ COPY go.mod go.sum ./
 RUN --mount=type=cache,target=/go/pkg/mod \
     go mod download
 
-# grpcurl backs the healthcheck. Installed before the source COPY so its cached compile
-# survives a source-only rebuild, and pinned for reproducibility.
+# grpcurl backs the healthcheck; installing it before the source copy keeps its layer cached too.
 RUN --mount=type=cache,target=/go/pkg/mod \
     --mount=type=cache,target=/root/.cache/go-build \
     GOBIN=/usr/local/bin go install github.com/fullstorydev/grpcurl/cmd/grpcurl@v1.9.3
@@ -22,7 +20,7 @@ COPY ./cmd/migrations ./cmd/migrations
 COPY ./internal/handlers ./internal/handlers
 COPY ./internal/dao ./internal/dao
 COPY ./internal/core ./internal/core
-COPY ./internal/models ./internal/models
+COPY ./internal/models/migrations ./internal/models/migrations
 COPY ./internal/config ./internal/config
 
 RUN --mount=type=cache,target=/go/pkg/mod \

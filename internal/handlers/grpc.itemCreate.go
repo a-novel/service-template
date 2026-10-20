@@ -37,10 +37,12 @@ func (handler *GrpcItemCreate) ItemCreate(
 	ctx, span := otel.Tracer().Start(ctx, "grpc.ItemCreate")
 	defer span.End()
 
-	item, err := handler.service.Exec(ctx, &core.ItemCreateRequest{
+	serviceRequest := &core.ItemCreateRequest{
 		Name:        request.GetName(),
 		Description: request.GetDescription(),
-	})
+	}
+
+	item, err := handler.service.Exec(ctx, serviceRequest)
 	if errors.Is(err, core.ErrInvalidRequest) {
 		return nil, status.Error(codes.InvalidArgument, "invalid request")
 	}

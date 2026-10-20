@@ -18,18 +18,17 @@ The scaffold every new A-Novel backend service starts from, with an example `ite
 
 ## Using this template
 
-Fork this repository to start a service. The rest of this README is the standard service README, written for the placeholder `item` resource. Your fork keeps its shape. The conventions the code follows, from layering to telemetry, are in the [service & architecture concepts](https://github.com/a-novel/.github/blob/master/CONTRIBUTING.md).
+Fork this repository to start a service. The rest of this README is the standard service README, written for the placeholder `item` resource. Your fork keeps its shape. The [taxonomy](https://github.com/a-novel/.github/blob/master/docs/taxonomy.md#inside-a-service-layers-and-contracts) explains the layers every service shares.
 
-**1. Rename the service.** Set your service's name on the first line, then rename the module and every `service-template` reference.
+**1. Rename the service.** Set your service's name on the first line, then replace every `service-template` reference.
 
 ```bash
 SERVICE="service-<name>"
 
-go mod edit -module "github.com/a-novel/$SERVICE"
 git grep -lz service-template | xargs -0 perl -pi -e "s/service-template/$SERVICE/g"
 ```
 
-The replace also covers import paths, image names, badges and links, the CI `image_name:` fields and both `package.json` files. Rename by hand what it leaves, where `git grep` finds every use:
+The replace covers the module path and import paths, image names and references, badges and links, and both `package.json` files. Rename by hand what it leaves, where `git grep` finds every use:
 
 | What                | Where                                            | From → to                                                                               |
 | ------------------- | ------------------------------------------------ | --------------------------------------------------------------------------------------- |
@@ -49,7 +48,7 @@ The replace also covers import paths, image names, badges and links, the CI `ima
 | Core      | `internal/core/item*.go`, `common.go` and their tests                                                                                   |
 | Handlers  | `internal/handlers/rest.item*.go`, `grpc.item*.go` and their tests                                                                      |
 | Proto     | `internal/models/proto/anovel/template/v0/item*.proto`                                                                                  |
-| API       | `openapi.yaml`, `pkg/go/client.go`, `pkg/js/rest/src/item.ts`, `pkg/js/test/rest/src/item.test.ts`                                      |
+| API       | `openapi.yaml`, `pkg/go/client.go` and its test, `pkg/js/rest/src/{index,item}.ts`, `pkg/js/test/rest/src/item.test.ts`                 |
 | Wiring    | `cmd/rest/main.go`, `cmd/grpc/main.go`                                                                                                  |
 
 **3. Check the fork.** Start its database, since the migration snapshots regenerate against it. Then regenerate the stubs, mocks and snapshots, and run every check.
@@ -64,7 +63,7 @@ pnpm lint
 a-novel test -y
 ```
 
-Then delete this section and describe your service in the rest of this README.
+Then delete this section and describe your service in the rest of this README. In [CONTRIBUTING.md](./CONTRIBUTING.md), replace the introduction and the local run, which describe the template.
 
 ## What it does
 
@@ -86,7 +85,7 @@ The service runs as published OCI images plus a PostgreSQL database. Both server
 | `service-template/grpc`            | Private item CRUD + status API. Internal network only.                      |
 | `service-template/rest`            | Public item CRUD + health API.                                              |
 | `service-template/jobs/migrations` | One-shot schema migration job; runs to completion before the servers start. |
-| `service-template/database`        | Pre-tuned PostgreSQL image — or bring your own Postgres.                    |
+| `service-template/database`        | PostgreSQL with pgBackRest, or bring your own Postgres.                     |
 
 Pin every image to the same release tag. A production deployment runs `database`, then `migrations` to completion, then any number of `grpc` and/or `rest` replicas. Provide `POSTGRES_USER`, `POSTGRES_PASSWORD`, and `POSTGRES_DATABASE` through the orchestrator; store the password as a secret.
 
@@ -151,17 +150,11 @@ Run both servers by adding a second service that reuses the same database and mi
 
 ### Database image
 
-The database image packages PostgreSQL and pgBackRest on Wolfi. Its
-[package manifest](./builds/database.apko.yaml) is assembled with apko during the container
-build, from [locks](./builds/database.apko.lock.json) that pin every package, so an unchanged
-image rebuilds to the same digest; Docker and Podman users need no additional host tools.
-PostgreSQL keeps its standard `POSTGRES_*` initialization variables, `uuid-ossp` extension and
-volume at `/var/lib/postgresql`. Backup scheduling and repository credentials remain the
-operator's responsibility.
+The database image packages PostgreSQL and pgBackRest on Wolfi. The container build assembles its [package manifest](./builds/database.apko.yaml) with apko, from [locks](./builds/database.apko.lock.json) that pin every package, so an unchanged image rebuilds to the same digest. Building it takes Docker or Podman alone. The image keeps PostgreSQL's standard `POSTGRES_*` initialization variables, the `uuid-ossp` extension and the volume at `/var/lib/postgresql`. Backup scheduling and repository credentials stay with the operator.
 
 ### Configuration
 
-Every variable is read from the process environment. `SERVICE_TEMPLATE_ENV_PREFIX` prepends a prefix to every name, so the service can share an environment without collisions. Set `POSTGRES_HOST` to use the discrete connection fields. `POSTGRES_DSN` remains a fallback.
+Every variable is read from the process environment. `SERVICE_TEMPLATE_ENV_PREFIX` prepends a prefix to every name, so the service can share an environment without collisions.
 
 | Name                   | Description                                                                                                                   | Images |
 | ---------------------- | ----------------------------------------------------------------------------------------------------------------------------- | ------ |
@@ -335,8 +328,6 @@ networks:
   api:
 ```
 
-To work on the service itself, see [CONTRIBUTING](./CONTRIBUTING.md).
-
 ## Contributing
 
-Platform setup and the day-to-day commands live in the [developer guide](https://a-novel-kit.github.io/stack/). Template-specific concepts and local interactions are in [CONTRIBUTING.md](./CONTRIBUTING.md).
+Platform setup and the day-to-day commands live in the [developer guide](https://a-novel-kit.github.io/stack/). This repository's own concepts and local commands are in [CONTRIBUTING.md](./CONTRIBUTING.md).

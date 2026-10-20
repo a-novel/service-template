@@ -29,12 +29,15 @@ var postgresConnection = postgrespresets.Connection{
 // PostgresPresetDefault is the servers' PostgreSQL connection.
 var PostgresPresetDefault = NewPostgresPreset(postgresConnection, env.PostgresMaxOpenConns, env.PostgresMaxIdleConns)
 
-// PostgresPresetMigrations is the migrations job's connection. A migration waiting for a lock gives
-// up after three seconds, so the queries queued behind it on its table proceed, and the runner tries
-// it again later.
+// migrationsSessionParams bounds how long a migration waits for a lock. After three seconds the
+// migration gives up, so the queries queued behind it on its table proceed, and the runner retries it
+// later.
+var migrationsSessionParams = map[string]any{"lock_timeout": "3s"}
+
+// PostgresPresetMigrations is the migrations job's connection.
 var PostgresPresetMigrations = NewPostgresPreset(
 	postgresConnection, env.PostgresMaxOpenConns, env.PostgresMaxIdleConns,
-	pgdriver.WithConnParams(map[string]any{"lock_timeout": "3s"}),
+	pgdriver.WithConnParams(migrationsSessionParams),
 )
 
 // NewPostgresPreset returns a PostgreSQL preset with a three-minute dial timeout and a pool bounded

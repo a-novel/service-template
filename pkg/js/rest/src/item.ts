@@ -71,16 +71,13 @@ export async function itemCreate(api: TemplateApi, name: string, description?: s
 
 /** Fetches a single Item by ID. */
 export async function itemGet(api: TemplateApi, id: string): Promise<Item> {
-  const params = new URLSearchParams();
-  params.set("id", id);
+  const params = new URLSearchParams({ id });
   return await api.fetch(`/v0/item?${params.toString()}`, ItemSchema, { method: "GET", headers: HTTP_HEADERS.JSON });
 }
 
 /** Lists Items; returns the first 100 from the start when limit and offset are omitted. */
 export async function itemList(api: TemplateApi, limit?: number, offset?: number): Promise<Item[]> {
-  const params = new URLSearchParams();
-  params.set("limit", `${limit || 100}`);
-  params.set("offset", `${offset || 0}`);
+  const params = new URLSearchParams({ limit: `${limit || 100}`, offset: `${offset || 0}` });
   return await api.fetch(`/v0/items?${params.toString()}`, z.array(ItemSchema), {
     method: "GET",
     headers: HTTP_HEADERS.JSON,
@@ -98,7 +95,6 @@ export async function itemUpdate(api: TemplateApi, id: string, name: string, des
 
 /** Deletes an Item by ID and returns the record that was removed. */
 export async function itemDelete(api: TemplateApi, id: string): Promise<Item> {
-  const params = new URLSearchParams();
-  params.set("id", id);
+  const params = new URLSearchParams({ id });
   return await api.fetch(`/v0/item?${params.toString()}`, ItemSchema, { method: "DELETE", headers: HTTP_HEADERS.JSON });
 }

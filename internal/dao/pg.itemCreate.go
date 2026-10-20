@@ -21,7 +21,8 @@ type ItemCreateRequest struct {
 	ID          uuid.UUID
 	Name        string
 	Description string
-	Now         time.Time
+	// Now is the instant stored as both created_at and updated_at.
+	Now time.Time
 }
 
 // PgItemCreate inserts a new item into the database.

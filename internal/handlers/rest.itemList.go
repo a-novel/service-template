@@ -18,6 +18,11 @@ type RestItemListService interface {
 	Exec(ctx context.Context, request *core.ItemListRequest) ([]*core.Item, error)
 }
 
+// itemListErrors maps a refused page request to its status.
+var itemListErrors = httpf.ErrMap{
+	core.ErrInvalidRequest: http.StatusBadRequest,
+}
+
 // RestItemListRequest carries the pagination query parameters accepted by the
 // list endpoint.
 type RestItemListRequest struct {
@@ -48,14 +53,14 @@ func (handler *RestItemList) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	items, err := handler.service.Exec(ctx, &core.ItemListRequest{
+	serviceRequest := &core.ItemListRequest{
 		Limit:  request.Limit,
 		Offset: request.Offset,
-	})
+	}
+
+	items, err := handler.service.Exec(ctx, serviceRequest)
 	if err != nil {
-		httpf.HandleError(ctx, handler.logger, w, span, httpf.ErrMap{
-			core.ErrInvalidRequest: http.StatusBadRequest,
-		}, err)
+		httpf.HandleError(ctx, handler.logger, w, span, itemListErrors, err)
 
 		return
 	}

@@ -45,12 +45,14 @@ func (service *ItemCreate) Exec(ctx context.Context, request *ItemCreateRequest)
 		return nil, otel.ReportError(span, errors.Join(err, ErrInvalidRequest))
 	}
 
-	entity, err := service.dao.Exec(ctx, &dao.ItemCreateRequest{
+	daoRequest := &dao.ItemCreateRequest{
 		ID:          uuid.New(),
 		Name:        request.Name,
 		Description: request.Description,
 		Now:         time.Now(),
-	})
+	}
+
+	entity, err := service.dao.Exec(ctx, daoRequest)
 	if err != nil {
 		return nil, otel.ReportError(span, fmt.Errorf("create item: %w", err))
 	}
