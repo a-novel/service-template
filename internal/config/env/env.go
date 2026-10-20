@@ -61,22 +61,19 @@ var (
 
 	// AppName is the name of the application, as it appears in logs and tracing.
 	AppName = config.LoadEnv(getEnv("APP_NAME"), AppNameDefault, config.StringParser)
-	// Otel enables OpenTelemetry instrumentation.
-	//
-	// See: https://opentelemetry.io/
+	// Otel enables OpenTelemetry tracing.
 	Otel = config.LoadEnv(getEnv("OTEL"), false, config.BoolParser)
 
-	// GrpcUrl is the URL of the gRPC service, typically <host>:<port>.
+	// GrpcUrl is the address of the gRPC service, in the form <host>:<port>. The Go client tests
+	// dial it.
 	GrpcUrl = getEnv("GRPC_URL")
 	// Grpc configures the gRPC server from the GRPC_* variables.
 	Grpc = grpcf.LoadServerConfig(getEnv, grpcf.ServerConfigDefault)
 	// Rest configures the REST server from the REST_* variables.
 	Rest = httpf.LoadServerConfig(getEnv, restDefaults())
 
-	// GcloudProjectId names the Google Cloud project the service runs in. Setting
-	// it switches logging and tracing from the local console to Google Cloud.
-	//
-	// See: https://docs.cloud.google.com/resource-manager/docs/creating-managing-projects
+	// GcloudProjectId is the Google Cloud project the service runs in. When set, logs and traces
+	// go to Google Cloud. When empty, they go to standard output.
 	GcloudProjectId = getEnv("GCLOUD_PROJECT_ID")
 
 	// DowntimeStart is when a planned downtime of this service starts, in RFC 3339. From then

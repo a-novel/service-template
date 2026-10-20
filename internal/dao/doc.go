@@ -1,3 +1,3 @@
-// Package dao is the data access layer of the service. It holds the PostgreSQL DAOs that persist and
-// query items, each running the statement embedded from its sibling .sql file.
+// Package dao is the data access layer of the service. Each DAO runs one PostgreSQL statement,
+// embedded from the .sql file beside it.
 package dao

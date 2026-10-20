@@ -1,5 +1,5 @@
-// Command rest serves the public item API over HTTP. cmd/grpc serves the same domain to other
-// services over gRPC, and cmd/migrations applies the database schema.
+// Command rest serves the public REST API, for any HTTP client. cmd/grpc serves the same domain to
+// other services over gRPC, and cmd/migrations applies the database schema.
 package main
 
 import (

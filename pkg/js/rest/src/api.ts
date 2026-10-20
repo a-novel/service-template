@@ -8,9 +8,8 @@ async function decodeRawHttpResponse<T>(response: Response): Promise<T> {
 }
 
 /**
- * Health of a single upstream dependency reported by the service. It carries the state
- * alone: the server records richer diagnostics on its own traces rather than returning
- * them to an unauthenticated caller.
+ * Health of a single upstream dependency reported by the service. The health endpoint is
+ * unauthenticated, so the report carries the state alone. Diagnostics stay on the server's traces.
  */
 export type HealthDependency = {
   status: "up" | "down";
