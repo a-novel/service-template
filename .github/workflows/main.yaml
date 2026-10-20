@@ -16,7 +16,7 @@ jobs:
     runs-on: ubuntu-latest
     permissions:
       contents: read
-      # Removes append-only-override once a push makes it stale.
+      # The job removes append-only-override once a push makes it stale.
       pull-requests: write
     steps:
       - uses: actions/checkout@v7
@@ -99,7 +99,7 @@ jobs:
           # renovate: datasource=github-releases depName=hadolint/hadolint
           version: "2.15.1"
 
-  # Structural conventions golangci-lint cannot express.
+  # The service ruleset checks the structural conventions golangci-lint cannot express.
   lint-semgrep:
     runs-on: ubuntu-latest
     permissions:
@@ -114,7 +114,7 @@ jobs:
           # renovate: datasource=docker depName=semgrep/semgrep
           version: "1.181.0"
 
-  # Scans for secrets offline, so no hosted service can block a merge.
+  # gitleaks scans for secrets offline, so no hosted service can block a merge.
   scan-secrets:
     runs-on: ubuntu-latest
     permissions:
@@ -128,7 +128,7 @@ jobs:
           # renovate: datasource=github-releases depName=gitleaks/gitleaks
           version: "8.30.1"
 
-  # Audits the workflows, excessive job permissions included.
+  # zizmor audits the workflows, excessive job permissions included.
   lint-workflows:
     runs-on: ubuntu-latest
     permissions:
@@ -332,8 +332,8 @@ jobs:
       id-token: write
     outputs:
       digest: ${{ steps.build.outputs.digest }}
-    # test-pkg boots and exercises this image in a full integration run, so this job only
-    # builds and pushes it; skip_healthcheck drops the redundant smoke run.
+    # test-pkg boots this image and runs the client suite against it, so the job only builds and
+    # pushes it, without a smoke run.
     steps:
       - uses: a-novel-kit/workflows/build-actions/docker@v1.66.0
         id: build
@@ -375,8 +375,8 @@ jobs:
       id-token: write
     outputs:
       digest: ${{ steps.build.outputs.digest }}
-    # test-pkg-js boots and exercises this image in a full integration run, so this job only
-    # builds and pushes it; skip_healthcheck drops the redundant smoke run.
+    # test-pkg-js boots this image and runs the JS client suite against it, so the job only builds
+    # and pushes it, without a smoke run.
     steps:
       - uses: a-novel-kit/workflows/build-actions/docker@v1.66.0
         id: build
@@ -412,7 +412,7 @@ jobs:
   publish-docs:
     runs-on: ubuntu-latest
     if: github.ref == 'refs/heads/master' && success()
-    # lint-js is what checks the openapi files this deploys.
+    # lint-js checks the openapi files this job deploys.
     needs: [lint-js]
     # GitHub Pages allows one deployment in flight per site. The group serializes concurrent
     # master runs.

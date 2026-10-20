@@ -250,7 +250,7 @@ jobs:
           app_private_key: ${{ secrets.AGENT_BOT_PRIVATE_KEY }}
           version: ${{ github.ref_name }}
 
-  # Everything shipped — clear this repo's awaiting-release board items.
+  # Once everything ships, the job clears this repo's awaiting-release board items.
   archive:
     needs:
       - build-database
