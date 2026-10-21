@@ -65,5 +65,5 @@ func (handler *RestItemList) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 		return
 	}
 
-	httpf.SendJSONStatus(ctx, w, span, http.StatusOK, lo.Map(items, loadItemMap))
+	httpf.SendJSONStatus(w, span, http.StatusOK, lo.Map(items, loadItemMap))
 }
