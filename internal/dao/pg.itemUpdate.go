@@ -17,9 +17,7 @@ import (
 //go:embed pg.itemUpdate.sql
 var itemUpdateQuery string
 
-// ErrItemUpdateNotFound is returned by [PgItemUpdate.Exec] when no item matches the
-// requested ID. It is joined onto the underlying sql.ErrNoRows so callers can branch
-// on it with errors.Is.
+// ErrItemUpdateNotFound is returned by [PgItemUpdate.Exec] when no item has the requested ID.
 var ErrItemUpdateNotFound = errors.New("item not found")
 
 // ItemUpdateRequest is the input to [PgItemUpdate.Exec].
@@ -42,19 +40,19 @@ func (dao *PgItemUpdate) Exec(ctx context.Context, request *ItemUpdateRequest) (
 	ctx, span := otel.Tracer().Start(ctx, "dao.PgItemUpdate")
 	defer span.End()
 
-	tx, err := postgres.GetContext(ctx)
+	db, err := postgres.GetContext(ctx)
 	if err != nil {
 		return nil, otel.ReportError(span, fmt.Errorf("get transaction: %w", err))
 	}
 
 	entity := &Item{}
 
-	err = tx.NewRaw(itemUpdateQuery, request.Name, request.Description, request.Now, request.ID).Scan(ctx, entity)
-	if err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
-			err = errors.Join(err, ErrItemUpdateNotFound)
-		}
+	err = db.NewRaw(itemUpdateQuery, request.Name, request.Description, request.Now, request.ID).Scan(ctx, entity)
+	if errors.Is(err, sql.ErrNoRows) {
+		err = errors.Join(err, ErrItemUpdateNotFound)
+	}
 
+	if err != nil {
 		return nil, otel.ReportError(span, fmt.Errorf("execute query: %w", err))
 	}
 

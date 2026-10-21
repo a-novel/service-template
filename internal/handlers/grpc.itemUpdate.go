@@ -30,9 +30,8 @@ func NewGrpcItemUpdate(service GrpcItemUpdateService) *GrpcItemUpdate {
 	return &GrpcItemUpdate{service: service}
 }
 
-// ItemUpdate applies the requested changes to the item with the given ID and
-// returns the updated record. A malformed ID or rejected request maps to
-// InvalidArgument, a missing item to NotFound, and any other failure to Internal.
+// ItemUpdate replaces the name and description of the item with the given ID and returns the
+// updated record.
 func (handler *GrpcItemUpdate) ItemUpdate(
 	ctx context.Context, request *templatev0.ItemUpdateRequest,
 ) (*templatev0.ItemUpdateResponse, error) {

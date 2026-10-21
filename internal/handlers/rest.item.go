@@ -17,13 +17,14 @@ type Item struct {
 	UpdatedAt   time.Time `json:"updatedAt"`
 }
 
-func loadItem(s *core.Item) Item {
+// loadItem converts a core item into its REST form.
+func loadItem(item *core.Item) Item {
 	return Item{
-		ID:          s.ID,
-		Name:        s.Name,
-		Description: s.Description,
-		CreatedAt:   s.CreatedAt,
-		UpdatedAt:   s.UpdatedAt,
+		ID:          item.ID,
+		Name:        item.Name,
+		Description: item.Description,
+		CreatedAt:   item.CreatedAt,
+		UpdatedAt:   item.UpdatedAt,
 	}
 }
 

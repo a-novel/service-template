@@ -30,9 +30,7 @@ func NewGrpcItemGet(service GrpcItemGetService) *GrpcItemGet {
 	return &GrpcItemGet{service: service}
 }
 
-// ItemGet returns the item with the given ID. A malformed ID or rejected request
-// maps to InvalidArgument, a missing item to NotFound, and any other failure to
-// Internal.
+// ItemGet returns the item with the given ID.
 func (handler *GrpcItemGet) ItemGet(
 	ctx context.Context, request *templatev0.ItemGetRequest,
 ) (*templatev0.ItemGetResponse, error) {

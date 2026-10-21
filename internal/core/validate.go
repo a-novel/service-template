@@ -12,8 +12,8 @@ var validate = validator.New(validator.WithRequiredStructEnabled())
 // ErrInvalidRequest is returned by a service Exec when its request fails struct validation.
 var ErrInvalidRequest = errors.New("invalid request")
 
-// ValidateNotBlank reports whether a string holds a non-whitespace character, rejecting values that
-// are empty or whitespace-only. The package registers it under the "notblank" struct tag at init.
+// ValidateNotBlank reports whether a string holds a non-whitespace character. The package registers
+// it as the "notblank" struct tag.
 func ValidateNotBlank(fl validator.FieldLevel) bool {
 	return strings.TrimSpace(fl.Field().String()) != ""
 }

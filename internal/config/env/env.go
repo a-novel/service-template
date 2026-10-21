@@ -22,10 +22,9 @@ const (
 	// AppNameDefault names the application in logs and traces when APP_NAME is unset.
 	AppNameDefault = "service-template"
 
-	// PostgresMaxOpenConnsDefault keeps the pool well under a stock PostgreSQL max_connections of 100
-	// once multiplied by a service's replica count, leaving room for the migration job and a psql
-	// session. Go's own default is unlimited, which turns a spike into connection refusals for
-	// everything on that database. The limit queues the spike inside this process instead.
+	// PostgresMaxOpenConnsDefault caps the connections one instance opens. Multiplied by the replica
+	// count, the cap stays well under PostgreSQL's default max_connections of 100. That leaves room
+	// for the migration job and a psql session. A spike waits inside the process for a free connection.
 	PostgresMaxOpenConnsDefault = 20
 	// PostgresMaxIdleConnsDefault matches the open limit, so a burst keeps the connections it is about
 	// to reuse.

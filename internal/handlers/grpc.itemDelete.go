@@ -31,8 +31,6 @@ func NewGrpcItemDelete(service GrpcItemDeleteService) *GrpcItemDelete {
 }
 
 // ItemDelete deletes the item with the given ID and returns the removed record.
-// A malformed ID or rejected request maps to InvalidArgument, a missing item to
-// NotFound, and any other failure to Internal.
 func (handler *GrpcItemDelete) ItemDelete(
 	ctx context.Context, request *templatev0.ItemDeleteRequest,
 ) (*templatev0.ItemDeleteResponse, error) {
