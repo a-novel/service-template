@@ -11,8 +11,10 @@ on:
   merge_group:
 
 jobs:
+  # The template deploys nothing, so it edits its migrations in place. A fork is no template
+  # repository, so the guard runs there.
   check-migration-snapshots:
-    if: github.event_name == 'pull_request'
+    if: github.event_name == 'pull_request' && !github.event.repository.is_template
     runs-on: ubuntu-latest
     permissions:
       contents: read
@@ -74,6 +76,10 @@ jobs:
       - uses: bufbuild/buf-action@85aebf73123b5c15fd5528aaecbf9129cddf7fa7 # v1.6.0
         with:
           pr_comment: false
+          # The template changes its contract in place, as it does its migrations.
+          breaking: >-
+            ${{ github.event_name == 'pull_request' && !github.event.repository.is_template
+            && !contains(github.event.pull_request.labels.*.name, 'buf skip breaking') }}
 
   lint-js:
     runs-on: ubuntu-latest
