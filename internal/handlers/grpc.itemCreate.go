@@ -29,8 +29,7 @@ func NewGrpcItemCreate(service GrpcItemCreateService) *GrpcItemCreate {
 	return &GrpcItemCreate{service: service}
 }
 
-// ItemCreate creates an item and returns it. A rejected request maps to
-// InvalidArgument; any other failure maps to Internal.
+// ItemCreate creates an item and returns it.
 func (handler *GrpcItemCreate) ItemCreate(
 	ctx context.Context, request *templatev0.ItemCreateRequest,
 ) (*templatev0.ItemCreateResponse, error) {

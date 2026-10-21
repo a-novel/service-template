@@ -17,9 +17,7 @@ import (
 //go:embed pg.itemUpdate.sql
 var itemUpdateQuery string
 
-// ErrItemUpdateNotFound is returned by [PgItemUpdate.Exec] when no item matches the
-// requested ID. It is joined onto the underlying sql.ErrNoRows so callers can branch
-// on it with errors.Is.
+// ErrItemUpdateNotFound is returned by [PgItemUpdate.Exec] when no item has the requested ID.
 var ErrItemUpdateNotFound = errors.New("item not found")
 
 // ItemUpdateRequest is the input to [PgItemUpdate.Exec].

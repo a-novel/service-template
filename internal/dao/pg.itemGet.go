@@ -16,9 +16,7 @@ import (
 //go:embed pg.itemGet.sql
 var itemGetQuery string
 
-// ErrItemGetNotFound is returned by [PgItemGet.Exec] when no item matches the requested
-// ID. It is joined onto the underlying sql.ErrNoRows so callers can branch on it with
-// errors.Is.
+// ErrItemGetNotFound is returned by [PgItemGet.Exec] when no item has the requested ID.
 var ErrItemGetNotFound = errors.New("item not found")
 
 // ItemGetRequest is the input to [PgItemGet.Exec].

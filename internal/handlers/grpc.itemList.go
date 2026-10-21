@@ -30,8 +30,7 @@ func NewGrpcItemList(service GrpcItemListService) *GrpcItemList {
 	return &GrpcItemList{service: service}
 }
 
-// ItemList returns a page of items. A rejected request maps to InvalidArgument;
-// any other failure maps to Internal.
+// ItemList returns a page of items, newest first.
 func (handler *GrpcItemList) ItemList(
 	ctx context.Context, request *templatev0.ItemListRequest,
 ) (*templatev0.ItemListResponse, error) {
