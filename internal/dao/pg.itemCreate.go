@@ -40,7 +40,7 @@ func (dao *PgItemCreate) Exec(ctx context.Context, request *ItemCreateRequest) (
 
 	db, err := postgres.GetContext(ctx)
 	if err != nil {
-		return nil, otel.ReportError(span, fmt.Errorf("get transaction: %w", err))
+		return nil, otel.ReportError(span, fmt.Errorf("get postgres context: %w", err))
 	}
 
 	entity := &Item{}
