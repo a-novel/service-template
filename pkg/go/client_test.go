@@ -32,7 +32,7 @@ func TestClient(t *testing.T) {
 	t.Run("Success/RemoteCalls", func(t *testing.T) {
 		t.Parallel()
 
-		client, err := servicetemplate.NewClient(env.GrpcUrl, grpc.WithTransportCredentials(insecure.NewCredentials()))
+		client, err := servicetemplate.NewClient(env.GrpcURL, grpc.WithTransportCredentials(insecure.NewCredentials()))
 		require.NoError(t, err)
 
 		defer client.Close()
