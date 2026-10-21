@@ -4,6 +4,7 @@ import (
 	"context"
 	"net/http"
 
+	"github.com/google/uuid"
 	"github.com/samber/lo"
 
 	"github.com/a-novel-kit/golib/httpf"
@@ -26,8 +27,8 @@ var itemListErrors = httpf.ErrMap{
 // RestItemListRequest carries the pagination query parameters accepted by the
 // list endpoint.
 type RestItemListRequest struct {
-	Limit  int `schema:"limit"`
-	Offset int `schema:"offset"`
+	Limit int       `schema:"limit"`
+	After uuid.UUID `schema:"after"`
 }
 
 // RestItemList is the HTTP handler for the list-items endpoint.
@@ -54,8 +55,8 @@ func (handler *RestItemList) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 
 	serviceRequest := &core.ItemListRequest{
-		Limit:  request.Limit,
-		Offset: request.Offset,
+		Limit: request.Limit,
+		After: request.After,
 	}
 
 	items, err := handler.service.Exec(ctx, serviceRequest)

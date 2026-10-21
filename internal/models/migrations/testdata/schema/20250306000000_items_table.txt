@@ -1,7 +1,7 @@
-migration-history	sha256:c933f9b619f376e820a51e916ceb93e908f8ed7e6ae3d6cbbe7b841966aba544
+migration-history	sha256:290348356429448c3169521e693a481cc60853b91dd1265171f0e4857be096c5
 column	items.created_at	timestamp with time zone NOT NULL DEFAULT CURRENT_TIMESTAMP
 column	items.description	text
-column	items.id	uuid NOT NULL DEFAULT gen_random_uuid()
+column	items.id	uuid NOT NULL DEFAULT uuidv7()
 column	items.name	text NOT NULL
 column	items.updated_at	timestamp with time zone NOT NULL DEFAULT CURRENT_TIMESTAMP
 comment	schema public	standard public schema

@@ -1,13 +1,12 @@
--- id breaks ties on created_at. LIMIT/OFFSET over a partial order lets Postgres return a tied group
--- in a different sequence per query, so paging repeats some rows and skips others.
+-- Item IDs are UUIDv7, which sort by creation time, so the primary key serves this order. A page
+-- starts after the last ID of the previous one, and a deleted ID still marks its place.
 SELECT
   *
 FROM
   items
+WHERE
+  id < ?1
 ORDER BY
-  created_at DESC,
   id DESC
 LIMIT
-  ?0
-OFFSET
-  ?1;
+  ?0;

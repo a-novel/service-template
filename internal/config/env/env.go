@@ -36,11 +36,11 @@ const (
 )
 
 var (
-	// PostgresDsn is the legacy URL used when PostgresHost is empty, formatted as
+	// PostgresDSN is the legacy URL used when PostgresHost is empty, formatted as
 	//	postgres://<user>:<password>@<host>:<port>/<database>
 	//
 	// Configure the discrete PostgreSQL fields for new deployments.
-	PostgresDsn = getEnv("POSTGRES_DSN")
+	PostgresDSN = getEnv("POSTGRES_DSN")
 	// PostgresHost is the PostgreSQL server hostname or IP address.
 	PostgresHost = getEnv("POSTGRES_HOST")
 	// PostgresPort is the PostgreSQL server port.
@@ -64,17 +64,17 @@ var (
 	// Otel enables OpenTelemetry tracing.
 	Otel = config.LoadEnv(getEnv("OTEL"), false, config.BoolParser)
 
-	// GrpcUrl is the address of the gRPC service, in the form <host>:<port>. The Go client tests
+	// GrpcURL is the address of the gRPC service, in the form <host>:<port>. The Go client tests
 	// dial it.
-	GrpcUrl = getEnv("GRPC_URL")
+	GrpcURL = getEnv("GRPC_URL")
 	// Grpc configures the gRPC server from the GRPC_* variables.
 	Grpc = grpcf.LoadServerConfig(getEnv, grpcf.ServerConfigDefault)
 	// Rest configures the REST server from the REST_* variables.
 	Rest = httpf.LoadServerConfig(getEnv, restDefaults())
 
-	// GcloudProjectId is the Google Cloud project the service runs in. When set, logs and traces
+	// GcloudProjectID is the Google Cloud project the service runs in. When set, logs and traces
 	// go to Google Cloud. When empty, they go to standard output.
-	GcloudProjectId = getEnv("GCLOUD_PROJECT_ID")
+	GcloudProjectID = getEnv("GCLOUD_PROJECT_ID")
 
 	// DowntimeStart is when a planned downtime of this service starts, in RFC 3339. From then
 	// until it is removed, the service refuses work. Nil when none is planned.

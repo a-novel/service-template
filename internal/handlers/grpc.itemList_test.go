@@ -23,6 +23,7 @@ func TestGrpcItemList(t *testing.T) {
 	errFoo := errors.New("foo")
 
 	type serviceMock struct {
+		req  *core.ItemListRequest
 		resp []*core.Item
 		err  error
 	}
@@ -41,11 +42,12 @@ func TestGrpcItemList(t *testing.T) {
 			name: "Success",
 
 			request: &templatev0.ItemListRequest{
-				Limit:  10,
-				Offset: 0,
+				Limit: 10,
+				After: "00000000-0000-0000-0000-000000000003",
 			},
 
 			serviceMock: &serviceMock{
+				req: &core.ItemListRequest{Limit: 10, After: uuid.MustParse("00000000-0000-0000-0000-000000000003")},
 				resp: []*core.Item{
 					{
 						ID:        uuid.MustParse("00000000-0000-0000-0000-000000000001"),
@@ -84,12 +86,21 @@ func TestGrpcItemList(t *testing.T) {
 			name: "Error/InvalidArgument",
 
 			request: &templatev0.ItemListRequest{
-				Limit:  0,
-				Offset: 0,
+				Limit: 101,
 			},
 
 			serviceMock: &serviceMock{
+				req: &core.ItemListRequest{Limit: 101},
 				err: core.ErrInvalidRequest,
+			},
+
+			expectStatus: codes.InvalidArgument,
+		},
+		{
+			name: "Error/InvalidAfter",
+
+			request: &templatev0.ItemListRequest{
+				After: "not-a-uuid",
 			},
 
 			expectStatus: codes.InvalidArgument,
@@ -98,11 +109,11 @@ func TestGrpcItemList(t *testing.T) {
 			name: "Error/Internal",
 
 			request: &templatev0.ItemListRequest{
-				Limit:  10,
-				Offset: 0,
+				Limit: 10,
 			},
 
 			serviceMock: &serviceMock{
+				req: &core.ItemListRequest{Limit: 10},
 				err: errFoo,
 			},
 
@@ -117,13 +128,8 @@ func TestGrpcItemList(t *testing.T) {
 			service := handlersmocks.NewMockGrpcItemListService(t)
 
 			if testCase.serviceMock != nil {
-				serviceRequest := &core.ItemListRequest{
-					Limit:  int(testCase.request.GetLimit()),
-					Offset: int(testCase.request.GetOffset()),
-				}
-
 				service.EXPECT().
-					Exec(mock.Anything, serviceRequest).
+					Exec(mock.Anything, testCase.serviceMock.req).
 					Return(testCase.serviceMock.resp, testCase.serviceMock.err)
 			}
 

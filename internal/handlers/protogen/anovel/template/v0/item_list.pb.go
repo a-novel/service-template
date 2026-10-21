@@ -26,8 +26,9 @@ type ItemListRequest struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// Maximum number of items to return, 100 at most. Zero or a negative value selects 20.
 	Limit int32 `protobuf:"varint,1,opt,name=limit,proto3" json:"limit,omitempty"`
-	// Number of leading items to skip before collecting the page.
-	Offset        int32 `protobuf:"varint,2,opt,name=offset,proto3" json:"offset,omitempty"`
+	// ID of the last item of the previous page. The page starts with the next older item. Empty
+	// starts at the newest item.
+	After         string `protobuf:"bytes,3,opt,name=after,proto3" json:"after,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -69,11 +70,11 @@ func (x *ItemListRequest) GetLimit() int32 {
 	return 0
 }
 
-func (x *ItemListRequest) GetOffset() int32 {
+func (x *ItemListRequest) GetAfter() string {
 	if x != nil {
-		return x.Offset
+		return x.After
 	}
-	return 0
+	return ""
 }
 
 // ItemListResponse returns the requested page of items, empty when none match.
@@ -126,10 +127,10 @@ var File_anovel_template_v0_item_list_proto protoreflect.FileDescriptor
 
 const file_anovel_template_v0_item_list_proto_rawDesc = "" +
 	"\n" +
-	"\"anovel/template/v0/item_list.proto\x12\x12anovel.template.v0\x1a\x1danovel/template/v0/item.proto\"?\n" +
+	"\"anovel/template/v0/item_list.proto\x12\x12anovel.template.v0\x1a\x1danovel/template/v0/item.proto\"K\n" +
 	"\x0fItemListRequest\x12\x14\n" +
-	"\x05limit\x18\x01 \x01(\x05R\x05limit\x12\x16\n" +
-	"\x06offset\x18\x02 \x01(\x05R\x06offset\"B\n" +
+	"\x05limit\x18\x01 \x01(\x05R\x05limit\x12\x14\n" +
+	"\x05after\x18\x03 \x01(\tR\x05afterJ\x04\b\x02\x10\x03R\x06offset\"B\n" +
 	"\x10ItemListResponse\x12.\n" +
 	"\x05items\x18\x01 \x03(\v2\x18.anovel.template.v0.ItemR\x05items2h\n" +
 	"\x0fItemListService\x12U\n" +

@@ -38,10 +38,10 @@ func TestItemList(t *testing.T) {
 		{
 			name: "Success",
 
-			request: &core.ItemListRequest{Limit: 10, Offset: 5},
+			request: &core.ItemListRequest{Limit: 10, After: uuid.MustParse("00000000-0000-0000-0000-000000000004")},
 
 			daoMock: &daoMock{
-				req: &dao.ItemListRequest{Limit: 10, Offset: 5},
+				req: &dao.ItemListRequest{Limit: 10, After: uuid.MustParse("00000000-0000-0000-0000-000000000004")},
 				resp: []*dao.Item{
 					{
 						ID:        uuid.MustParse("00000000-0000-0000-0000-000000000003"),
@@ -76,39 +76,33 @@ func TestItemList(t *testing.T) {
 		{
 			name: "Success/Empty",
 
-			request: &core.ItemListRequest{Limit: 10, Offset: 0},
+			request: &core.ItemListRequest{Limit: 10},
 
-			daoMock: &daoMock{req: &dao.ItemListRequest{Limit: 10}, resp: []*dao.Item{}},
+			daoMock: &daoMock{req: &dao.ItemListRequest{Limit: 10, After: uuid.Max}, resp: []*dao.Item{}},
 
 			expect: []*core.Item{},
 		},
 		{
 			name: "Success/LimitDefaulted",
 
-			request: &core.ItemListRequest{Limit: 0, Offset: 0},
+			request: &core.ItemListRequest{},
 
-			daoMock: &daoMock{req: &dao.ItemListRequest{Limit: core.ItemListDefaultSize}, resp: []*dao.Item{}},
+			daoMock: &daoMock{req: &dao.ItemListRequest{Limit: core.ItemListDefaultSize, After: uuid.Max}, resp: []*dao.Item{}},
 
 			expect: []*core.Item{},
 		},
 		{
 			name: "Error/LimitTooHigh",
 
-			request:   &core.ItemListRequest{Limit: 101, Offset: 0},
-			expectErr: core.ErrInvalidRequest,
-		},
-		{
-			name: "Error/OffsetNegative",
-
-			request:   &core.ItemListRequest{Limit: 10, Offset: -1},
+			request:   &core.ItemListRequest{Limit: 101},
 			expectErr: core.ErrInvalidRequest,
 		},
 		{
 			name: "Error/Dao",
 
-			request: &core.ItemListRequest{Limit: 10, Offset: 0},
+			request: &core.ItemListRequest{Limit: 10},
 
-			daoMock:   &daoMock{req: &dao.ItemListRequest{Limit: 10}, err: errFoo},
+			daoMock:   &daoMock{req: &dao.ItemListRequest{Limit: 10, After: uuid.Max}, err: errFoo},
 			expectErr: errFoo,
 		},
 	}

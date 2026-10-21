@@ -5,6 +5,7 @@ import (
 	_ "embed"
 	"fmt"
 
+	"github.com/google/uuid"
 	"go.opentelemetry.io/otel/attribute"
 
 	"github.com/a-novel-kit/golib/otel"
@@ -16,8 +17,9 @@ var itemListQuery string
 
 // ItemListRequest is the input to [PgItemList.Exec].
 type ItemListRequest struct {
-	Limit  int
-	Offset int
+	Limit int
+	// After is the ID the page starts after, in descending order. uuid.Max starts at the newest item.
+	After uuid.UUID
 }
 
 // PgItemList retrieves a page of items, newest first.
@@ -33,12 +35,12 @@ func (dao *PgItemList) Exec(ctx context.Context, request *ItemListRequest) ([]*I
 
 	db, err := postgres.GetContext(ctx)
 	if err != nil {
-		return nil, otel.ReportError(span, fmt.Errorf("get transaction: %w", err))
+		return nil, otel.ReportError(span, fmt.Errorf("get postgres context: %w", err))
 	}
 
 	var entities []*Item
 
-	err = db.NewRaw(itemListQuery, request.Limit, request.Offset).Scan(ctx, &entities)
+	err = db.NewRaw(itemListQuery, request.Limit, request.After).Scan(ctx, &entities)
 	if err != nil {
 		return nil, otel.ReportError(span, fmt.Errorf("execute query: %w", err))
 	}

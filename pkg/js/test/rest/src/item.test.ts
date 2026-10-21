@@ -71,10 +71,21 @@ describe("itemList", () => {
   it("returns at most limit items", async () => {
     const created = await itemCreate(api, "item to page");
 
-    const items = await itemList(api, 1, 0);
+    const items = await itemList(api, 1);
     expect(items).toHaveLength(1);
 
     await itemDelete(api, created.id);
+  });
+
+  it("continues after the given item", async () => {
+    const older = await itemCreate(api, "older item");
+    const newer = await itemCreate(api, "newer item");
+
+    const items = await itemList(api, 1, newer.id);
+    expect(items.map((item) => item.id)).toEqual([older.id]);
+
+    await itemDelete(api, newer.id);
+    await itemDelete(api, older.id);
   });
 });
 

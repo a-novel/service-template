@@ -31,9 +31,13 @@ export async function itemGet(api: TemplateApi, id: string): Promise<Item> {
   return await api.fetch(`/v0/item?${params.toString()}`, ItemSchema, { method: "GET", headers: HTTP_HEADERS.JSON });
 }
 
-/** Lists Items; returns the first 100 from the start when limit and offset are omitted. */
-export async function itemList(api: TemplateApi, limit?: number, offset?: number): Promise<Item[]> {
-  const params = new URLSearchParams({ limit: `${limit || 100}`, offset: `${offset || 0}` });
+/**
+ * Lists Items newest first, 100 at most when limit is omitted. Pass the id of the last Item received
+ * as after to read the next page.
+ */
+export async function itemList(api: TemplateApi, limit?: number, after?: string): Promise<Item[]> {
+  const params = new URLSearchParams({ limit: `${limit || 100}` });
+  if (after) params.set("after", after);
   return await api.fetch(`/v0/items?${params.toString()}`, z.array(ItemSchema), {
     method: "GET",
     headers: HTTP_HEADERS.JSON,

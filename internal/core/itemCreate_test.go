@@ -98,7 +98,7 @@ func TestItemCreate(t *testing.T) {
 			if testCase.daoMock != nil {
 				mockDao.EXPECT().
 					Exec(mock.Anything, mock.MatchedBy(func(req *dao.ItemCreateRequest) bool {
-						return assert.NotEqual(t, uuid.Nil, req.ID) &&
+						return assert.Equal(t, uuid.Version(7), req.ID.Version()) &&
 							assert.WithinDuration(t, time.Now(), req.Now, time.Minute) &&
 							assert.Equal(t, testCase.request.Name, req.Name) &&
 							assert.Equal(t, testCase.request.Description, req.Description)

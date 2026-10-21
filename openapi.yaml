@@ -84,12 +84,13 @@ paths:
       operationId: itemList
       summary: List items.
       description: |
-        Returns a page of items, newest first.
+        Returns a page of items, newest first. To read the next page, pass the ID of the last item
+        received as `after`.
       tags: [item]
       security: []
       parameters:
         - $ref: "#/components/parameters/limit"
-        - $ref: "#/components/parameters/offset"
+        - $ref: "#/components/parameters/after"
       responses:
         "200":
           $ref: "#/components/responses/itemList"
@@ -455,13 +456,12 @@ components:
         default: 20
         examples: [10]
 
-    offset:
-      name: offset
+    after:
+      name: after
       in: query
-      description: Number of items to skip before returning results.
+      description: >
+        ID of the last item of the previous page. The page starts with the next older item, even
+        when that item was deleted since. When omitted, the page starts at the newest item.
       required: false
       schema:
-        type: integer
-        minimum: 0
-        default: 0
-        examples: [0]
+        $ref: "#/components/schemas/itemID"

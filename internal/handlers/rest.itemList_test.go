@@ -43,10 +43,12 @@ func TestRestItemList(t *testing.T) {
 		{
 			name: "Success",
 
-			request: httptest.NewRequestWithContext(t.Context(), http.MethodGet, "/v0/items?limit=10&offset=0", nil),
+			request: httptest.NewRequestWithContext(
+				t.Context(), http.MethodGet, "/v0/items?limit=10&after=00000000-0000-0000-0000-000000000003", nil,
+			),
 
 			serviceMock: &serviceMock{
-				req: &core.ItemListRequest{Limit: 10, Offset: 0},
+				req: &core.ItemListRequest{Limit: 10, After: uuid.MustParse("00000000-0000-0000-0000-000000000003")},
 				resp: []*core.Item{
 					{
 						ID:        uuid.MustParse("00000000-0000-0000-0000-000000000002"),
@@ -80,12 +82,31 @@ func TestRestItemList(t *testing.T) {
 			},
 		},
 		{
-			name: "Error/Internal",
+			name: "Error/InvalidAfter",
 
-			request: httptest.NewRequestWithContext(t.Context(), http.MethodGet, "/v0/items?limit=10&offset=0", nil),
+			request: httptest.NewRequestWithContext(t.Context(), http.MethodGet, "/v0/items?after=not-a-uuid", nil),
+
+			expectStatus: http.StatusBadRequest,
+		},
+		{
+			name: "Error/InvalidRequest",
+
+			request: httptest.NewRequestWithContext(t.Context(), http.MethodGet, "/v0/items?limit=101", nil),
 
 			serviceMock: &serviceMock{
-				req: &core.ItemListRequest{Limit: 10, Offset: 0},
+				req: &core.ItemListRequest{Limit: 101},
+				err: core.ErrInvalidRequest,
+			},
+
+			expectStatus: http.StatusBadRequest,
+		},
+		{
+			name: "Error/Internal",
+
+			request: httptest.NewRequestWithContext(t.Context(), http.MethodGet, "/v0/items?limit=10", nil),
+
+			serviceMock: &serviceMock{
+				req: &core.ItemListRequest{Limit: 10},
 				err: errFoo,
 			},
 

@@ -5,6 +5,7 @@ import (
 	"errors"
 	"fmt"
 
+	"github.com/google/uuid"
 	"go.opentelemetry.io/otel/attribute"
 
 	"github.com/a-novel-kit/golib/otel"
@@ -24,8 +25,9 @@ const ItemListDefaultSize = 20
 type ItemListRequest struct {
 	// Limit caps the page at 100 items. It defaults to [ItemListDefaultSize] when zero or negative.
 	Limit int `validate:"max=100"`
-	// Offset is the number of newest items to skip.
-	Offset int `validate:"min=0"`
+	// After is the ID of the last item of the previous page. The page starts with the next older
+	// item, or with the newest one when After is uuid.Nil.
+	After uuid.UUID
 }
 
 // ItemList retrieves a paginated list of items.
@@ -47,9 +49,15 @@ func (service *ItemList) Exec(ctx context.Context, request *ItemListRequest) ([]
 		limit = ItemListDefaultSize
 	}
 
+	// Item IDs are UUIDv7, so uuid.Max sorts after every item.
+	after := request.After
+	if after == uuid.Nil {
+		after = uuid.Max
+	}
+
 	span.SetAttributes(
 		attribute.Int("item.limit", limit),
-		attribute.Int("item.offset", request.Offset),
+		attribute.String("item.after", request.After.String()),
 	)
 
 	err := validate.Struct(request)
@@ -58,8 +66,8 @@ func (service *ItemList) Exec(ctx context.Context, request *ItemListRequest) ([]
 	}
 
 	daoRequest := &dao.ItemListRequest{
-		Limit:  limit,
-		Offset: request.Offset,
+		Limit: limit,
+		After: after,
 	}
 
 	entities, err := service.dao.Exec(ctx, daoRequest)
