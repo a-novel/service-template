@@ -1,9 +1,9 @@
 CREATE TABLE items (
-  id uuid PRIMARY KEY NOT NULL DEFAULT gen_random_uuid(),
+  -- A UUIDv7 sorts by creation time, so the primary key also orders pages.
+  id uuid PRIMARY KEY NOT NULL DEFAULT uuidv7(),
   name text NOT NULL CHECK (name <> ''),
   description text,
-  -- Full precision keeps created_at usable as a sort key on its own, and lets updated_at
-  -- distinguish two updates made within the same second.
+  -- Full precision lets updated_at distinguish two updates made within the same second.
   created_at timestamp with time zone NOT NULL DEFAULT CURRENT_TIMESTAMP,
   updated_at timestamp with time zone NOT NULL DEFAULT CURRENT_TIMESTAMP
 );
