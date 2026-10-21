@@ -78,7 +78,7 @@ The service ships two APIs:
 
 The service runs as published OCI images plus a PostgreSQL database. Both servers are stateless, so each scales to as many replicas as you need behind a load balancer; all state lives in Postgres.
 
-> **OpenTofu modules are the planned canonical deployment path.** Until they land, deploy the images with any container orchestrator — the composition below is the reference for which images to run, how they wire together, and the environment they expect.
+Deploy the images with any container orchestrator. The composition below shows which images to run, how they wire together, and the environment they expect.
 
 | Image                              | Role                                                                        |
 | ---------------------------------- | --------------------------------------------------------------------------- |
