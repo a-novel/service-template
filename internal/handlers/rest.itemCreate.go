@@ -63,5 +63,5 @@ func (handler *RestItemCreate) ServeHTTP(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
-	httpf.SendJSONStatus(ctx, w, span, http.StatusCreated, loadItem(item))
+	httpf.SendJSONStatus(w, span, http.StatusCreated, loadItem(item))
 }

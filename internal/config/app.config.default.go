@@ -21,7 +21,7 @@ const OtelFlushTimeout = 2 * time.Second
 // LoggerProdGrpc sends gRPC request logs to Google Cloud Logging.
 var LoggerProdGrpc = loggingpresets.GRPCGcloud{
 	Component: env.AppName,
-	ProjectId: env.GcloudProjectId,
+	ProjectID: env.GcloudProjectId,
 }
 
 // LoggerDevGrpc prints gRPC request logs to the console for local development.
@@ -34,7 +34,7 @@ var LoggerDev = &loggingpresets.LogLocal{
 
 // LoggerProd sends application and REST request logs to Google Cloud Logging.
 var LoggerProd = &loggingpresets.LogGcloud{
-	ProjectId: env.GcloudProjectId,
+	ProjectID: env.GcloudProjectId,
 }
 
 // AppPresetDefault is the configuration the service starts with. It reads every value from the
