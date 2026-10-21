@@ -38,14 +38,14 @@ func (dao *PgItemCreate) Exec(ctx context.Context, request *ItemCreateRequest) (
 
 	span.SetAttributes(attribute.String("item.id", request.ID.String()))
 
-	tx, err := postgres.GetContext(ctx)
+	db, err := postgres.GetContext(ctx)
 	if err != nil {
 		return nil, otel.ReportError(span, fmt.Errorf("get transaction: %w", err))
 	}
 
 	entity := &Item{}
 
-	err = tx.NewRaw(itemCreateQuery, request.ID, request.Name, request.Description, request.Now).Scan(ctx, entity)
+	err = db.NewRaw(itemCreateQuery, request.ID, request.Name, request.Description, request.Now).Scan(ctx, entity)
 	if err != nil {
 		return nil, otel.ReportError(span, fmt.Errorf("execute query: %w", err))
 	}

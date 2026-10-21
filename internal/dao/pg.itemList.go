@@ -31,14 +31,14 @@ func (dao *PgItemList) Exec(ctx context.Context, request *ItemListRequest) ([]*I
 	ctx, span := otel.Tracer().Start(ctx, "dao.PgItemList")
 	defer span.End()
 
-	tx, err := postgres.GetContext(ctx)
+	db, err := postgres.GetContext(ctx)
 	if err != nil {
 		return nil, otel.ReportError(span, fmt.Errorf("get transaction: %w", err))
 	}
 
 	var entities []*Item
 
-	err = tx.NewRaw(itemListQuery, request.Limit, request.Offset).Scan(ctx, &entities)
+	err = db.NewRaw(itemListQuery, request.Limit, request.Offset).Scan(ctx, &entities)
 	if err != nil {
 		return nil, otel.ReportError(span, fmt.Errorf("execute query: %w", err))
 	}

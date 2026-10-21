@@ -37,19 +37,19 @@ func (dao *PgItemDelete) Exec(ctx context.Context, request *ItemDeleteRequest) (
 	ctx, span := otel.Tracer().Start(ctx, "dao.PgItemDelete")
 	defer span.End()
 
-	tx, err := postgres.GetContext(ctx)
+	db, err := postgres.GetContext(ctx)
 	if err != nil {
 		return nil, otel.ReportError(span, fmt.Errorf("get transaction: %w", err))
 	}
 
 	entity := &Item{}
 
-	err = tx.NewRaw(itemDeleteQuery, request.ID).Scan(ctx, entity)
-	if err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
-			err = errors.Join(err, ErrItemDeleteNotFound)
-		}
+	err = db.NewRaw(itemDeleteQuery, request.ID).Scan(ctx, entity)
+	if errors.Is(err, sql.ErrNoRows) {
+		err = errors.Join(err, ErrItemDeleteNotFound)
+	}
 
+	if err != nil {
 		return nil, otel.ReportError(span, fmt.Errorf("execute query: %w", err))
 	}
 

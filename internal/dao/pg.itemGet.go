@@ -37,19 +37,19 @@ func (dao *PgItemGet) Exec(ctx context.Context, request *ItemGetRequest) (*Item,
 	ctx, span := otel.Tracer().Start(ctx, "dao.PgItemGet")
 	defer span.End()
 
-	tx, err := postgres.GetContext(ctx)
+	db, err := postgres.GetContext(ctx)
 	if err != nil {
 		return nil, otel.ReportError(span, fmt.Errorf("get transaction: %w", err))
 	}
 
 	entity := &Item{}
 
-	err = tx.NewRaw(itemGetQuery, request.ID).Scan(ctx, entity)
-	if err != nil {
-		if errors.Is(err, sql.ErrNoRows) {
-			err = errors.Join(err, ErrItemGetNotFound)
-		}
+	err = db.NewRaw(itemGetQuery, request.ID).Scan(ctx, entity)
+	if errors.Is(err, sql.ErrNoRows) {
+		err = errors.Join(err, ErrItemGetNotFound)
+	}
 
+	if err != nil {
 		return nil, otel.ReportError(span, fmt.Errorf("execute query: %w", err))
 	}
 
