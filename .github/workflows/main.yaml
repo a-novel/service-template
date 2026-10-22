@@ -173,6 +173,7 @@ jobs:
           coverage_artifact: gocover
           coverage_file: coverage.txt
           modfile: gotestsum.mod
+          race: "true"
 
   test-pkg:
     needs: [build-database, build-standalone-grpc]
@@ -203,6 +204,7 @@ jobs:
           coverage_artifact: gocoverpkg
           coverage_file: coverage_pkg.txt
           modfile: gotestsum.mod
+          race: "true"
 
   test-pkg-js:
     needs: [build-database, build-standalone-rest]
