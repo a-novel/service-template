@@ -134,7 +134,7 @@ jobs:
         with:
           ruleset: service
           # renovate: datasource=docker depName=semgrep/semgrep
-          version: "1.182.0"
+          version: "1.182.1"
 
   # gitleaks scans for secrets offline, so no hosted service can block a merge.
   scan-secrets:
