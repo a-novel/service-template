@@ -10,6 +10,7 @@ import (
 	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/a-novel/service-template/internal/core"
 	"github.com/a-novel/service-template/internal/handlers"
@@ -60,8 +61,8 @@ func TestGrpcItemDelete(t *testing.T) {
 					Id:          "00000000-0000-0000-0000-000000000001",
 					Name:        "test item",
 					Description: "test description",
-					CreatedAt:   "2021-01-01T00:00:00Z",
-					UpdatedAt:   "2021-01-01T00:00:00Z",
+					CreatedAt:   timestamppb.New(time.Date(2021, 1, 1, 0, 0, 0, 0, time.UTC)),
+					UpdatedAt:   timestamppb.New(time.Date(2021, 1, 1, 0, 0, 0, 0, time.UTC)),
 				},
 			},
 		},
