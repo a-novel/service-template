@@ -9,6 +9,7 @@ package v0
 import (
 	protoreflect "google.golang.org/protobuf/reflect/protoreflect"
 	protoimpl "google.golang.org/protobuf/runtime/protoimpl"
+	timestamppb "google.golang.org/protobuf/types/known/timestamppb"
 	reflect "reflect"
 	sync "sync"
 	unsafe "unsafe"
@@ -30,10 +31,10 @@ type Item struct {
 	Name string `protobuf:"bytes,2,opt,name=name,proto3" json:"name,omitempty"`
 	// Description of the item, empty when it has none.
 	Description string `protobuf:"bytes,3,opt,name=description,proto3" json:"description,omitempty"`
-	// Creation timestamp, formatted as RFC 3339.
-	CreatedAt string `protobuf:"bytes,4,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
-	// Timestamp of the most recent update, formatted as RFC 3339.
-	UpdatedAt     string `protobuf:"bytes,5,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
+	// CreatedAt is when the item was created.
+	CreatedAt *timestamppb.Timestamp `protobuf:"bytes,4,opt,name=created_at,json=createdAt,proto3" json:"created_at,omitempty"`
+	// UpdatedAt is when the item last changed.
+	UpdatedAt     *timestamppb.Timestamp `protobuf:"bytes,5,opt,name=updated_at,json=updatedAt,proto3" json:"updated_at,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -89,33 +90,33 @@ func (x *Item) GetDescription() string {
 	return ""
 }
 
-func (x *Item) GetCreatedAt() string {
+func (x *Item) GetCreatedAt() *timestamppb.Timestamp {
 	if x != nil {
 		return x.CreatedAt
 	}
-	return ""
+	return nil
 }
 
-func (x *Item) GetUpdatedAt() string {
+func (x *Item) GetUpdatedAt() *timestamppb.Timestamp {
 	if x != nil {
 		return x.UpdatedAt
 	}
-	return ""
+	return nil
 }
 
 var File_anovel_template_v0_item_proto protoreflect.FileDescriptor
 
 const file_anovel_template_v0_item_proto_rawDesc = "" +
 	"\n" +
-	"\x1danovel/template/v0/item.proto\x12\x12anovel.template.v0\"\x8a\x01\n" +
+	"\x1danovel/template/v0/item.proto\x12\x12anovel.template.v0\x1a\x1fgoogle/protobuf/timestamp.proto\"\xc2\x01\n" +
 	"\x04Item\x12\x0e\n" +
 	"\x02id\x18\x01 \x01(\tR\x02id\x12\x12\n" +
 	"\x04name\x18\x02 \x01(\tR\x04name\x12 \n" +
-	"\vdescription\x18\x03 \x01(\tR\vdescription\x12\x1d\n" +
+	"\vdescription\x18\x03 \x01(\tR\vdescription\x129\n" +
 	"\n" +
-	"created_at\x18\x04 \x01(\tR\tcreatedAt\x12\x1d\n" +
+	"created_at\x18\x04 \x01(\v2\x1a.google.protobuf.TimestampR\tcreatedAt\x129\n" +
 	"\n" +
-	"updated_at\x18\x05 \x01(\tR\tupdatedAtB\xe0\x01\n" +
+	"updated_at\x18\x05 \x01(\v2\x1a.google.protobuf.TimestampR\tupdatedAtB\xe0\x01\n" +
 	"\x16com.anovel.template.v0B\tItemProtoP\x01ZQgithub.com/a-novel/service-template/internal/handlers/protogen/anovel/template/v0\xa2\x02\x03ATV\xaa\x02\x12Anovel.Template.V0\xca\x02\x12Anovel\\Template\\V0\xe2\x02\x1eAnovel\\Template\\V0\\GPBMetadata\xea\x02\x14Anovel::Template::V0b\x06proto3"
 
 var (
@@ -132,14 +133,17 @@ func file_anovel_template_v0_item_proto_rawDescGZIP() []byte {
 
 var file_anovel_template_v0_item_proto_msgTypes = make([]protoimpl.MessageInfo, 1)
 var file_anovel_template_v0_item_proto_goTypes = []any{
-	(*Item)(nil), // 0: anovel.template.v0.Item
+	(*Item)(nil),                  // 0: anovel.template.v0.Item
+	(*timestamppb.Timestamp)(nil), // 1: google.protobuf.Timestamp
 }
 var file_anovel_template_v0_item_proto_depIdxs = []int32{
-	0, // [0:0] is the sub-list for method output_type
-	0, // [0:0] is the sub-list for method input_type
-	0, // [0:0] is the sub-list for extension type_name
-	0, // [0:0] is the sub-list for extension extendee
-	0, // [0:0] is the sub-list for field type_name
+	1, // 0: anovel.template.v0.Item.created_at:type_name -> google.protobuf.Timestamp
+	1, // 1: anovel.template.v0.Item.updated_at:type_name -> google.protobuf.Timestamp
+	2, // [2:2] is the sub-list for method output_type
+	2, // [2:2] is the sub-list for method input_type
+	2, // [2:2] is the sub-list for extension type_name
+	2, // [2:2] is the sub-list for extension extendee
+	0, // [0:2] is the sub-list for field type_name
 }
 
 func init() { file_anovel_template_v0_item_proto_init() }
