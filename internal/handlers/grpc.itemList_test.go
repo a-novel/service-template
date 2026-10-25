@@ -10,6 +10,7 @@ import (
 	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
+	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/a-novel/service-template/internal/core"
 	"github.com/a-novel/service-template/internal/handlers"
@@ -70,14 +71,14 @@ func TestGrpcItemList(t *testing.T) {
 					{
 						Id:        "00000000-0000-0000-0000-000000000001",
 						Name:      "item one",
-						CreatedAt: "2021-01-03T00:00:00Z",
-						UpdatedAt: "2021-01-03T00:00:00Z",
+						CreatedAt: timestamppb.New(time.Date(2021, 1, 3, 0, 0, 0, 0, time.UTC)),
+						UpdatedAt: timestamppb.New(time.Date(2021, 1, 3, 0, 0, 0, 0, time.UTC)),
 					},
 					{
 						Id:        "00000000-0000-0000-0000-000000000002",
 						Name:      "item two",
-						CreatedAt: "2021-01-02T00:00:00Z",
-						UpdatedAt: "2021-01-02T00:00:00Z",
+						CreatedAt: timestamppb.New(time.Date(2021, 1, 2, 0, 0, 0, 0, time.UTC)),
+						UpdatedAt: timestamppb.New(time.Date(2021, 1, 2, 0, 0, 0, 0, time.UTC)),
 					},
 				},
 			},

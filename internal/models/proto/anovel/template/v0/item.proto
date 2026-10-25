@@ -2,6 +2,8 @@ syntax = "proto3";
 
 package anovel.template.v0;
 
+import "google/protobuf/timestamp.proto";
+
 // An Item is the placeholder resource the template exposes through its item RPCs.
 message Item {
   // Unique identifier, formatted as a UUID.
@@ -10,8 +12,8 @@ message Item {
   string name = 2;
   // Description of the item, empty when it has none.
   string description = 3;
-  // Creation timestamp, formatted as RFC 3339.
-  string created_at = 4;
-  // Timestamp of the most recent update, formatted as RFC 3339.
-  string updated_at = 5;
+  // CreatedAt is when the item was created.
+  google.protobuf.Timestamp created_at = 4;
+  // UpdatedAt is when the item last changed.
+  google.protobuf.Timestamp updated_at = 5;
 }
