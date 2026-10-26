@@ -14,9 +14,13 @@ import (
 	"github.com/a-novel/service-template/internal/config/env"
 )
 
-// FlushTimeout bounds how long the OpenTelemetry exporter and the Sentry reporter each wait to
-// flush their pending data on shutdown.
-const FlushTimeout = 2 * time.Second
+// OtelFlushTimeout bounds how long the OpenTelemetry exporter waits to flush pending spans on
+// shutdown.
+const OtelFlushTimeout = 2 * time.Second
+
+// SentryFlushTimeout bounds how long a server waits on exit to send its pending Sentry events, inside
+// the platform's shutdown grace period.
+const SentryFlushTimeout = 2 * time.Second
 
 // OtelPresetDefault is the OpenTelemetry exporter of the servers. It exports nothing unless OTEL is
 // set, then exports to Google Cloud when GCLOUD_PROJECT_ID is set, and to standard output otherwise.
@@ -69,8 +73,8 @@ func newOtelPreset() otel.Config {
 	case !env.Otel:
 		return &otelpresets.Disabled{}
 	case env.GcloudProjectID == "":
-		return &otelpresets.Local{FlushTimeout: FlushTimeout}
+		return &otelpresets.Local{FlushTimeout: OtelFlushTimeout}
 	default:
-		return &otelpresets.Gcloud{ProjectID: env.GcloudProjectID, FlushTimeout: FlushTimeout}
+		return &otelpresets.Gcloud{ProjectID: env.GcloudProjectID, FlushTimeout: OtelFlushTimeout}
 	}
 }
