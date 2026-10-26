@@ -63,6 +63,8 @@ pnpm lint
 a-novel test -y
 ```
 
+**4. Connect Sentry.** The servers report their faults once `SENTRY_DSN` is set. When the service gets a Sentry project named after its repository, add the release step and the intake workflow from the workflows [v1.79.0 guide](https://github.com/a-novel-kit/workflows/blob/master/docs/migrations/v1.79.0.md).
+
 Then delete this section and describe your service in the rest of this README. In [CONTRIBUTING.md](./CONTRIBUTING.md), replace the introduction and the local run, which describe the template.
 
 ## What it does
@@ -167,7 +169,7 @@ Every variable is read from the process environment. `SERVICE_TEMPLATE_ENV_PREFI
 | `POSTGRES_DSN`         | Connection-URL fallback, read only when `POSTGRES_HOST` is empty.                                                             | all    |
 
 <details>
-<summary>Optional configuration (server tuning, OpenTelemetry)</summary>
+<summary>Optional configuration (server tuning, OpenTelemetry, Sentry)</summary>
 
 gRPC tuning (images `grpc`, `standalone-grpc`):
 
@@ -216,6 +218,14 @@ Logs and tracing — OpenTelemetry supports a stdout and a Google Cloud exporter
 | `OTEL`              | Enable OTel tracing; the variables below pick the exporter.           | `false`            |
 | `GCLOUD_PROJECT_ID` | Google Cloud project ID. When set, switches the OTel exporter to GCP. |                    |
 | `APP_NAME`          | Application name attached to traces and logs.                         | `service-template` |
+
+Fault reporting — Sentry receives each server fault, tagged with its release (server images). Without `SENTRY_DSN`, the servers report nothing:
+
+| Name                 | Description                                                                                                       | Default |
+| -------------------- | ----------------------------------------------------------------------------------------------------------------- | ------- |
+| `SENTRY_DSN`         | Client key of the service's Sentry project. Inject it as a secret.                                                |         |
+| `SENTRY_RELEASE`     | Deployed build, as `service-template@<version>`: the name release CI gives it in Sentry. **Required with a DSN.** |         |
+| `SENTRY_ENVIRONMENT` | Deployment name, such as `production`. **Required with a DSN.**                                                   |         |
 
 </details>
 
