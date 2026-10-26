@@ -7,6 +7,7 @@ import (
 	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/status"
 
+	"github.com/a-novel-kit/golib/grpcf"
 	"github.com/a-novel-kit/golib/otel"
 
 	"github.com/a-novel/service-template/internal/core"
@@ -47,9 +48,7 @@ func (handler *GrpcItemCreate) ItemCreate(
 	}
 
 	if err != nil {
-		_ = otel.ReportError(span, err)
-
-		return nil, status.Error(codes.Internal, "internal error")
+		return nil, grpcf.Fault(codes.Internal, "internal error", otel.ReportError(span, err))
 	}
 
 	return &templatev0.ItemCreateResponse{Item: itemToProto(item)}, nil

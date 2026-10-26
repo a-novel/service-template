@@ -37,6 +37,7 @@ func TestGrpcItemDelete(t *testing.T) {
 
 		expect       *templatev0.ItemDeleteResponse
 		expectStatus codes.Code
+		expectCause  error
 	}{
 		{
 			name: "Success",
@@ -100,6 +101,7 @@ func TestGrpcItemDelete(t *testing.T) {
 			},
 
 			expectStatus: codes.Internal,
+			expectCause:  errFoo,
 		},
 	}
 
@@ -128,6 +130,11 @@ func TestGrpcItemDelete(t *testing.T) {
 				"expected status code %s, got %s (%v)", testCase.expectStatus, resSt.Code(), err,
 			)
 			require.Equal(t, testCase.expect, res)
+
+			if testCase.expectCause != nil {
+				// The fault keeps its cause, which Sentry groups it by.
+				require.ErrorIs(t, err, testCase.expectCause)
+			}
 
 			service.AssertExpectations(t)
 		})
