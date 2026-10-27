@@ -211,12 +211,15 @@ Planned downtime (server images):
 | ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------- |
 | `DOWNTIME_START` | When a planned downtime starts, in RFC 3339. From then until it is removed, even past the announced end, the servers answer `503` / `UNAVAILABLE` except for ping and gRPC health, and start without the database. |         |
 
-Logs and tracing — OpenTelemetry supports a stdout and a Google Cloud exporter (all server images):
+Logs and tracing — OpenTelemetry exports to standard output, or over OTLP/HTTP once an endpoint is set (all server images):
 
 | Name                | Description                                                           | Default            |
 | ------------------- | --------------------------------------------------------------------- | ------------------ |
 | `OTEL`              | Enable OTel tracing; the variables below pick the exporter.           | `false`            |
-| `GCLOUD_PROJECT_ID` | Google Cloud project ID. When set, switches the OTel exporter to GCP. |                    |
+| `OTEL_EXPORTER_OTLP_ENDPOINT` | Base URL of the OTLP/HTTP backend. When set, traces and logs export there, and the servers write no request log. | |
+| `OTEL_EXPORTER_OTLP_HEADERS` | Headers each export sends, such as the backend's key. Inject it as a secret. | |
+| `OTEL_EXPORTER_OTLP_COMPRESSION` | `gzip` compresses each export. | |
+| `OTEL_SERVICE_NAME` | Service name every span and log record carries. | |
 | `APP_NAME`          | Application name attached to traces and logs.                         | `service-template` |
 
 Fault reporting — Sentry receives each server fault, tagged with its release (server images). Without `SENTRY_DSN`, the servers report nothing:
