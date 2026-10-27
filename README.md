@@ -213,14 +213,14 @@ Planned downtime (server images):
 
 Logs and tracing — OpenTelemetry exports to standard output, or over OTLP/HTTP once an endpoint is set (all server images):
 
-| Name                | Description                                                           | Default            |
-| ------------------- | --------------------------------------------------------------------- | ------------------ |
-| `OTEL`              | Enable OTel tracing; the variables below pick the exporter.           | `false`            |
-| `OTEL_EXPORTER_OTLP_ENDPOINT` | Base URL of the OTLP/HTTP backend. When set, traces and logs export there, and the servers write no request log. | |
-| `OTEL_EXPORTER_OTLP_HEADERS` | Headers each export sends, such as the backend's key. Inject it as a secret. | |
-| `OTEL_EXPORTER_OTLP_COMPRESSION` | `gzip` compresses each export. | |
-| `OTEL_SERVICE_NAME` | Service name every span and log record carries. | |
-| `APP_NAME`          | Application name attached to traces and logs.                         | `service-template` |
+| Name                             | Description                                                                                                      | Default            |
+| -------------------------------- | ---------------------------------------------------------------------------------------------------------------- | ------------------ |
+| `OTEL`                           | Enable OTel tracing; the variables below pick the exporter.                                                      | `false`            |
+| `OTEL_EXPORTER_OTLP_ENDPOINT`    | Base URL of the OTLP/HTTP backend. When set, traces and logs export there, and the servers write no request log. |                    |
+| `OTEL_EXPORTER_OTLP_HEADERS`     | Headers each export sends, such as the backend's key. Inject it as a secret.                                     |                    |
+| `OTEL_EXPORTER_OTLP_COMPRESSION` | `gzip` compresses each export.                                                                                   |                    |
+| `OTEL_SERVICE_NAME`              | Service name every span and log record carries.                                                                  |                    |
+| `APP_NAME`                       | Application name attached to traces and logs.                                                                    | `service-template` |
 
 Fault reporting — Sentry receives each server fault, tagged with its release (server images). Without `SENTRY_DSN`, the servers report nothing:
 
