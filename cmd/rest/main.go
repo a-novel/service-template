@@ -92,6 +92,9 @@ func main() {
 	// =================================================================================================================
 
 	router := httpf.NewRouter(cfg.Rest, cfg.Otel, cfg.RestLogger, cfg.App.DowntimeStart)
+	withServiceToken := handlers.RestServiceToken(
+		cfg.ServiceToken, httpf.NewPoolClient(httpf.PoolOptions{}), cfg.Logger, cfg.Rest.Liveness,
+	)
 
 	router.Route("/v0", func(api chi.Router) {
 		api.Get("/ping", handlerPing.ServeHTTP)
@@ -109,7 +112,7 @@ func main() {
 
 	log.Println("Starting REST server on :" + strconv.Itoa(cfg.Rest.Port))
 
-	lo.Must0(httpf.ListenAndServe(ctx, cfg.Rest, router))
+	lo.Must0(httpf.ListenAndServe(ctx, cfg.Rest, withServiceToken(router)))
 }
 
 func closeDatabase(database io.Closer) {
