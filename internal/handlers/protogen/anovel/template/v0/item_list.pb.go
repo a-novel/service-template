@@ -24,7 +24,7 @@ const (
 // ItemListRequest bounds the page of items to return.
 type ItemListRequest struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
-	// Maximum number of items to return, 100 at most. Zero or a negative value selects 20.
+	// Maximum number of items to return, from 1 to 100. Zero selects 20.
 	Limit int32 `protobuf:"varint,1,opt,name=limit,proto3" json:"limit,omitempty"`
 	// How many items, newest first, come before the page. Zero starts at the newest item.
 	Offset        int32 `protobuf:"varint,4,opt,name=offset,proto3" json:"offset,omitempty"`

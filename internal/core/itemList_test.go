@@ -97,9 +97,15 @@ func TestItemList(t *testing.T) {
 
 			request: &core.ItemListRequest{},
 
-			daoMock: &daoMock{req: &dao.ItemListRequest{Limit: core.ItemListDefaultSize}, resp: []*dao.ItemListRow{}},
+			daoMock: &daoMock{req: &dao.ItemListRequest{Limit: core.ItemListLimitDefault}, resp: []*dao.ItemListRow{}},
 
 			expect: &core.ItemPage{Items: []*core.Item{}},
+		},
+		{
+			name: "Error/NegativeLimit",
+
+			request:   &core.ItemListRequest{Limit: -1},
+			expectErr: core.ErrInvalidRequest,
 		},
 		{
 			name: "Error/LimitTooHigh",
