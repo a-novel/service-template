@@ -25,7 +25,7 @@ func TestGrpcItemList(t *testing.T) {
 
 	type serviceMock struct {
 		req  *core.ItemListRequest
-		resp []*core.Item
+		resp *core.ItemPage
 		err  error
 	}
 
@@ -44,25 +44,28 @@ func TestGrpcItemList(t *testing.T) {
 			name: "Success",
 
 			request: &templatev0.ItemListRequest{
-				Limit: 10,
-				After: "00000000-0000-0000-0000-000000000003",
+				Limit:  10,
+				Offset: 1,
 			},
 
 			serviceMock: &serviceMock{
-				req: &core.ItemListRequest{Limit: 10, After: uuid.MustParse("00000000-0000-0000-0000-000000000003")},
-				resp: []*core.Item{
-					{
-						ID:        uuid.MustParse("00000000-0000-0000-0000-000000000001"),
-						Name:      "item one",
-						CreatedAt: time.Date(2021, 1, 3, 0, 0, 0, 0, time.UTC),
-						UpdatedAt: time.Date(2021, 1, 3, 0, 0, 0, 0, time.UTC),
+				req: &core.ItemListRequest{Limit: 10, Offset: 1},
+				resp: &core.ItemPage{
+					Items: []*core.Item{
+						{
+							ID:        uuid.MustParse("00000000-0000-0000-0000-000000000001"),
+							Name:      "item one",
+							CreatedAt: time.Date(2021, 1, 3, 0, 0, 0, 0, time.UTC),
+							UpdatedAt: time.Date(2021, 1, 3, 0, 0, 0, 0, time.UTC),
+						},
+						{
+							ID:        uuid.MustParse("00000000-0000-0000-0000-000000000002"),
+							Name:      "item two",
+							CreatedAt: time.Date(2021, 1, 2, 0, 0, 0, 0, time.UTC),
+							UpdatedAt: time.Date(2021, 1, 2, 0, 0, 0, 0, time.UTC),
+						},
 					},
-					{
-						ID:        uuid.MustParse("00000000-0000-0000-0000-000000000002"),
-						Name:      "item two",
-						CreatedAt: time.Date(2021, 1, 2, 0, 0, 0, 0, time.UTC),
-						UpdatedAt: time.Date(2021, 1, 2, 0, 0, 0, 0, time.UTC),
-					},
+					Total: 3,
 				},
 			},
 
@@ -82,6 +85,7 @@ func TestGrpcItemList(t *testing.T) {
 						UpdatedAt: timestamppb.New(time.Date(2021, 1, 2, 0, 0, 0, 0, time.UTC)),
 					},
 				},
+				Total: 3,
 			},
 		},
 		{
@@ -94,15 +98,6 @@ func TestGrpcItemList(t *testing.T) {
 			serviceMock: &serviceMock{
 				req: &core.ItemListRequest{Limit: 101},
 				err: core.ErrInvalidRequest,
-			},
-
-			expectStatus: codes.InvalidArgument,
-		},
-		{
-			name: "Error/InvalidAfter",
-
-			request: &templatev0.ItemListRequest{
-				After: "not-a-uuid",
 			},
 
 			expectStatus: codes.InvalidArgument,

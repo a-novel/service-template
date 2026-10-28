@@ -45,7 +45,7 @@ func (service *ItemCreate) Exec(ctx context.Context, request *ItemCreateRequest)
 		return nil, otel.ReportError(span, errors.Join(err, ErrInvalidRequest))
 	}
 
-	// A UUIDv7 sorts by creation time, which lets ItemList page by ID.
+	// A UUIDv7 sorts by creation time, which lets ItemList order items newest first by ID.
 	id, err := uuid.NewV7()
 	if err != nil {
 		return nil, otel.ReportError(span, fmt.Errorf("generate item id: %w", err))

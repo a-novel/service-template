@@ -303,7 +303,7 @@ import { TemplateApi, itemCreate, itemList } from "@a-novel/service-template-res
 const api = new TemplateApi("http://service-template:8080");
 
 const created = await itemCreate(api, "My Item", "An optional description.");
-const items = await itemList(api, 10, 0);
+const { items, total } = await itemList(api, 10, 0);
 ```
 
 ## Running locally

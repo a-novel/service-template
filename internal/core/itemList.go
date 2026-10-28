@@ -5,7 +5,7 @@ import (
 	"errors"
 	"fmt"
 
-	"github.com/google/uuid"
+	"github.com/samber/lo"
 	"go.opentelemetry.io/otel/attribute"
 
 	"github.com/a-novel-kit/golib/otel"
@@ -15,7 +15,7 @@ import (
 
 // ItemListDao is the persistence dependency ItemList uses to read a page of items.
 type ItemListDao interface {
-	Exec(ctx context.Context, request *dao.ItemListRequest) ([]*dao.Item, error)
+	Exec(ctx context.Context, request *dao.ItemListRequest) ([]*dao.ItemListRow, error)
 }
 
 // ItemListDefaultSize is the page size of an [ItemListRequest] whose Limit is zero or negative.
@@ -25,12 +25,11 @@ const ItemListDefaultSize = 20
 type ItemListRequest struct {
 	// Limit caps the page at 100 items. It defaults to [ItemListDefaultSize] when zero or negative.
 	Limit int `validate:"max=100"`
-	// After is the ID of the last item of the previous page. The page starts with the next older
-	// item, or with the newest one when After is uuid.Nil.
-	After uuid.UUID
+	// Offset is how many items, newest first, come before the page.
+	Offset int `validate:"min=0"`
 }
 
-// ItemList retrieves a paginated list of items.
+// ItemList reads the items page by page, newest first. Each page carries the total.
 type ItemList struct {
 	dao ItemListDao
 }
@@ -39,7 +38,7 @@ func NewItemList(dao ItemListDao) *ItemList {
 	return &ItemList{dao: dao}
 }
 
-func (service *ItemList) Exec(ctx context.Context, request *ItemListRequest) ([]*Item, error) {
+func (service *ItemList) Exec(ctx context.Context, request *ItemListRequest) (*ItemPage, error) {
 	ctx, span := otel.Tracer().Start(ctx, "core.ItemList")
 	defer span.End()
 
@@ -49,15 +48,9 @@ func (service *ItemList) Exec(ctx context.Context, request *ItemListRequest) ([]
 		limit = ItemListDefaultSize
 	}
 
-	// Item IDs are UUIDv7, so uuid.Max sorts after every item.
-	after := request.After
-	if after == uuid.Nil {
-		after = uuid.Max
-	}
-
 	span.SetAttributes(
 		attribute.Int("item.limit", limit),
-		attribute.String("item.after", request.After.String()),
+		attribute.Int("item.offset", request.Offset),
 	)
 
 	err := validate.Struct(request)
@@ -66,19 +59,23 @@ func (service *ItemList) Exec(ctx context.Context, request *ItemListRequest) ([]
 	}
 
 	daoRequest := &dao.ItemListRequest{
-		Limit: limit,
-		After: after,
+		Limit:  limit,
+		Offset: request.Offset,
 	}
 
-	entities, err := service.dao.Exec(ctx, daoRequest)
+	rows, err := service.dao.Exec(ctx, daoRequest)
 	if err != nil {
 		return nil, otel.ReportError(span, fmt.Errorf("list items: %w", err))
 	}
 
-	items := make([]*Item, len(entities))
-	for i, entity := range entities {
-		items[i] = newItem(entity)
+	page := &ItemPage{
+		Items: lo.Map(rows, func(row *dao.ItemListRow, _ int) *Item { return newItem(&row.Item) }),
 	}
 
-	return items, nil
+	// Every row carries the total, and a page past the end carries none.
+	if len(rows) > 0 {
+		page.Total = rows[0].Total
+	}
+
+	return page, nil
 }

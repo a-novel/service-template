@@ -62,8 +62,8 @@ describe("itemList", () => {
   it("lists a created item", async () => {
     const created = await itemCreate(api, "item to list");
 
-    const items = await itemList(api);
-    expect(items.map((item) => item.id)).toContain(created.id);
+    const page = await itemList(api);
+    expect(page.items.map((item) => item.id)).toContain(created.id);
 
     await itemDelete(api, created.id);
   });
@@ -71,21 +71,38 @@ describe("itemList", () => {
   it("returns at most limit items", async () => {
     const created = await itemCreate(api, "item to page");
 
-    const items = await itemList(api, 1);
-    expect(items).toHaveLength(1);
+    const page = await itemList(api, 1);
+    expect(page.items).toHaveLength(1);
 
     await itemDelete(api, created.id);
   });
 
-  it("continues after the given item", async () => {
+  it("pages newest first by offset, with the total", async () => {
     const older = await itemCreate(api, "older item");
     const newer = await itemCreate(api, "newer item");
 
-    const items = await itemList(api, 1, newer.id);
-    expect(items.map((item) => item.id)).toEqual([older.id]);
+    const first = await itemList(api, 1);
+    expect(first.items.map((item) => item.id)).toEqual([newer.id]);
+    expect(first.total).toBeGreaterThanOrEqual(2);
+
+    const next = await itemList(api, 1, 1);
+    expect(next.items.map((item) => item.id)).toEqual([older.id]);
 
     await itemDelete(api, newer.id);
     await itemDelete(api, older.id);
+  });
+
+  it("returns an empty page past the end", async () => {
+    const created = await itemCreate(api, "item to page past");
+
+    const { total } = await itemList(api, 1);
+    expect(await itemList(api, 1, total)).toEqual({ items: [], total: 0 });
+
+    await itemDelete(api, created.id);
+  });
+
+  it("returns 400 for a negative offset", async () => {
+    await expectStatus(itemList(api, 1, -1), 400);
   });
 });
 

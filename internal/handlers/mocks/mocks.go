@@ -360,23 +360,23 @@ func (_m *MockGrpcItemListService) EXPECT() *MockGrpcItemListService_Expecter {
 }
 
 // Exec provides a mock function for the type MockGrpcItemListService
-func (_mock *MockGrpcItemListService) Exec(ctx context.Context, request *core.ItemListRequest) ([]*core.Item, error) {
+func (_mock *MockGrpcItemListService) Exec(ctx context.Context, request *core.ItemListRequest) (*core.ItemPage, error) {
 	ret := _mock.Called(ctx, request)
 
 	if len(ret) == 0 {
 		panic("no return value specified for Exec")
 	}
 
-	var r0 []*core.Item
+	var r0 *core.ItemPage
 	var r1 error
-	if returnFunc, ok := ret.Get(0).(func(context.Context, *core.ItemListRequest) ([]*core.Item, error)); ok {
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *core.ItemListRequest) (*core.ItemPage, error)); ok {
 		return returnFunc(ctx, request)
 	}
-	if returnFunc, ok := ret.Get(0).(func(context.Context, *core.ItemListRequest) []*core.Item); ok {
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *core.ItemListRequest) *core.ItemPage); ok {
 		r0 = returnFunc(ctx, request)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).([]*core.Item)
+			r0 = ret.Get(0).(*core.ItemPage)
 		}
 	}
 	if returnFunc, ok := ret.Get(1).(func(context.Context, *core.ItemListRequest) error); ok {
@@ -417,12 +417,12 @@ func (_c *MockGrpcItemListService_Exec_Call) Run(run func(ctx context.Context, r
 	return _c
 }
 
-func (_c *MockGrpcItemListService_Exec_Call) Return(items []*core.Item, err error) *MockGrpcItemListService_Exec_Call {
-	_c.Call.Return(items, err)
+func (_c *MockGrpcItemListService_Exec_Call) Return(itemPage *core.ItemPage, err error) *MockGrpcItemListService_Exec_Call {
+	_c.Call.Return(itemPage, err)
 	return _c
 }
 
-func (_c *MockGrpcItemListService_Exec_Call) RunAndReturn(run func(ctx context.Context, request *core.ItemListRequest) ([]*core.Item, error)) *MockGrpcItemListService_Exec_Call {
+func (_c *MockGrpcItemListService_Exec_Call) RunAndReturn(run func(ctx context.Context, request *core.ItemListRequest) (*core.ItemPage, error)) *MockGrpcItemListService_Exec_Call {
 	_c.Call.Return(run)
 	return _c
 }
@@ -880,23 +880,23 @@ func (_m *MockRestItemListService) EXPECT() *MockRestItemListService_Expecter {
 }
 
 // Exec provides a mock function for the type MockRestItemListService
-func (_mock *MockRestItemListService) Exec(ctx context.Context, request *core.ItemListRequest) ([]*core.Item, error) {
+func (_mock *MockRestItemListService) Exec(ctx context.Context, request *core.ItemListRequest) (*core.ItemPage, error) {
 	ret := _mock.Called(ctx, request)
 
 	if len(ret) == 0 {
 		panic("no return value specified for Exec")
 	}
 
-	var r0 []*core.Item
+	var r0 *core.ItemPage
 	var r1 error
-	if returnFunc, ok := ret.Get(0).(func(context.Context, *core.ItemListRequest) ([]*core.Item, error)); ok {
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *core.ItemListRequest) (*core.ItemPage, error)); ok {
 		return returnFunc(ctx, request)
 	}
-	if returnFunc, ok := ret.Get(0).(func(context.Context, *core.ItemListRequest) []*core.Item); ok {
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *core.ItemListRequest) *core.ItemPage); ok {
 		r0 = returnFunc(ctx, request)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).([]*core.Item)
+			r0 = ret.Get(0).(*core.ItemPage)
 		}
 	}
 	if returnFunc, ok := ret.Get(1).(func(context.Context, *core.ItemListRequest) error); ok {
@@ -937,12 +937,12 @@ func (_c *MockRestItemListService_Exec_Call) Run(run func(ctx context.Context, r
 	return _c
 }
 
-func (_c *MockRestItemListService_Exec_Call) Return(items []*core.Item, err error) *MockRestItemListService_Exec_Call {
-	_c.Call.Return(items, err)
+func (_c *MockRestItemListService_Exec_Call) Return(itemPage *core.ItemPage, err error) *MockRestItemListService_Exec_Call {
+	_c.Call.Return(itemPage, err)
 	return _c
 }
 
-func (_c *MockRestItemListService_Exec_Call) RunAndReturn(run func(ctx context.Context, request *core.ItemListRequest) ([]*core.Item, error)) *MockRestItemListService_Exec_Call {
+func (_c *MockRestItemListService_Exec_Call) RunAndReturn(run func(ctx context.Context, request *core.ItemListRequest) (*core.ItemPage, error)) *MockRestItemListService_Exec_Call {
 	_c.Call.Return(run)
 	return _c
 }

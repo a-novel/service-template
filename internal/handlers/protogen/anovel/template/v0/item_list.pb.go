@@ -26,9 +26,8 @@ type ItemListRequest struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// Maximum number of items to return, 100 at most. Zero or a negative value selects 20.
 	Limit int32 `protobuf:"varint,1,opt,name=limit,proto3" json:"limit,omitempty"`
-	// ID of the last item of the previous page. The page starts with the next older item. Empty
-	// starts at the newest item.
-	After         string `protobuf:"bytes,3,opt,name=after,proto3" json:"after,omitempty"`
+	// How many items, newest first, come before the page. Zero starts at the newest item.
+	Offset        int32 `protobuf:"varint,4,opt,name=offset,proto3" json:"offset,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -70,18 +69,21 @@ func (x *ItemListRequest) GetLimit() int32 {
 	return 0
 }
 
-func (x *ItemListRequest) GetAfter() string {
+func (x *ItemListRequest) GetOffset() int32 {
 	if x != nil {
-		return x.After
+		return x.Offset
 	}
-	return ""
+	return 0
 }
 
-// ItemListResponse returns the requested page of items, empty when none match.
+// ItemListResponse returns the requested page of items, empty past the end.
 type ItemListResponse struct {
 	state protoimpl.MessageState `protogen:"open.v1"`
 	// The items of the page.
-	Items         []*Item `protobuf:"bytes,1,rep,name=items,proto3" json:"items,omitempty"`
+	Items []*Item `protobuf:"bytes,1,rep,name=items,proto3" json:"items,omitempty"`
+	// How many items exist in all, so a client paging through them knows when it holds them all. A
+	// page past the end reports 0.
+	Total         int64 `protobuf:"varint,2,opt,name=total,proto3" json:"total,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -123,16 +125,24 @@ func (x *ItemListResponse) GetItems() []*Item {
 	return nil
 }
 
+func (x *ItemListResponse) GetTotal() int64 {
+	if x != nil {
+		return x.Total
+	}
+	return 0
+}
+
 var File_anovel_template_v0_item_list_proto protoreflect.FileDescriptor
 
 const file_anovel_template_v0_item_list_proto_rawDesc = "" +
 	"\n" +
-	"\"anovel/template/v0/item_list.proto\x12\x12anovel.template.v0\x1a\x1danovel/template/v0/item.proto\"K\n" +
+	"\"anovel/template/v0/item_list.proto\x12\x12anovel.template.v0\x1a\x1danovel/template/v0/item.proto\"R\n" +
 	"\x0fItemListRequest\x12\x14\n" +
-	"\x05limit\x18\x01 \x01(\x05R\x05limit\x12\x14\n" +
-	"\x05after\x18\x03 \x01(\tR\x05afterJ\x04\b\x02\x10\x03R\x06offset\"B\n" +
+	"\x05limit\x18\x01 \x01(\x05R\x05limit\x12\x16\n" +
+	"\x06offset\x18\x04 \x01(\x05R\x06offsetJ\x04\b\x02\x10\x03J\x04\b\x03\x10\x04R\x05after\"X\n" +
 	"\x10ItemListResponse\x12.\n" +
-	"\x05items\x18\x01 \x03(\v2\x18.anovel.template.v0.ItemR\x05items2h\n" +
+	"\x05items\x18\x01 \x03(\v2\x18.anovel.template.v0.ItemR\x05items\x12\x14\n" +
+	"\x05total\x18\x02 \x01(\x03R\x05total2h\n" +
 	"\x0fItemListService\x12U\n" +
 	"\bItemList\x12#.anovel.template.v0.ItemListRequest\x1a$.anovel.template.v0.ItemListResponseB\xe4\x01\n" +
 	"\x16com.anovel.template.v0B\rItemListProtoP\x01ZQgithub.com/a-novel/service-template/internal/handlers/protogen/anovel/template/v0\xa2\x02\x03ATV\xaa\x02\x12Anovel.Template.V0\xca\x02\x12Anovel\\Template\\V0\xe2\x02\x1eAnovel\\Template\\V0\\GPBMetadata\xea\x02\x14Anovel::Template::V0b\x06proto3"
