@@ -18,13 +18,13 @@ type ItemListDao interface {
 	Exec(ctx context.Context, request *dao.ItemListRequest) ([]*dao.ItemListRow, error)
 }
 
-// ItemListDefaultSize is the page size of an [ItemListRequest] whose Limit is zero or negative.
-const ItemListDefaultSize = 20
+// ItemListLimitDefault is the page size of an [ItemListRequest] whose Limit is zero.
+const ItemListLimitDefault = 20
 
 // ItemListRequest selects a page of items.
 type ItemListRequest struct {
-	// Limit caps the page at 100 items. It defaults to [ItemListDefaultSize] when zero or negative.
-	Limit int `validate:"max=100"`
+	// Limit caps the page at 100 items. It defaults to [ItemListLimitDefault] when zero.
+	Limit int `validate:"min=0,max=100"`
 	// Offset is how many items, newest first, come before the page.
 	Offset int `validate:"min=0"`
 }
@@ -42,14 +42,8 @@ func (service *ItemList) Exec(ctx context.Context, request *ItemListRequest) (*I
 	ctx, span := otel.Tracer().Start(ctx, "core.ItemList")
 	defer span.End()
 
-	// Resolved locally so the caller's request stays untouched.
-	limit := request.Limit
-	if limit <= 0 {
-		limit = ItemListDefaultSize
-	}
-
 	span.SetAttributes(
-		attribute.Int("item.limit", limit),
+		attribute.Int("item.limit", request.Limit),
 		attribute.Int("item.offset", request.Offset),
 	)
 
@@ -58,8 +52,12 @@ func (service *ItemList) Exec(ctx context.Context, request *ItemListRequest) (*I
 		return nil, otel.ReportError(span, errors.Join(err, ErrInvalidRequest))
 	}
 
+	if request.Limit == 0 {
+		request.Limit = ItemListLimitDefault
+	}
+
 	daoRequest := &dao.ItemListRequest{
-		Limit:  limit,
+		Limit:  request.Limit,
 		Offset: request.Offset,
 	}
 

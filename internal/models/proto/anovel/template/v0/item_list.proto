@@ -7,7 +7,7 @@ import "anovel/template/v0/item.proto";
 // ItemListService returns a page of items.
 service ItemListService {
   // Returns a page of items, newest first, with their total. Returns INVALID_ARGUMENT for a limit
-  // above 100 or a negative offset.
+  // below 0 or above 100, or a negative offset.
   rpc ItemList(ItemListRequest) returns (ItemListResponse);
 }
 
@@ -16,7 +16,7 @@ message ItemListRequest {
   reserved 2, 3;
   reserved "after";
 
-  // Maximum number of items to return, 100 at most. Zero or a negative value selects 20.
+  // Maximum number of items to return, from 1 to 100. Zero selects 20.
   int32 limit = 1;
   // How many items, newest first, come before the page. Zero starts at the newest item.
   int32 offset = 4;
