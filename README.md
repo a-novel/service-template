@@ -73,8 +73,8 @@ The service stores `item` records, each a name with an optional description, beh
 
 The service ships two APIs:
 
-- A **private gRPC API** (`cmd/grpc`), for traffic between services on a private network. It authenticates no caller: network policy, ingress or a service mesh controls access.
-- A **public REST API** (`cmd/rest`), for any HTTP client.
+- A **private gRPC API** (`cmd/grpc`), for traffic between services on a private network. Once service tokens are configured, it admits only the callers they allow. Otherwise network policy, ingress or a service mesh controls access.
+- A **public REST API** (`cmd/rest`), for any HTTP client, unless service tokens restrict it too.
 
 ## Deploying
 
@@ -169,7 +169,7 @@ Every variable is read from the process environment. `SERVICE_TEMPLATE_ENV_PREFI
 | `POSTGRES_DSN`         | Connection-URL fallback, read only when `POSTGRES_HOST` is empty.                                                             | all    |
 
 <details>
-<summary>Optional configuration (server tuning, OpenTelemetry, Sentry)</summary>
+<summary>Optional configuration (server tuning, service tokens, OpenTelemetry, Sentry)</summary>
 
 gRPC tuning (images `grpc`, `standalone-grpc`):
 
@@ -210,6 +210,14 @@ Planned downtime (server images):
 | Name             | Description                                                                                                                                                                                                        | Default |
 | ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------- |
 | `DOWNTIME_START` | When a planned downtime starts, in RFC 3339. From then until it is removed, even past the announced end, the servers answer `503` / `UNAVAILABLE` except for ping and gRPC health, and start without the database. |         |
+
+Service tokens (server images). Without `SERVICE_TOKEN_ISSUER`, the servers take every call. With it, they refuse a call unless its `X-Service-Authorization` header carries a token from an allowed caller. The REST ping and the gRPC health service stay open for probes:
+
+| Name                     | Description                                                                                                                                                                                                                                                                  | Default |
+| ------------------------ | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------- |
+| `SERVICE_TOKEN_ISSUER`   | Issuer of the service tokens the servers accept, such as a GKE cluster's `https://container.googleapis.com/v1/projects/<project>/locations/<location>/clusters/<cluster>`. The servers read its keys through its OpenID discovery document, so they need egress to its host. |         |
+| `SERVICE_TOKEN_AUDIENCE` | Audience the servers answer to. Each caller's projected token names it.                                                                                                                                                                                                      |         |
+| `SERVICE_TOKEN_CALLERS`  | Service accounts allowed to call, comma-separated, each as `system:serviceaccount:<namespace>:<name>`.                                                                                                                                                                       |         |
 
 Logs and tracing — OpenTelemetry exports to standard output, or over OTLP/HTTP once an endpoint is set (all server images):
 
@@ -261,8 +269,9 @@ import (
 func main() {
 	ctx := context.Background()
 
-	// In production, swap insecure.NewCredentials() for a TLS or mTLS credential. The server
-	// authenticates no caller, so transport security alone protects it on the network.
+	// In production, pass the options of golib's grpcf.ServiceTokenCredentialsProvider when the
+	// server verifies service tokens. Otherwise swap insecure.NewCredentials() for a TLS or mTLS
+	// credential: transport security alone then protects the server on the network.
 	client, err := servicetemplate.NewClient(
 		"service-template:8080",
 		grpc.WithTransportCredentials(insecure.NewCredentials()),
