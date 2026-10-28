@@ -30,14 +30,14 @@ git grep -lz service-template | xargs -0 perl -pi -e "s/service-template/$SERVIC
 
 The replace covers the module path and import paths, image names and references, badges and links, and both `package.json` files. Rename by hand what it leaves, where `git grep` finds every use:
 
-| What                | Where                                            | From → to                                                                               |
-| ------------------- | ------------------------------------------------ | --------------------------------------------------------------------------------------- |
-| Go package          | `generate.go`, `pkg/go/`                         | `servicetemplate` → `service<name>`                                                     |
-| Env-var prefix      | `internal/config/env/env.go`                     | `SERVICE_TEMPLATE_ENV_PREFIX` → `SERVICE_<NAME>_ENV_PREFIX`                             |
-| Protobuf package    | `internal/models/proto/anovel/template/v0`       | `anovel.template.v0` → `anovel.<name>.v0`, with its folder and the `templatev0` imports |
-| JS client class     | `pkg/js/rest/src/`                               | `TemplateApi` → `<Name>Api`                                                             |
-| Display name        | `openapi.yaml`, `openapi.html`, both `README.md` | `Service Template` → your service's title                                               |
-| Local compose names | `builds/*.yaml`                                  | `template` → `<name>` in container, network and volume names                            |
+| What                | Where                                                                           | From → to                                                                               |
+| ------------------- | ------------------------------------------------------------------------------- | --------------------------------------------------------------------------------------- |
+| Go package          | `generate.go`, `pkg/go/`                                                        | `servicetemplate` → `service<name>`                                                     |
+| Env-var prefix      | `internal/config/env/env.go`                                                    | `SERVICE_TEMPLATE_ENV_PREFIX` → `SERVICE_<NAME>_ENV_PREFIX`                             |
+| Protobuf package    | `internal/models/proto/anovel/template/v0`                                      | `anovel.template.v0` → `anovel.<name>.v0`, with its folder and the `templatev0` imports |
+| JS client class     | `pkg/js/rest/src/`                                                              | `TemplateApi` → `<Name>Api`                                                             |
+| Display name        | `openapi.yaml`, `openapi.html`, `.github/workflows/main.yaml`, both `README.md` | `Service Template` → your service's title                                               |
+| Local compose names | `builds/*.yaml`                                                                 | `template` → `<name>` in container, network and volume names                            |
 
 **2. Replace the `item` resource.** Swap `item` and `Item` for your own resource in each layer, then adjust the fields.
 
