@@ -360,23 +360,23 @@ func (_m *MockItemListDao) EXPECT() *MockItemListDao_Expecter {
 }
 
 // Exec provides a mock function for the type MockItemListDao
-func (_mock *MockItemListDao) Exec(ctx context.Context, request *dao.ItemListRequest) ([]*dao.Item, error) {
+func (_mock *MockItemListDao) Exec(ctx context.Context, request *dao.ItemListRequest) ([]*dao.ItemListRow, error) {
 	ret := _mock.Called(ctx, request)
 
 	if len(ret) == 0 {
 		panic("no return value specified for Exec")
 	}
 
-	var r0 []*dao.Item
+	var r0 []*dao.ItemListRow
 	var r1 error
-	if returnFunc, ok := ret.Get(0).(func(context.Context, *dao.ItemListRequest) ([]*dao.Item, error)); ok {
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *dao.ItemListRequest) ([]*dao.ItemListRow, error)); ok {
 		return returnFunc(ctx, request)
 	}
-	if returnFunc, ok := ret.Get(0).(func(context.Context, *dao.ItemListRequest) []*dao.Item); ok {
+	if returnFunc, ok := ret.Get(0).(func(context.Context, *dao.ItemListRequest) []*dao.ItemListRow); ok {
 		r0 = returnFunc(ctx, request)
 	} else {
 		if ret.Get(0) != nil {
-			r0 = ret.Get(0).([]*dao.Item)
+			r0 = ret.Get(0).([]*dao.ItemListRow)
 		}
 	}
 	if returnFunc, ok := ret.Get(1).(func(context.Context, *dao.ItemListRequest) error); ok {
@@ -417,12 +417,12 @@ func (_c *MockItemListDao_Exec_Call) Run(run func(ctx context.Context, request *
 	return _c
 }
 
-func (_c *MockItemListDao_Exec_Call) Return(items []*dao.Item, err error) *MockItemListDao_Exec_Call {
-	_c.Call.Return(items, err)
+func (_c *MockItemListDao_Exec_Call) Return(itemListRows []*dao.ItemListRow, err error) *MockItemListDao_Exec_Call {
+	_c.Call.Return(itemListRows, err)
 	return _c
 }
 
-func (_c *MockItemListDao_Exec_Call) RunAndReturn(run func(ctx context.Context, request *dao.ItemListRequest) ([]*dao.Item, error)) *MockItemListDao_Exec_Call {
+func (_c *MockItemListDao_Exec_Call) RunAndReturn(run func(ctx context.Context, request *dao.ItemListRequest) ([]*dao.ItemListRow, error)) *MockItemListDao_Exec_Call {
 	_c.Call.Return(run)
 	return _c
 }

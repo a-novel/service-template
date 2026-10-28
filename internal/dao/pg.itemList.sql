@@ -1,12 +1,12 @@
--- Item IDs are UUIDv7, which sort by creation time, so the primary key serves this order. A page
--- starts after the last ID of the previous one, and a deleted ID still marks its place.
+-- Item IDs are UUIDv7, which sort by creation time, so the primary key serves this order.
 SELECT
-  *
+  *,
+  count(*) OVER () AS total
 FROM
   items
-WHERE
-  id < ?1
 ORDER BY
   id DESC
 LIMIT
-  ?0;
+  ?0
+OFFSET
+  ?1;

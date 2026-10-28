@@ -17,7 +17,7 @@ import (
 
 // GrpcItemListService is the core operation [GrpcItemList] delegates to.
 type GrpcItemListService interface {
-	Exec(ctx context.Context, request *core.ItemListRequest) ([]*core.Item, error)
+	Exec(ctx context.Context, request *core.ItemListRequest) (*core.ItemPage, error)
 }
 
 // GrpcItemList is the gRPC handler for the ItemList RPC.
@@ -31,24 +31,19 @@ func NewGrpcItemList(service GrpcItemListService) *GrpcItemList {
 	return &GrpcItemList{service: service}
 }
 
-// ItemList returns a page of items, newest first.
+// ItemList returns a page of items, newest first, with their total.
 func (handler *GrpcItemList) ItemList(
 	ctx context.Context, request *templatev0.ItemListRequest,
 ) (*templatev0.ItemListResponse, error) {
 	ctx, span := otel.Tracer().Start(ctx, "grpc.ItemList")
 	defer span.End()
 
-	after, err := parseOptionalItemID(request.GetAfter())
-	if err != nil {
-		return nil, status.Error(codes.InvalidArgument, "invalid item id")
-	}
-
 	serviceRequest := &core.ItemListRequest{
-		Limit: int(request.GetLimit()),
-		After: after,
+		Limit:  int(request.GetLimit()),
+		Offset: int(request.GetOffset()),
 	}
 
-	items, err := handler.service.Exec(ctx, serviceRequest)
+	page, err := handler.service.Exec(ctx, serviceRequest)
 	if errors.Is(err, core.ErrInvalidRequest) {
 		return nil, status.Error(codes.InvalidArgument, "invalid request")
 	}
@@ -58,6 +53,7 @@ func (handler *GrpcItemList) ItemList(
 	}
 
 	return &templatev0.ItemListResponse{
-		Items: lo.Map(items, func(item *core.Item, _ int) *templatev0.Item { return itemToProto(item) }),
+		Items: lo.Map(page.Items, func(item *core.Item, _ int) *templatev0.Item { return itemToProto(item) }),
+		Total: int64(page.Total),
 	}, nil
 }

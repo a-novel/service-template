@@ -21,7 +21,7 @@ func TestItemList(t *testing.T) {
 
 	type daoMock struct {
 		req  *dao.ItemListRequest
-		resp []*dao.Item
+		resp []*dao.ItemListRow
 		err  error
 	}
 
@@ -32,17 +32,40 @@ func TestItemList(t *testing.T) {
 
 		daoMock *daoMock
 
-		expect    []*core.Item
+		expect    *core.ItemPage
 		expectErr error
 	}{
 		{
 			name: "Success",
 
-			request: &core.ItemListRequest{Limit: 10, After: uuid.MustParse("00000000-0000-0000-0000-000000000004")},
+			request: &core.ItemListRequest{Limit: 10, Offset: 2},
 
 			daoMock: &daoMock{
-				req: &dao.ItemListRequest{Limit: 10, After: uuid.MustParse("00000000-0000-0000-0000-000000000004")},
-				resp: []*dao.Item{
+				req: &dao.ItemListRequest{Limit: 10, Offset: 2},
+				resp: []*dao.ItemListRow{
+					{
+						Item: dao.Item{
+							ID:        uuid.MustParse("00000000-0000-0000-0000-000000000003"),
+							Name:      "item three",
+							CreatedAt: time.Date(2021, 1, 3, 0, 0, 0, 0, time.UTC),
+							UpdatedAt: time.Date(2021, 1, 3, 0, 0, 0, 0, time.UTC),
+						},
+						Total: 4,
+					},
+					{
+						Item: dao.Item{
+							ID:        uuid.MustParse("00000000-0000-0000-0000-000000000001"),
+							Name:      "item one",
+							CreatedAt: time.Date(2021, 1, 1, 0, 0, 0, 0, time.UTC),
+							UpdatedAt: time.Date(2021, 1, 1, 0, 0, 0, 0, time.UTC),
+						},
+						Total: 4,
+					},
+				},
+			},
+
+			expect: &core.ItemPage{
+				Items: []*core.Item{
 					{
 						ID:        uuid.MustParse("00000000-0000-0000-0000-000000000003"),
 						Name:      "item three",
@@ -56,40 +79,27 @@ func TestItemList(t *testing.T) {
 						UpdatedAt: time.Date(2021, 1, 1, 0, 0, 0, 0, time.UTC),
 					},
 				},
-			},
-
-			expect: []*core.Item{
-				{
-					ID:        uuid.MustParse("00000000-0000-0000-0000-000000000003"),
-					Name:      "item three",
-					CreatedAt: time.Date(2021, 1, 3, 0, 0, 0, 0, time.UTC),
-					UpdatedAt: time.Date(2021, 1, 3, 0, 0, 0, 0, time.UTC),
-				},
-				{
-					ID:        uuid.MustParse("00000000-0000-0000-0000-000000000001"),
-					Name:      "item one",
-					CreatedAt: time.Date(2021, 1, 1, 0, 0, 0, 0, time.UTC),
-					UpdatedAt: time.Date(2021, 1, 1, 0, 0, 0, 0, time.UTC),
-				},
+				Total: 4,
 			},
 		},
 		{
+			// A page past the end has no row to carry the total.
 			name: "Success/Empty",
 
-			request: &core.ItemListRequest{Limit: 10},
+			request: &core.ItemListRequest{Limit: 10, Offset: 50},
 
-			daoMock: &daoMock{req: &dao.ItemListRequest{Limit: 10, After: uuid.Max}, resp: []*dao.Item{}},
+			daoMock: &daoMock{req: &dao.ItemListRequest{Limit: 10, Offset: 50}, resp: []*dao.ItemListRow{}},
 
-			expect: []*core.Item{},
+			expect: &core.ItemPage{Items: []*core.Item{}},
 		},
 		{
 			name: "Success/LimitDefaulted",
 
 			request: &core.ItemListRequest{},
 
-			daoMock: &daoMock{req: &dao.ItemListRequest{Limit: core.ItemListDefaultSize, After: uuid.Max}, resp: []*dao.Item{}},
+			daoMock: &daoMock{req: &dao.ItemListRequest{Limit: core.ItemListDefaultSize}, resp: []*dao.ItemListRow{}},
 
-			expect: []*core.Item{},
+			expect: &core.ItemPage{Items: []*core.Item{}},
 		},
 		{
 			name: "Error/LimitTooHigh",
@@ -98,11 +108,17 @@ func TestItemList(t *testing.T) {
 			expectErr: core.ErrInvalidRequest,
 		},
 		{
+			name: "Error/NegativeOffset",
+
+			request:   &core.ItemListRequest{Offset: -1},
+			expectErr: core.ErrInvalidRequest,
+		},
+		{
 			name: "Error/Dao",
 
 			request: &core.ItemListRequest{Limit: 10},
 
-			daoMock:   &daoMock{req: &dao.ItemListRequest{Limit: 10, After: uuid.Max}, err: errFoo},
+			daoMock:   &daoMock{req: &dao.ItemListRequest{Limit: 10}, err: errFoo},
 			expectErr: errFoo,
 		},
 	}

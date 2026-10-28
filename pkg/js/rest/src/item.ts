@@ -16,6 +16,15 @@ export const ItemSchema = z.object({
 /** An Item resource held by the template service. */
 export type Item = z.infer<typeof ItemSchema>;
 
+/** A page of Items, newest first, with how many exist in all. */
+export const ItemPageSchema = z.object({
+  items: z.array(ItemSchema),
+  total: z.int(),
+});
+
+/** The value {@link ItemPageSchema} validates. */
+export type ItemPage = z.infer<typeof ItemPageSchema>;
+
 /** Creates a new Item and returns the stored record. */
 export async function itemCreate(api: TemplateApi, name: string, description?: string): Promise<Item> {
   return await api.fetch("/v0/items", ItemSchema, {
@@ -32,13 +41,13 @@ export async function itemGet(api: TemplateApi, id: string): Promise<Item> {
 }
 
 /**
- * Lists Items newest first, 100 at most when limit is omitted. Pass the id of the last Item received
- * as after to read the next page.
+ * Lists a page of Items newest first, with their total, 100 at most when limit is omitted. Raise offset
+ * by the page size to read the next page.
  */
-export async function itemList(api: TemplateApi, limit?: number, after?: string): Promise<Item[]> {
+export async function itemList(api: TemplateApi, limit?: number, offset?: number): Promise<ItemPage> {
   const params = new URLSearchParams({ limit: `${limit || 100}` });
-  if (after) params.set("after", after);
-  return await api.fetch(`/v0/items?${params.toString()}`, z.array(ItemSchema), {
+  if (offset) params.set("offset", `${offset}`);
+  return await api.fetch(`/v0/items?${params.toString()}`, ItemPageSchema, {
     method: "GET",
     headers: HTTP_HEADERS.JSON,
   });

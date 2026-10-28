@@ -19,180 +19,68 @@ import (
 func TestPgItemList(t *testing.T) {
 	t.Parallel()
 
+	one := dao.Item{
+		ID:        uuid.MustParse("00000000-0000-0000-0000-000000000001"),
+		Name:      "item one",
+		CreatedAt: time.Date(2021, 1, 1, 0, 0, 0, 0, time.UTC),
+		UpdatedAt: time.Date(2021, 1, 1, 0, 0, 0, 0, time.UTC),
+	}
+	two := dao.Item{
+		ID:        uuid.MustParse("00000000-0000-0000-0000-000000000002"),
+		Name:      "item two",
+		CreatedAt: time.Date(2021, 1, 2, 0, 0, 0, 0, time.UTC),
+		UpdatedAt: time.Date(2021, 1, 2, 0, 0, 0, 0, time.UTC),
+	}
+	three := dao.Item{
+		ID:        uuid.MustParse("00000000-0000-0000-0000-000000000003"),
+		Name:      "item three",
+		CreatedAt: time.Date(2021, 1, 3, 0, 0, 0, 0, time.UTC),
+		UpdatedAt: time.Date(2021, 1, 3, 0, 0, 0, 0, time.UTC),
+	}
+
+	row := func(item dao.Item) *dao.ItemListRow {
+		return &dao.ItemListRow{Item: item, Total: 3}
+	}
+
 	testCases := []struct {
 		name string
 
-		fixtures []*dao.Item
+		fixtures []dao.Item
 
 		request *dao.ItemListRequest
 
-		expect    []*dao.Item
+		expect    []*dao.ItemListRow
 		expectErr error
 	}{
 		{
 			name: "Success",
 
-			fixtures: []*dao.Item{
-				{
-					ID:        uuid.MustParse("00000000-0000-0000-0000-000000000001"),
-					Name:      "item one",
-					CreatedAt: time.Date(2021, 1, 1, 0, 0, 0, 0, time.UTC),
-					UpdatedAt: time.Date(2021, 1, 1, 0, 0, 0, 0, time.UTC),
-				},
-				{
-					ID:        uuid.MustParse("00000000-0000-0000-0000-000000000002"),
-					Name:      "item two",
-					CreatedAt: time.Date(2021, 1, 2, 0, 0, 0, 0, time.UTC),
-					UpdatedAt: time.Date(2021, 1, 2, 0, 0, 0, 0, time.UTC),
-				},
-				{
-					ID:        uuid.MustParse("00000000-0000-0000-0000-000000000003"),
-					Name:      "item three",
-					CreatedAt: time.Date(2021, 1, 3, 0, 0, 0, 0, time.UTC),
-					UpdatedAt: time.Date(2021, 1, 3, 0, 0, 0, 0, time.UTC),
-				},
-			},
+			fixtures: []dao.Item{one, two, three},
 
-			request: &dao.ItemListRequest{Limit: 10, After: uuid.Max},
+			request: &dao.ItemListRequest{Limit: 10},
 
-			expect: []*dao.Item{
-				{
-					ID:        uuid.MustParse("00000000-0000-0000-0000-000000000003"),
-					Name:      "item three",
-					CreatedAt: time.Date(2021, 1, 3, 0, 0, 0, 0, time.UTC),
-					UpdatedAt: time.Date(2021, 1, 3, 0, 0, 0, 0, time.UTC),
-				},
-				{
-					ID:        uuid.MustParse("00000000-0000-0000-0000-000000000002"),
-					Name:      "item two",
-					CreatedAt: time.Date(2021, 1, 2, 0, 0, 0, 0, time.UTC),
-					UpdatedAt: time.Date(2021, 1, 2, 0, 0, 0, 0, time.UTC),
-				},
-				{
-					ID:        uuid.MustParse("00000000-0000-0000-0000-000000000001"),
-					Name:      "item one",
-					CreatedAt: time.Date(2021, 1, 1, 0, 0, 0, 0, time.UTC),
-					UpdatedAt: time.Date(2021, 1, 1, 0, 0, 0, 0, time.UTC),
-				},
-			},
+			expect: []*dao.ItemListRow{row(three), row(two), row(one)},
 		},
 		{
 			name: "Success/Empty",
 
-			request: &dao.ItemListRequest{Limit: 10, After: uuid.Max},
+			request: &dao.ItemListRequest{Limit: 10},
 		},
 		{
-			name: "Success/Limit",
+			name: "Success/Page",
 
-			fixtures: []*dao.Item{
-				{
-					ID:        uuid.MustParse("00000000-0000-0000-0000-000000000001"),
-					Name:      "item one",
-					CreatedAt: time.Date(2021, 1, 1, 0, 0, 0, 0, time.UTC),
-					UpdatedAt: time.Date(2021, 1, 1, 0, 0, 0, 0, time.UTC),
-				},
-				{
-					ID:        uuid.MustParse("00000000-0000-0000-0000-000000000002"),
-					Name:      "item two",
-					CreatedAt: time.Date(2021, 1, 2, 0, 0, 0, 0, time.UTC),
-					UpdatedAt: time.Date(2021, 1, 2, 0, 0, 0, 0, time.UTC),
-				},
-				{
-					ID:        uuid.MustParse("00000000-0000-0000-0000-000000000003"),
-					Name:      "item three",
-					CreatedAt: time.Date(2021, 1, 3, 0, 0, 0, 0, time.UTC),
-					UpdatedAt: time.Date(2021, 1, 3, 0, 0, 0, 0, time.UTC),
-				},
-			},
+			fixtures: []dao.Item{one, two, three},
 
-			request: &dao.ItemListRequest{Limit: 2, After: uuid.Max},
+			request: &dao.ItemListRequest{Limit: 1, Offset: 1},
 
-			expect: []*dao.Item{
-				{
-					ID:        uuid.MustParse("00000000-0000-0000-0000-000000000003"),
-					Name:      "item three",
-					CreatedAt: time.Date(2021, 1, 3, 0, 0, 0, 0, time.UTC),
-					UpdatedAt: time.Date(2021, 1, 3, 0, 0, 0, 0, time.UTC),
-				},
-				{
-					ID:        uuid.MustParse("00000000-0000-0000-0000-000000000002"),
-					Name:      "item two",
-					CreatedAt: time.Date(2021, 1, 2, 0, 0, 0, 0, time.UTC),
-					UpdatedAt: time.Date(2021, 1, 2, 0, 0, 0, 0, time.UTC),
-				},
-			},
+			expect: []*dao.ItemListRow{row(two)},
 		},
 		{
-			name: "Success/After",
+			name: "Success/PastEnd",
 
-			fixtures: []*dao.Item{
-				{
-					ID:        uuid.MustParse("00000000-0000-0000-0000-000000000001"),
-					Name:      "item one",
-					CreatedAt: time.Date(2021, 1, 1, 0, 0, 0, 0, time.UTC),
-					UpdatedAt: time.Date(2021, 1, 1, 0, 0, 0, 0, time.UTC),
-				},
-				{
-					ID:        uuid.MustParse("00000000-0000-0000-0000-000000000002"),
-					Name:      "item two",
-					CreatedAt: time.Date(2021, 1, 2, 0, 0, 0, 0, time.UTC),
-					UpdatedAt: time.Date(2021, 1, 2, 0, 0, 0, 0, time.UTC),
-				},
-				{
-					ID:        uuid.MustParse("00000000-0000-0000-0000-000000000003"),
-					Name:      "item three",
-					CreatedAt: time.Date(2021, 1, 3, 0, 0, 0, 0, time.UTC),
-					UpdatedAt: time.Date(2021, 1, 3, 0, 0, 0, 0, time.UTC),
-				},
-			},
+			fixtures: []dao.Item{one, two, three},
 
-			request: &dao.ItemListRequest{Limit: 10, After: uuid.MustParse("00000000-0000-0000-0000-000000000003")},
-
-			expect: []*dao.Item{
-				{
-					ID:        uuid.MustParse("00000000-0000-0000-0000-000000000002"),
-					Name:      "item two",
-					CreatedAt: time.Date(2021, 1, 2, 0, 0, 0, 0, time.UTC),
-					UpdatedAt: time.Date(2021, 1, 2, 0, 0, 0, 0, time.UTC),
-				},
-				{
-					ID:        uuid.MustParse("00000000-0000-0000-0000-000000000001"),
-					Name:      "item one",
-					CreatedAt: time.Date(2021, 1, 1, 0, 0, 0, 0, time.UTC),
-					UpdatedAt: time.Date(2021, 1, 1, 0, 0, 0, 0, time.UTC),
-				},
-			},
-		},
-		{
-			// The previous page ended on an item deleted since. Its ID still marks the position, so the
-			// next page neither repeats nor skips a row.
-			name: "Success/AfterDeletedItem",
-
-			fixtures: []*dao.Item{
-				{
-					ID:        uuid.MustParse("00000000-0000-0000-0000-000000000001"),
-					Name:      "item one",
-					CreatedAt: time.Date(2021, 1, 1, 0, 0, 0, 0, time.UTC),
-					UpdatedAt: time.Date(2021, 1, 1, 0, 0, 0, 0, time.UTC),
-				},
-				{
-					ID:        uuid.MustParse("00000000-0000-0000-0000-000000000003"),
-					Name:      "item three",
-					CreatedAt: time.Date(2021, 1, 3, 0, 0, 0, 0, time.UTC),
-					UpdatedAt: time.Date(2021, 1, 3, 0, 0, 0, 0, time.UTC),
-				},
-			},
-
-			request: &dao.ItemListRequest{Limit: 10, After: uuid.MustParse("00000000-0000-0000-0000-000000000002")},
-
-			expect: []*dao.Item{
-				{
-					ID:        uuid.MustParse("00000000-0000-0000-0000-000000000001"),
-					Name:      "item one",
-					CreatedAt: time.Date(2021, 1, 1, 0, 0, 0, 0, time.UTC),
-					UpdatedAt: time.Date(2021, 1, 1, 0, 0, 0, 0, time.UTC),
-				},
-			},
+			request: &dao.ItemListRequest{Limit: 10, Offset: 3},
 		},
 	}
 

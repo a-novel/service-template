@@ -26,7 +26,7 @@ func TestRestItemList(t *testing.T) {
 
 	type serviceMock struct {
 		req  *core.ItemListRequest
-		resp []*core.Item
+		resp *core.ItemPage
 		err  error
 	}
 
@@ -44,47 +44,67 @@ func TestRestItemList(t *testing.T) {
 			name: "Success",
 
 			request: httptest.NewRequestWithContext(
-				t.Context(), http.MethodGet, "/v0/items?limit=10&after=00000000-0000-0000-0000-000000000003", nil,
+				t.Context(), http.MethodGet, "/v0/items?limit=10&offset=1", nil,
 			),
 
 			serviceMock: &serviceMock{
-				req: &core.ItemListRequest{Limit: 10, After: uuid.MustParse("00000000-0000-0000-0000-000000000003")},
-				resp: []*core.Item{
-					{
-						ID:        uuid.MustParse("00000000-0000-0000-0000-000000000002"),
-						Name:      "item two",
-						CreatedAt: time.Date(2021, 1, 2, 0, 0, 0, 0, time.UTC),
-						UpdatedAt: time.Date(2021, 1, 2, 0, 0, 0, 0, time.UTC),
+				req: &core.ItemListRequest{Limit: 10, Offset: 1},
+				resp: &core.ItemPage{
+					Items: []*core.Item{
+						{
+							ID:        uuid.MustParse("00000000-0000-0000-0000-000000000002"),
+							Name:      "item two",
+							CreatedAt: time.Date(2021, 1, 2, 0, 0, 0, 0, time.UTC),
+							UpdatedAt: time.Date(2021, 1, 2, 0, 0, 0, 0, time.UTC),
+						},
+						{
+							ID:        uuid.MustParse("00000000-0000-0000-0000-000000000001"),
+							Name:      "item one",
+							CreatedAt: time.Date(2021, 1, 1, 0, 0, 0, 0, time.UTC),
+							UpdatedAt: time.Date(2021, 1, 1, 0, 0, 0, 0, time.UTC),
+						},
 					},
-					{
-						ID:        uuid.MustParse("00000000-0000-0000-0000-000000000001"),
-						Name:      "item one",
-						CreatedAt: time.Date(2021, 1, 1, 0, 0, 0, 0, time.UTC),
-						UpdatedAt: time.Date(2021, 1, 1, 0, 0, 0, 0, time.UTC),
-					},
+					Total: 3,
 				},
 			},
 
 			expectStatus: http.StatusOK,
-			expectResponse: []any{
-				map[string]any{
-					"id":        "00000000-0000-0000-0000-000000000002",
-					"name":      "item two",
-					"createdAt": "2021-01-02T00:00:00Z",
-					"updatedAt": "2021-01-02T00:00:00Z",
+			expectResponse: map[string]any{
+				"items": []any{
+					map[string]any{
+						"id":        "00000000-0000-0000-0000-000000000002",
+						"name":      "item two",
+						"createdAt": "2021-01-02T00:00:00Z",
+						"updatedAt": "2021-01-02T00:00:00Z",
+					},
+					map[string]any{
+						"id":        "00000000-0000-0000-0000-000000000001",
+						"name":      "item one",
+						"createdAt": "2021-01-01T00:00:00Z",
+						"updatedAt": "2021-01-01T00:00:00Z",
+					},
 				},
-				map[string]any{
-					"id":        "00000000-0000-0000-0000-000000000001",
-					"name":      "item one",
-					"createdAt": "2021-01-01T00:00:00Z",
-					"updatedAt": "2021-01-01T00:00:00Z",
-				},
+				"total": float64(3),
 			},
 		},
 		{
-			name: "Error/InvalidAfter",
+			// A page past the end lists no item, as an empty array.
+			name: "Success/Empty",
 
-			request: httptest.NewRequestWithContext(t.Context(), http.MethodGet, "/v0/items?after=not-a-uuid", nil),
+			request: httptest.NewRequestWithContext(t.Context(), http.MethodGet, "/v0/items?offset=50", nil),
+
+			serviceMock: &serviceMock{
+				req:  &core.ItemListRequest{Offset: 50},
+				resp: &core.ItemPage{Items: []*core.Item{}},
+			},
+
+			expectStatus:   http.StatusOK,
+			expectResponse: map[string]any{"items": []any{}, "total": float64(0)},
+		},
+		{
+			name: "Error/InvalidOffset",
+
+			request: httptest.NewRequestWithContext(t.Context(), http.MethodGet, "/v0/items?offset=first", nil),
 
 			expectStatus: http.StatusBadRequest,
 		},

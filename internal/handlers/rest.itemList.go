@@ -4,9 +4,6 @@ import (
 	"context"
 	"net/http"
 
-	"github.com/google/uuid"
-	"github.com/samber/lo"
-
 	"github.com/a-novel-kit/golib/httpf"
 	"github.com/a-novel-kit/golib/logging"
 	"github.com/a-novel-kit/golib/otel"
@@ -16,7 +13,7 @@ import (
 
 // RestItemListService is the core operation [RestItemList] delegates to.
 type RestItemListService interface {
-	Exec(ctx context.Context, request *core.ItemListRequest) ([]*core.Item, error)
+	Exec(ctx context.Context, request *core.ItemListRequest) (*core.ItemPage, error)
 }
 
 // itemListErrors maps a refused page request to its status.
@@ -27,11 +24,12 @@ var itemListErrors = httpf.ErrMap{
 // RestItemListRequest carries the pagination query parameters accepted by the
 // list endpoint.
 type RestItemListRequest struct {
-	Limit int       `schema:"limit"`
-	After uuid.UUID `schema:"after"`
+	Limit  int `schema:"limit"`
+	Offset int `schema:"offset"`
 }
 
-// RestItemList is the HTTP handler for the list-items endpoint.
+// RestItemList is the HTTP handler for the list-items endpoint. It responds with a page of items,
+// newest first, and their total.
 type RestItemList struct {
 	service RestItemListService
 	logger  logging.Log
@@ -55,16 +53,16 @@ func (handler *RestItemList) ServeHTTP(w http.ResponseWriter, r *http.Request) {
 	}
 
 	serviceRequest := &core.ItemListRequest{
-		Limit: request.Limit,
-		After: request.After,
+		Limit:  request.Limit,
+		Offset: request.Offset,
 	}
 
-	items, err := handler.service.Exec(ctx, serviceRequest)
+	page, err := handler.service.Exec(ctx, serviceRequest)
 	if err != nil {
 		httpf.HandleError(ctx, handler.logger, w, span, itemListErrors, err)
 
 		return
 	}
 
-	httpf.SendJSONStatus(w, span, http.StatusOK, lo.Map(items, loadItemMap))
+	httpf.SendJSONStatus(w, span, http.StatusOK, loadItemPage(page))
 }

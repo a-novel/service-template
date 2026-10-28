@@ -17,6 +17,14 @@ type Item struct {
 	UpdatedAt   time.Time
 }
 
+// ItemPage is a page of items.
+type ItemPage struct {
+	Items []*Item
+	// Total counts every item, so a client paging through them knows when it holds them all. A page
+	// past the end reports 0.
+	Total int
+}
+
 func newItem(entity *dao.Item) *Item {
 	return &Item{
 		ID:          entity.ID,

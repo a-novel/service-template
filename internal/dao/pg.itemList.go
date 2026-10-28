@@ -5,7 +5,6 @@ import (
 	_ "embed"
 	"fmt"
 
-	"github.com/google/uuid"
 	"go.opentelemetry.io/otel/attribute"
 
 	"github.com/a-novel-kit/golib/otel"
@@ -18,18 +17,27 @@ var itemListQuery string
 // ItemListRequest is the input to [PgItemList.Exec].
 type ItemListRequest struct {
 	Limit int
-	// After is the ID the page starts after, in descending order. uuid.Max starts at the newest item.
-	After uuid.UUID
+	// Offset is how many items, newest first, come before the page.
+	Offset int
 }
 
-// PgItemList retrieves a page of items, newest first.
+// ItemListRow is one item of a page.
+type ItemListRow struct {
+	Item
+
+	// Total counts every item, beyond the page.
+	Total int `bun:"total"`
+}
+
+// PgItemList retrieves a page of items, newest first. Each row carries the total, and a page past
+// the end comes back empty.
 type PgItemList struct{}
 
 func NewPgItemList() *PgItemList {
 	return &PgItemList{}
 }
 
-func (dao *PgItemList) Exec(ctx context.Context, request *ItemListRequest) ([]*Item, error) {
+func (dao *PgItemList) Exec(ctx context.Context, request *ItemListRequest) ([]*ItemListRow, error) {
 	ctx, span := otel.Tracer().Start(ctx, "dao.PgItemList")
 	defer span.End()
 
@@ -38,9 +46,9 @@ func (dao *PgItemList) Exec(ctx context.Context, request *ItemListRequest) ([]*I
 		return nil, otel.ReportError(span, fmt.Errorf("get postgres context: %w", err))
 	}
 
-	var entities []*Item
+	var entities []*ItemListRow
 
-	err = db.NewRaw(itemListQuery, request.Limit, request.After).Scan(ctx, &entities)
+	err = db.NewRaw(itemListQuery, request.Limit, request.Offset).Scan(ctx, &entities)
 	if err != nil {
 		return nil, otel.ReportError(span, fmt.Errorf("execute query: %w", err))
 	}
