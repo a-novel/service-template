@@ -13,6 +13,15 @@ import (
 	"github.com/a-novel/service-template/internal/config/configtest"
 )
 
+const (
+	// serviceTokenAudience is the audience the service token tests answer to.
+	serviceTokenAudience = "service-template"
+	// serviceTokenCaller is the one caller the service token tests allow.
+	serviceTokenCaller = "system:serviceaccount:agora:caller"
+	// serviceTokenStranger is a caller outside the allowed ones.
+	serviceTokenStranger = "system:serviceaccount:agora:stranger"
+)
+
 // probeSetup selects the state of the PostgreSQL connection a health probe meets.
 type probeSetup int
 
