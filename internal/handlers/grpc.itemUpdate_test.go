@@ -155,7 +155,7 @@ func TestGrpcItemUpdate(t *testing.T) {
 			require.Equal(t, testCase.expect, res)
 
 			if testCase.expectCause != nil {
-				// The fault keeps its cause, which Sentry groups it by.
+				// The fault keeps its cause, so the server span names its type.
 				require.ErrorIs(t, err, testCase.expectCause)
 			}
 
