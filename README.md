@@ -63,8 +63,6 @@ pnpm lint
 a-novel test -y
 ```
 
-**4. Connect Sentry.** The servers report their faults once `SENTRY_DSN` is set. When the service gets a Sentry project named after its repository, add the release step and the intake workflow from the workflows [v1.79.0 guide](https://github.com/a-novel-kit/workflows/blob/master/docs/migrations/v1.79.0.md).
-
 Then delete this section and describe your service in the rest of this README. In [CONTRIBUTING.md](./CONTRIBUTING.md), replace the introduction and the local run, which describe the template.
 
 ## What it does
@@ -169,34 +167,34 @@ Every variable is read from the process environment. `SERVICE_TEMPLATE_ENV_PREFI
 | `POSTGRES_DSN`         | Connection-URL fallback, read only when `POSTGRES_HOST` is empty.                                                             | all    |
 
 <details>
-<summary>Optional configuration (server tuning, service tokens, OpenTelemetry, Sentry)</summary>
+<summary>Optional configuration (server tuning, service tokens, OpenTelemetry)</summary>
 
 gRPC tuning (images `grpc`, `standalone-grpc`):
 
-| Name                    | Description                                                                                                                  | Default |
-| ----------------------- | ---------------------------------------------------------------------------------------------------------------------------- | ------- |
-| `GRPC_TIMEOUT_SHUTDOWN` | Graceful shutdown budget. With the 4 seconds of telemetry flushes after it, it fits Cloud Run's 10 seconds before `SIGKILL`. | `6s`    |
+| Name                    | Description                                                                                                            | Default |
+| ----------------------- | ---------------------------------------------------------------------------------------------------------------------- | ------- |
+| `GRPC_TIMEOUT_SHUTDOWN` | Graceful shutdown budget. With the 2-second telemetry flush after it, it fits Kubernetes' 30 seconds before `SIGKILL`. | `6s`    |
 
 REST tuning (images `rest`, `standalone-rest`):
 
-| Name                          | Description                                                                                                                  | Default                          |
-| ----------------------------- | ---------------------------------------------------------------------------------------------------------------------------- | -------------------------------- |
-| `REST_MAX_REQUEST_SIZE`       | Maximum request body size, in bytes.                                                                                         | `16384` (16KiB)                  |
-| `REST_CLIENT_IP_HEADER`       | Header a trusted proxy sets to the visitor IP. Set it only when every request comes through that proxy.                      | TCP peer                         |
-| `REST_LIVENESS_PATH`          | Ping path, which still answers during a planned downtime and skips the rate limit.                                           | `/v0/ping`                       |
-| `REST_RATE_LIMITS_ENABLED`    | Rate-limit each visitor on every route but the ping. Turn off only in test stacks.                                           | `true`                           |
-| `REST_RATE_LIMIT`             | Requests each visitor sends to each route, as `<requests>/<window>`.                                                         | `5/1s`                           |
-| `REST_TIMEOUT_READ`           | Read timeout.                                                                                                                | `15s`                            |
-| `REST_TIMEOUT_READ_HEADER`    | Header read timeout.                                                                                                         | `3s`                             |
-| `REST_TIMEOUT_WRITE`          | Write timeout.                                                                                                               | `30s`                            |
-| `REST_TIMEOUT_IDLE`           | Idle keep-alive timeout.                                                                                                     | `60s`                            |
-| `REST_TIMEOUT_REQUEST`        | Per-request timeout.                                                                                                         | `60s`                            |
-| `REST_TIMEOUT_SHUTDOWN`       | Graceful shutdown budget. With the 4 seconds of telemetry flushes after it, it fits Cloud Run's 10 seconds before `SIGKILL`. | `6s`                             |
-| `REST_CORS_ALLOWED_ORIGINS`   | CORS allowed origins.                                                                                                        | `*`                              |
-| `REST_CORS_ALLOWED_HEADERS`   | CORS allowed headers.                                                                                                        | `*`                              |
-| `REST_CORS_ALLOWED_METHODS`   | CORS allowed methods, comma-separated.                                                                                       | `HEAD,GET,POST,PUT,PATCH,DELETE` |
-| `REST_CORS_ALLOW_CREDENTIALS` | CORS allow-credentials flag.                                                                                                 | `false`                          |
-| `REST_CORS_MAX_AGE`           | CORS max-age, in seconds.                                                                                                    | `3600`                           |
+| Name                          | Description                                                                                                            | Default                          |
+| ----------------------------- | ---------------------------------------------------------------------------------------------------------------------- | -------------------------------- |
+| `REST_MAX_REQUEST_SIZE`       | Maximum request body size, in bytes.                                                                                   | `16384` (16KiB)                  |
+| `REST_CLIENT_IP_HEADER`       | Header a trusted proxy sets to the visitor IP. Set it only when every request comes through that proxy.                | TCP peer                         |
+| `REST_LIVENESS_PATH`          | Ping path, which still answers during a planned downtime and skips the rate limit.                                     | `/v0/ping`                       |
+| `REST_RATE_LIMITS_ENABLED`    | Rate-limit each visitor on every route but the ping. Turn off only in test stacks.                                     | `true`                           |
+| `REST_RATE_LIMIT`             | Requests each visitor sends to each route, as `<requests>/<window>`.                                                   | `5/1s`                           |
+| `REST_TIMEOUT_READ`           | Read timeout.                                                                                                          | `15s`                            |
+| `REST_TIMEOUT_READ_HEADER`    | Header read timeout.                                                                                                   | `3s`                             |
+| `REST_TIMEOUT_WRITE`          | Write timeout.                                                                                                         | `30s`                            |
+| `REST_TIMEOUT_IDLE`           | Idle keep-alive timeout.                                                                                               | `60s`                            |
+| `REST_TIMEOUT_REQUEST`        | Per-request timeout.                                                                                                   | `60s`                            |
+| `REST_TIMEOUT_SHUTDOWN`       | Graceful shutdown budget. With the 2-second telemetry flush after it, it fits Kubernetes' 30 seconds before `SIGKILL`. | `6s`                             |
+| `REST_CORS_ALLOWED_ORIGINS`   | CORS allowed origins.                                                                                                  | `*`                              |
+| `REST_CORS_ALLOWED_HEADERS`   | CORS allowed headers.                                                                                                  | `*`                              |
+| `REST_CORS_ALLOWED_METHODS`   | CORS allowed methods, comma-separated.                                                                                 | `HEAD,GET,POST,PUT,PATCH,DELETE` |
+| `REST_CORS_ALLOW_CREDENTIALS` | CORS allow-credentials flag.                                                                                           | `false`                          |
+| `REST_CORS_MAX_AGE`           | CORS max-age, in seconds.                                                                                              | `3600`                           |
 
 Database connection pool (server images). The limits are **per process**. The database's `max_connections` has to cover every replica plus the migration job; the stock `postgres` default is 100.
 
@@ -229,14 +227,6 @@ Logs and tracing — OpenTelemetry exports to standard output, or over OTLP/HTTP
 | `OTEL_EXPORTER_OTLP_COMPRESSION` | `gzip` compresses each export.                                                                                   |                    |
 | `OTEL_SERVICE_NAME`              | Service name every span and log record carries.                                                                  |                    |
 | `APP_NAME`                       | Application name attached to traces and logs.                                                                    | `service-template` |
-
-Fault reporting — Sentry receives each server fault, tagged with its release (server images). Without `SENTRY_DSN`, the servers report nothing:
-
-| Name                 | Description                                                                                                       | Default |
-| -------------------- | ----------------------------------------------------------------------------------------------------------------- | ------- |
-| `SENTRY_DSN`         | Client key of the service's Sentry project. Inject it as a secret.                                                |         |
-| `SENTRY_RELEASE`     | Deployed build, as `service-template@<version>`: the name release CI gives it in Sentry. **Required with a DSN.** |         |
-| `SENTRY_ENVIRONMENT` | Deployment name, such as `production`. **Required with a DSN.**                                                   |         |
 
 </details>
 
