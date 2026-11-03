@@ -3,7 +3,7 @@ module github.com/a-novel/service-template
 go 1.27.3
 
 require (
-	github.com/a-novel-kit/golib v0.62.2
+	github.com/a-novel-kit/golib v0.62.3
 	github.com/go-chi/chi/v5 v5.5.0
 	github.com/go-playground/validator/v10 v10.30.5
 	github.com/google/uuid v1.6.0
@@ -21,7 +21,7 @@ require (
 
 require (
 	charm.land/lipgloss/v2 v2.0.6 // indirect
-	github.com/a-novel-kit/jwt/v2 v2.6.0 // indirect
+	github.com/a-novel-kit/jwt/v2 v2.6.1 // indirect
 	github.com/cenkalti/backoff/v5 v5.0.3 // indirect
 	github.com/cespare/xxhash/v2 v2.3.0 // indirect
 	github.com/charmbracelet/colorprofile v0.4.3 // indirect
