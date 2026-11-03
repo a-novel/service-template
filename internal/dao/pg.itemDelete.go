@@ -40,9 +40,9 @@ func (dao *PgItemDelete) Exec(ctx context.Context, request *ItemDeleteRequest) (
 		return nil, otel.ReportError(span, fmt.Errorf("get postgres context: %w", err))
 	}
 
-	entity := &Item{}
+	var entity Item
 
-	err = db.NewRaw(itemDeleteQuery, request.ID).Scan(ctx, entity)
+	err = db.NewRaw(itemDeleteQuery, request.ID).Scan(ctx, &entity)
 	if errors.Is(err, sql.ErrNoRows) {
 		err = errors.Join(err, ErrItemDeleteNotFound)
 	}
@@ -51,5 +51,5 @@ func (dao *PgItemDelete) Exec(ctx context.Context, request *ItemDeleteRequest) (
 		return nil, otel.ReportError(span, fmt.Errorf("execute query: %w", err))
 	}
 
-	return entity, nil
+	return &entity, nil
 }

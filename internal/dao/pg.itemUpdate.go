@@ -45,9 +45,9 @@ func (dao *PgItemUpdate) Exec(ctx context.Context, request *ItemUpdateRequest) (
 		return nil, otel.ReportError(span, fmt.Errorf("get postgres context: %w", err))
 	}
 
-	entity := &Item{}
+	var entity Item
 
-	err = db.NewRaw(itemUpdateQuery, request.Name, request.Description, request.Now, request.ID).Scan(ctx, entity)
+	err = db.NewRaw(itemUpdateQuery, request.Name, request.Description, request.Now, request.ID).Scan(ctx, &entity)
 	if errors.Is(err, sql.ErrNoRows) {
 		err = errors.Join(err, ErrItemUpdateNotFound)
 	}
@@ -56,5 +56,5 @@ func (dao *PgItemUpdate) Exec(ctx context.Context, request *ItemUpdateRequest) (
 		return nil, otel.ReportError(span, fmt.Errorf("execute query: %w", err))
 	}
 
-	return entity, nil
+	return &entity, nil
 }

@@ -73,6 +73,7 @@ type client struct {
 }
 
 func (c *client) Close() {
+	// grpc.ClientConn.Close fails only on a connection already closed, which leaves nothing to release.
 	_ = c.conn.Close()
 }
 
