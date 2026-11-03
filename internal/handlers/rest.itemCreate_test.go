@@ -39,6 +39,7 @@ func TestRestItemCreate(t *testing.T) {
 		serviceMock *serviceMock
 
 		expectStatus   int
+		expectLocation string
 		expectResponse any
 	}{
 		{
@@ -63,7 +64,8 @@ func TestRestItemCreate(t *testing.T) {
 				},
 			},
 
-			expectStatus: http.StatusCreated,
+			expectStatus:   http.StatusCreated,
+			expectLocation: "item?id=00000000-0000-0000-0000-000000000001",
 			expectResponse: map[string]any{
 				"id":          "00000000-0000-0000-0000-000000000001",
 				"name":        "test item",
@@ -129,6 +131,7 @@ func TestRestItemCreate(t *testing.T) {
 			res := w.Result()
 
 			require.Equal(t, testCase.expectStatus, res.StatusCode)
+			require.Equal(t, testCase.expectLocation, res.Header.Get("Location"))
 
 			if testCase.expectResponse != nil {
 				// Result snapshots the headers at WriteHeader, so a Content-Type set after it fails here.
