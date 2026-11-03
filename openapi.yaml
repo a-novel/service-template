@@ -70,7 +70,7 @@ paths:
               $ref: "#/components/schemas/itemCreateRequest"
       responses:
         "201":
-          $ref: "#/components/responses/item"
+          $ref: "#/components/responses/itemCreated"
         "400":
           $ref: "#/components/responses/badRequest"
         "429":
@@ -223,6 +223,23 @@ components:
 
     item:
       description: An item resource.
+      content:
+        application/json:
+          schema:
+            $ref: "#/components/schemas/item"
+
+    itemCreated:
+      description: The created item.
+      headers:
+        Location:
+          description: |
+            The address of the created item, relative to the request's `/v0/items`, such as
+            `item?id=00000000-0000-0000-0000-000000000001`.
+          required: true
+          schema:
+            type: string
+            format: uri-reference
+            examples: ["item?id=00000000-0000-0000-0000-000000000001"]
       content:
         application/json:
           schema:

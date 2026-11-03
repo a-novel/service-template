@@ -27,8 +27,8 @@ type RestItemCreateRequest struct {
 	Description string `json:"description"`
 }
 
-// RestItemCreate is the HTTP handler for the create-item endpoint. It responds
-// 201 with the created item.
+// RestItemCreate is the HTTP handler for the create-item endpoint. It responds 201 with the created
+// item, and names the item's address in Location, as RFC 9110 §15.3.2 requires.
 type RestItemCreate struct {
 	service RestItemCreateService
 	logger  logging.Log
@@ -63,5 +63,8 @@ func (handler *RestItemCreate) ServeHTTP(w http.ResponseWriter, r *http.Request)
 		return
 	}
 
+	// A relative reference resolves against the request's /v0/items (RFC 9110 §10.2.2), so it keeps
+	// whatever prefix and version the route is mounted under.
+	w.Header().Set("Location", "item?id="+item.ID.String())
 	httpf.SendJSONStatus(w, span, http.StatusCreated, loadItem(item))
 }
