@@ -40,9 +40,9 @@ func (dao *PgItemGet) Exec(ctx context.Context, request *ItemGetRequest) (*Item,
 		return nil, otel.ReportError(span, fmt.Errorf("get postgres context: %w", err))
 	}
 
-	entity := &Item{}
+	var entity Item
 
-	err = db.NewRaw(itemGetQuery, request.ID).Scan(ctx, entity)
+	err = db.NewRaw(itemGetQuery, request.ID).Scan(ctx, &entity)
 	if errors.Is(err, sql.ErrNoRows) {
 		err = errors.Join(err, ErrItemGetNotFound)
 	}
@@ -51,5 +51,5 @@ func (dao *PgItemGet) Exec(ctx context.Context, request *ItemGetRequest) (*Item,
 		return nil, otel.ReportError(span, fmt.Errorf("execute query: %w", err))
 	}
 
-	return entity, nil
+	return &entity, nil
 }

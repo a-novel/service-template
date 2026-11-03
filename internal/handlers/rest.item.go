@@ -29,11 +29,6 @@ func loadItem(item *core.Item) Item {
 	}
 }
 
-// loadItemMap adapts loadItem to lo.Map, ignoring the slice index.
-func loadItemMap(item *core.Item, _ int) Item {
-	return loadItem(item)
-}
-
 // ItemPage is the REST representation of a page of items.
 type ItemPage struct {
 	Items []Item `json:"items"`
@@ -43,7 +38,7 @@ type ItemPage struct {
 // loadItemPage converts a core page of items into its REST form.
 func loadItemPage(page *core.ItemPage) ItemPage {
 	return ItemPage{
-		Items: lo.Map(page.Items, loadItemMap),
+		Items: lo.Map(page.Items, func(item *core.Item, _ int) Item { return loadItem(item) }),
 		Total: page.Total,
 	}
 }

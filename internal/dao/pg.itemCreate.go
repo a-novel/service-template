@@ -7,7 +7,6 @@ import (
 	"time"
 
 	"github.com/google/uuid"
-	"go.opentelemetry.io/otel/attribute"
 
 	"github.com/a-novel-kit/golib/otel"
 	"github.com/a-novel-kit/golib/postgres"
@@ -36,19 +35,17 @@ func (dao *PgItemCreate) Exec(ctx context.Context, request *ItemCreateRequest) (
 	ctx, span := otel.Tracer().Start(ctx, "dao.PgItemCreate")
 	defer span.End()
 
-	span.SetAttributes(attribute.String("item.id", request.ID.String()))
-
 	db, err := postgres.GetContext(ctx)
 	if err != nil {
 		return nil, otel.ReportError(span, fmt.Errorf("get postgres context: %w", err))
 	}
 
-	entity := &Item{}
+	var entity Item
 
-	err = db.NewRaw(itemCreateQuery, request.ID, request.Name, request.Description, request.Now).Scan(ctx, entity)
+	err = db.NewRaw(itemCreateQuery, request.ID, request.Name, request.Description, request.Now).Scan(ctx, &entity)
 	if err != nil {
 		return nil, otel.ReportError(span, fmt.Errorf("execute query: %w", err))
 	}
 
-	return entity, nil
+	return &entity, nil
 }

@@ -12,14 +12,6 @@ import (
 	templatev0 "github.com/a-novel/service-template/internal/handlers/protogen/anovel/template/v0"
 )
 
-// NewGrpcHealthStatus returns the health report for a dependency whose probe succeeded. A failed
-// probe answers Unavailable instead, so the report never carries a raw dependency error.
-func NewGrpcHealthStatus() *templatev0.DependencyHealth {
-	return &templatev0.DependencyHealth{
-		Status: templatev0.DependencyStatus_DEPENDENCY_STATUS_UP,
-	}
-}
-
 // GrpcStatus is the gRPC handler for the Status RPC, reporting the health of the
 // service's external dependencies.
 type GrpcStatus struct {
@@ -30,7 +22,8 @@ func NewGrpcStatus() *GrpcStatus {
 	return &GrpcStatus{}
 }
 
-// Status probes each dependency and returns their health, or Unavailable when a probe fails.
+// Status probes each dependency and returns their health, or Unavailable when a probe fails. A
+// failed probe never reaches the report, so it carries no raw dependency error.
 func (handler *GrpcStatus) Status(
 	ctx context.Context, _ *templatev0.StatusRequest,
 ) (*templatev0.StatusResponse, error) {
@@ -43,7 +36,7 @@ func (handler *GrpcStatus) Status(
 	}
 
 	return &templatev0.StatusResponse{
-		Postgres: NewGrpcHealthStatus(),
+		Postgres: &templatev0.DependencyHealth{Status: templatev0.DependencyStatus_DEPENDENCY_STATUS_UP},
 	}, nil
 }
 

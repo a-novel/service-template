@@ -51,6 +51,8 @@ func (service *ItemCreate) Exec(ctx context.Context, request *ItemCreateRequest)
 		return nil, otel.ReportError(span, fmt.Errorf("generate item id: %w", err))
 	}
 
+	span.SetAttributes(attribute.String("item.id", id.String()))
+
 	daoRequest := &dao.ItemCreateRequest{
 		ID:          id,
 		Name:        request.Name,
