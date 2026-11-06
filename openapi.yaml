@@ -14,7 +14,7 @@ info:
     resource. A fork replaces `item` with its own domain model.
   version: v0.0.0
   license:
-    name: AGPL-3.0
+    name: RPL-1.5
     url: "https://raw.githubusercontent.com/a-novel/service-template/refs/heads/master/LICENSE"
 
 paths:
