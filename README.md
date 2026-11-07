@@ -10,6 +10,7 @@ The scaffold every new A-Novel backend service starts from, with an example `ite
 ![GitHub go.mod Go version](https://img.shields.io/github/go-mod/go-version/a-novel/service-template)
 ![GitHub repo file or directory count](https://img.shields.io/github/directory-file-count/a-novel/service-template)
 ![GitHub code size in bytes](https://img.shields.io/github/languages/code-size/a-novel/service-template)
+[![License: RPL-1.5](https://img.shields.io/badge/license-RPL--1.5-blue)](LICENSE)
 
 ![GitHub Actions Workflow Status](https://img.shields.io/github/actions/workflow/status/a-novel/service-template/main.yaml)
 [![codecov](https://codecov.io/gh/a-novel/service-template/graph/badge.svg)](https://codecov.io/gh/a-novel/service-template)
