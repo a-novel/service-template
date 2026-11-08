@@ -3,7 +3,7 @@ module github.com/a-novel/service-template
 go 1.27.3
 
 require (
-	github.com/a-novel-kit/golib v0.63.0
+	github.com/a-novel-kit/golib v0.64.0
 	github.com/go-chi/chi/v5 v5.5.0
 	github.com/go-playground/validator/v10 v10.30.6
 	github.com/google/uuid v1.6.0
@@ -80,6 +80,6 @@ require (
 	golang.org/x/sys v0.49.0 // indirect
 	golang.org/x/text v0.43.0 // indirect
 	google.golang.org/genproto/googleapis/api v0.0.0-20261012220534-4341edf3f941 // indirect
-	google.golang.org/genproto/googleapis/rpc v0.0.0-20261026165753-2ffab32bce7e // indirect
+	google.golang.org/genproto/googleapis/rpc v0.0.0-20261104224025-d1e00e9f33ab // indirect
 	mellium.im/sasl v0.3.2 // indirect
 )
