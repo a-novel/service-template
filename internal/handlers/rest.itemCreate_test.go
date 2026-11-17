@@ -9,7 +9,7 @@ import (
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 
-	"github.com/a-novel/service-template/internal/config"
+	"github.com/a-novel/service-template/internal/config/configtest"
 	"github.com/a-novel/service-template/internal/core"
 	"github.com/a-novel/service-template/internal/handlers"
 	handlersmocks "github.com/a-novel/service-template/internal/handlers/mocks"
@@ -86,7 +86,7 @@ func TestRestItemCreate(t *testing.T) {
 			)
 
 			w := httptest.NewRecorder()
-			handlers.NewRestItemCreate(service, config.AppPresetDefault.Logger).ServeHTTP(w, request)
+			handlers.NewRestItemCreate(service, configtest.Logger).ServeHTTP(w, request)
 
 			response := w.Result()
 			require.Equal(t, testCase.expectLocation, response.Header.Get("Location"))

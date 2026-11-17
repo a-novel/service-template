@@ -7,7 +7,7 @@ import (
 
 	"github.com/stretchr/testify/mock"
 
-	"github.com/a-novel/service-template/internal/config"
+	"github.com/a-novel/service-template/internal/config/configtest"
 	"github.com/a-novel/service-template/internal/core"
 	"github.com/a-novel/service-template/internal/handlers"
 	handlersmocks "github.com/a-novel/service-template/internal/handlers/mocks"
@@ -89,7 +89,7 @@ func TestRestItemDelete(t *testing.T) {
 			request := httptest.NewRequestWithContext(t.Context(), http.MethodDelete, testCase.target, nil)
 
 			w := httptest.NewRecorder()
-			handlers.NewRestItemDelete(service, config.AppPresetDefault.Logger).ServeHTTP(w, request)
+			handlers.NewRestItemDelete(service, configtest.Logger).ServeHTTP(w, request)
 
 			requireResponse(t, w.Result(), testCase.expectStatus, testCase.expectResponse)
 		})
