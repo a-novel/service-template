@@ -8,9 +8,6 @@
   },
   "license": "RPL-1.5",
   "type": "module",
-  "devDependencies": {
-    "@a-novel/service-template-rest": "workspace:*"
-  },
   "engines": {
     "node": ">=23.11.0",
     "npm": ">=10.9.2"
