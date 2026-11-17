@@ -92,7 +92,7 @@ func TestRestItemList(t *testing.T) {
 			request := httptest.NewRequestWithContext(t.Context(), http.MethodGet, testCase.target, nil)
 
 			w := httptest.NewRecorder()
-			handlers.NewRestItemList(service, config.LoggerDev).ServeHTTP(w, request)
+			handlers.NewRestItemList(service, config.AppPresetDefault.Logger).ServeHTTP(w, request)
 
 			requireResponse(t, w.Result(), testCase.expectStatus, testCase.expectResponse)
 		})

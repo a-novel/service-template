@@ -6,8 +6,9 @@ package main
 
 import (
 	"context"
-	"io"
+	"fmt"
 	"log"
+	"net/http"
 	"os"
 	"os/signal"
 	"strconv"
@@ -23,7 +24,6 @@ import (
 	"github.com/a-novel-kit/golib/postgres"
 
 	"github.com/a-novel/service-template/internal/config"
-	"github.com/a-novel/service-template/internal/config/env"
 	"github.com/a-novel/service-template/internal/core"
 	"github.com/a-novel/service-template/internal/dao"
 	"github.com/a-novel/service-template/internal/handlers"
@@ -40,16 +40,28 @@ func main() {
 	lo.Must0(otel.Init(cfg.Otel))
 	defer cfg.Otel.Flush()
 
-	if env.OTLPEndpoint == "" {
-		log.SetFlags(log.Flags() &^ (log.Ldate | log.Ltime))
-	}
-
 	// A server started during a planned downtime refuses work, so it leaves the database alone.
 	if !downtime.Started(cfg.App.DowntimeStart, time.Now()) {
 		ctx = lo.Must(postgres.NewContext(ctx, cfg.Postgres))
+		defer cfg.Postgres.Close()
+	}
 
-		database := lo.Must(cfg.Postgres.DB(ctx))
-		defer closeDatabase(database)
+	router := lo.Must(newRouter(cfg))
+
+	log.Println("Starting REST server on :" + strconv.Itoa(cfg.Rest.Port))
+
+	lo.Must0(httpf.ListenAndServe(ctx, cfg.Rest, router))
+}
+
+// newRouter builds the REST API. Each request passes the service-token gate first, but for the
+// liveness probe. The gate refuses an empty issuer unless cfg opts a local stack out, so the server
+// never starts open by mistake.
+func newRouter(cfg config.App) (http.Handler, error) {
+	withServiceToken, err := httpf.ServiceTokenGate(
+		cfg.ServiceToken, httpf.NewPoolClient(httpf.PoolOptions{}), cfg.Logger, cfg.Rest.Liveness,
+	)
+	if err != nil {
+		return nil, fmt.Errorf("service token gate: %w", err)
 	}
 
 	// =================================================================================================================
@@ -76,8 +88,9 @@ func main() {
 	// HANDLERS
 	// =================================================================================================================
 
-	handlerPing := handlers.NewRestPing()
-	handlerHealth := handlers.NewRestHealth()
+	handlerHealth := httpf.Health(map[string]func(context.Context) error{
+		"client:postgres": postgres.Health,
+	})
 	handlerItemCreate := handlers.NewRestItemCreate(serviceItemCreate, cfg.Logger)
 	handlerItemGet := handlers.NewRestItemGet(serviceItemGet, cfg.Logger)
 	handlerItemList := handlers.NewRestItemList(serviceItemList, cfg.Logger)
@@ -88,15 +101,11 @@ func main() {
 	// ROUTER
 	// =================================================================================================================
 
-	router := httpf.NewRouter(cfg.Rest, cfg.Otel, cfg.RestLogger, cfg.App.DowntimeStart)
-	withServiceToken := lo.Must(handlers.RestServiceToken(
-		cfg.ServiceToken, cfg.ServiceIssuerOptional, httpf.NewPoolClient(httpf.PoolOptions{}), cfg.Logger,
-		cfg.Rest.Liveness,
-	))
+	router := httpf.NewMux(cfg.Rest, cfg.RestLogger, cfg.App.DowntimeStart)
 
 	router.Route("/v0", func(api chi.Router) {
-		api.Get("/ping", handlerPing.ServeHTTP)
-		api.Get("/healthcheck", handlerHealth.ServeHTTP)
+		api.Get("/ping", httpf.Ping)
+		api.Get("/healthcheck", handlerHealth)
 		api.Post("/items", handlerItemCreate.ServeHTTP)
 		api.Get("/items", handlerItemList.ServeHTTP)
 		api.Get("/item", handlerItemGet.ServeHTTP)
@@ -104,18 +113,5 @@ func main() {
 		api.Delete("/item", handlerItemDelete.ServeHTTP)
 	})
 
-	// =================================================================================================================
-	// RUN
-	// =================================================================================================================
-
-	log.Println("Starting REST server on :" + strconv.Itoa(cfg.Rest.Port))
-
-	lo.Must0(httpf.ListenAndServe(ctx, cfg.Rest, withServiceToken(router)))
-}
-
-func closeDatabase(database io.Closer) {
-	err := database.Close()
-	if err != nil {
-		log.Println("Close Postgres: " + err.Error())
-	}
+	return withServiceToken(router), nil
 }

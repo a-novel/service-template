@@ -89,7 +89,7 @@ func TestRestItemGet(t *testing.T) {
 			request := httptest.NewRequestWithContext(t.Context(), http.MethodGet, testCase.target, nil)
 
 			w := httptest.NewRecorder()
-			handlers.NewRestItemGet(service, config.LoggerDev).ServeHTTP(w, request)
+			handlers.NewRestItemGet(service, config.AppPresetDefault.Logger).ServeHTTP(w, request)
 
 			requireResponse(t, w.Result(), testCase.expectStatus, testCase.expectResponse)
 		})

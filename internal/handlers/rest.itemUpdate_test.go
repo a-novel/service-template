@@ -99,7 +99,7 @@ func TestRestItemUpdate(t *testing.T) {
 			request := httptest.NewRequestWithContext(t.Context(), http.MethodPut, "/v0/item", strings.NewReader(testCase.body))
 
 			w := httptest.NewRecorder()
-			handlers.NewRestItemUpdate(service, config.LoggerDev).ServeHTTP(w, request)
+			handlers.NewRestItemUpdate(service, config.AppPresetDefault.Logger).ServeHTTP(w, request)
 
 			requireResponse(t, w.Result(), testCase.expectStatus, testCase.expectResponse)
 		})

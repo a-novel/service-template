@@ -253,9 +253,9 @@ package main
 import (
 	"context"
 	"log"
+	"os"
 
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials/insecure"
+	"github.com/a-novel-kit/golib/grpcf"
 
 	servicetemplate "github.com/a-novel/service-template/pkg/go"
 )
@@ -263,12 +263,14 @@ import (
 func main() {
 	ctx := context.Background()
 
-	// In production, pass the options of golib's grpcf.ServiceTokenCredentialsProvider: the server
-	// admits only the callers its service tokens allow. A local standalone image takes every call.
-	client, err := servicetemplate.NewClient(
-		"service-template:8080",
-		grpc.WithTransportCredentials(insecure.NewCredentials()),
+	// LoadClientConfig reads SERVICE_TEMPLATE_HOST, _PORT, _TLS and _TOKEN_PATH. In production, the
+	// token path names the caller's projected service token, which the server requires. Without
+	// it, the client dials a local standalone image in plaintext.
+	target := grpcf.LoadClientConfig(
+		os.Getenv, "SERVICE_TEMPLATE", grpcf.ClientConfig{Host: "service-template", Port: 8080},
 	)
+
+	client, err := servicetemplate.NewClient(target.Address(), target.DialOptions()...)
 	if err != nil {
 		log.Fatal(err)
 	}

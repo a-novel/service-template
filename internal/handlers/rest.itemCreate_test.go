@@ -86,7 +86,7 @@ func TestRestItemCreate(t *testing.T) {
 			)
 
 			w := httptest.NewRecorder()
-			handlers.NewRestItemCreate(service, config.LoggerDev).ServeHTTP(w, request)
+			handlers.NewRestItemCreate(service, config.AppPresetDefault.Logger).ServeHTTP(w, request)
 
 			response := w.Result()
 			require.Equal(t, testCase.expectLocation, response.Header.Get("Location"))

@@ -29,11 +29,8 @@ type App struct {
 	// Rest configures the REST server.
 	Rest httpf.ServerConfig
 	// ServiceToken names the service tokens both servers accept. Without an issuer, the servers refuse
-	// to start unless ServiceIssuerOptional is set.
+	// to start unless its IssuerOptional is set, which only a local or test stack does.
 	ServiceToken servicetoken.Config
-	// ServiceIssuerOptional lets the servers start without a service-token issuer, and then take every
-	// call. Only a local or test stack sets it.
-	ServiceIssuerOptional bool
 
 	// Otel configures the OpenTelemetry exporter.
 	Otel otel.Config

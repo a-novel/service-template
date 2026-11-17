@@ -89,7 +89,7 @@ func TestRestItemDelete(t *testing.T) {
 			request := httptest.NewRequestWithContext(t.Context(), http.MethodDelete, testCase.target, nil)
 
 			w := httptest.NewRecorder()
-			handlers.NewRestItemDelete(service, config.LoggerDev).ServeHTTP(w, request)
+			handlers.NewRestItemDelete(service, config.AppPresetDefault.Logger).ServeHTTP(w, request)
 
 			requireResponse(t, w.Result(), testCase.expectStatus, testCase.expectResponse)
 		})
