@@ -60,14 +60,14 @@ func TestRestItemUpdate(t *testing.T) {
 
 			serviceMock: &serviceMock[*core.Item]{err: core.ErrInvalidRequest},
 
-			expectStatus: http.StatusBadRequest,
+			expectStatus: http.StatusUnprocessableEntity,
 		},
 		{
 			name: "Error/NotFound",
 
 			body: body,
 
-			serviceMock: &serviceMock[*core.Item]{err: core.ErrItemUpdateNotFound},
+			serviceMock: &serviceMock[*core.Item]{err: core.ErrItemNotFound},
 
 			expectStatus: http.StatusNotFound,
 		},

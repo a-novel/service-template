@@ -46,11 +46,20 @@ func TestRestItemDelete(t *testing.T) {
 			expectStatus: http.StatusBadRequest,
 		},
 		{
+			name: "Error/InvalidRequest",
+
+			target: target,
+
+			serviceMock: &serviceMock[*core.Item]{err: core.ErrInvalidRequest},
+
+			expectStatus: http.StatusUnprocessableEntity,
+		},
+		{
 			name: "Error/NotFound",
 
 			target: target,
 
-			serviceMock: &serviceMock[*core.Item]{err: core.ErrItemDeleteNotFound},
+			serviceMock: &serviceMock[*core.Item]{err: core.ErrItemNotFound},
 
 			expectStatus: http.StatusNotFound,
 		},

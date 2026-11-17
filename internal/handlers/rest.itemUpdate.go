@@ -20,8 +20,8 @@ type RestItemUpdateService interface {
 
 // itemUpdateErrors maps a refused item update to its status.
 var itemUpdateErrors = httpf.ErrMap{
-	core.ErrItemUpdateNotFound: http.StatusNotFound,
-	core.ErrInvalidRequest:     http.StatusBadRequest,
+	core.ErrItemNotFound:   http.StatusNotFound,
+	core.ErrInvalidRequest: http.StatusUnprocessableEntity,
 }
 
 // RestItemUpdateRequest is the JSON body accepted by the update endpoint.

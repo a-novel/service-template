@@ -14,32 +14,35 @@ import (
 // Main holds the top-level application settings.
 type Main struct {
 	// Name of the application, as it appears in logs and tracing.
-	Name string `json:"name" yaml:"name"`
+	Name string
 	// DowntimeStart is when a planned downtime starts; nil when none is planned. From then until
 	// it is removed, the service refuses work and leaves its database alone.
-	DowntimeStart *time.Time `json:"downtimeStart" yaml:"downtimeStart"`
+	DowntimeStart *time.Time
 }
 
 // App is the complete configuration the service reads at startup.
 type App struct {
 	// App holds the top-level application settings.
-	App Main `json:"app" yaml:"app"`
+	App Main
 	// Grpc configures the gRPC server.
-	Grpc grpcf.ServerConfig `json:"grpc" yaml:"grpc"`
+	Grpc grpcf.ServerConfig
 	// Rest configures the REST server.
-	Rest httpf.ServerConfig `json:"rest" yaml:"rest"`
-	// ServiceToken names the service tokens both servers accept. Without an issuer, they take every
-	// call without one.
-	ServiceToken servicetoken.Config `json:"serviceToken" yaml:"serviceToken"`
+	Rest httpf.ServerConfig
+	// ServiceToken names the service tokens both servers accept. Without an issuer, the servers refuse
+	// to start unless ServiceIssuerOptional is set.
+	ServiceToken servicetoken.Config
+	// ServiceIssuerOptional lets the servers start without a service-token issuer, and then take every
+	// call. Only a local or test stack sets it.
+	ServiceIssuerOptional bool
 
 	// Otel configures the OpenTelemetry exporter.
-	Otel otel.Config `json:"otel" yaml:"otel"`
+	Otel otel.Config
 	// Logger is the application logger the REST handlers report their errors to.
-	Logger logging.Log `json:"logger" yaml:"logger"`
+	Logger logging.Log
 	// GrpcLogger configures the gRPC request logging middleware.
-	GrpcLogger logging.RPCConfig `json:"grpcLogger" yaml:"grpcLogger"`
+	GrpcLogger logging.RPCConfig
 	// RestLogger configures the REST request logging middleware.
-	RestLogger logging.HTTPConfig `json:"restLogger" yaml:"restLogger"`
+	RestLogger logging.HTTPConfig
 	// Postgres configures the PostgreSQL connection.
-	Postgres postgres.Config `json:"postgres" yaml:"postgres"`
+	Postgres postgres.Config
 }

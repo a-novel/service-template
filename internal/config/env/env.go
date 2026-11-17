@@ -1,6 +1,7 @@
 package env
 
 import (
+	"cmp"
 	"os"
 	"strconv"
 	"time"
@@ -42,11 +43,6 @@ const (
 )
 
 var (
-	// PostgresDSN is the legacy URL used when PostgresHost is empty, formatted as
-	//	postgres://<user>:<password>@<host>:<port>/<database>
-	//
-	// Configure the discrete PostgreSQL fields for new deployments.
-	PostgresDSN = getEnv("POSTGRES_DSN")
 	// PostgresHost is the PostgreSQL server hostname or IP address.
 	PostgresHost = getEnv("POSTGRES_HOST")
 	// PostgresPort is the PostgreSQL server port.
@@ -66,26 +62,26 @@ var (
 	PostgresMaxIdleConns = config.LoadEnv(getEnv("POSTGRES_MAX_IDLE_CONNS"), PostgresMaxIdleConnsDefault, strconv.Atoi)
 
 	// AppName is the name of the application, as it appears in logs and tracing.
-	AppName = config.LoadEnv(getEnv("APP_NAME"), AppNameDefault, config.StringParser)
+	AppName = cmp.Or(getEnv("APP_NAME"), AppNameDefault)
 	// Otel enables OpenTelemetry tracing.
 	Otel = config.LoadEnv(getEnv("OTEL"), false, strconv.ParseBool)
 
-	// GrpcURL is the address of the gRPC service, in the form <host>:<port>. The Go client tests
-	// dial it.
-	GrpcURL = getEnv("GRPC_URL")
 	// Grpc configures the gRPC server from the GRPC_* variables.
 	Grpc = grpcf.LoadServerConfig(getEnv, grpcDefaults())
 	// Rest configures the REST server from the REST_* variables.
 	Rest = httpf.LoadServerConfig(getEnv, restDefaults())
 
 	// ServiceTokenIssuer is the issuer of the service tokens the servers accept, as a token's "iss"
-	// claim names it. When empty, the servers take every call without a service token.
+	// claim names it. When empty, the servers refuse to start unless [ServiceIssuerOptional] is set.
 	ServiceTokenIssuer = getEnv("SERVICE_TOKEN_ISSUER")
 	// ServiceTokenAudience is the audience the servers answer to. Each caller requests its token for it.
 	ServiceTokenAudience = getEnv("SERVICE_TOKEN_AUDIENCE")
 	// ServiceTokenCallers are the service accounts allowed to call, as a comma-separated list of
 	// system:serviceaccount:<namespace>:<name>.
 	ServiceTokenCallers = config.LoadEnv(getEnv("SERVICE_TOKEN_CALLERS"), nil, config.SliceParser(config.StringParser))
+	// ServiceIssuerOptional lets the servers start without [ServiceTokenIssuer], and then take every
+	// call. Only a local or test stack sets it, as the standalone images do.
+	ServiceIssuerOptional = config.LoadEnv(getEnv("SERVICE_ISSUER_OPTIONAL"), false, strconv.ParseBool)
 
 	// OTLPEndpoint is the standard OTEL_EXPORTER_OTLP_ENDPOINT. When set, traces and logs export
 	// over OTLP/HTTP, which the OTEL_EXPORTER_OTLP_* variables configure. When empty, they go to

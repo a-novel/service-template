@@ -10,13 +10,10 @@ COPY go.mod go.sum ./
 RUN --mount=type=cache,target=/go/pkg/mod \
     go mod download
 
-COPY ./cmd/rest ./cmd/rest
-COPY ./cmd/migrations ./cmd/migrations
-COPY ./internal/handlers ./internal/handlers
-COPY ./internal/dao ./internal/dao
-COPY ./internal/core ./internal/core
-COPY ./internal/models/migrations ./internal/models/migrations
-COPY ./internal/config ./internal/config
+# The whole source trees: .dockerignore drops tests and docs, and the build cache mount
+# recompiles only the packages that changed.
+COPY ./cmd ./cmd
+COPY ./internal ./internal
 
 RUN --mount=type=cache,target=/go/pkg/mod \
     --mount=type=cache,target=/root/.cache/go-build \
@@ -33,6 +30,9 @@ HEALTHCHECK --interval=1s --timeout=5s --retries=10 --start-period=1s \
   CMD ["wget", "-qO", "/dev/null", "http://localhost:8080/v0/ping"]
 
 ENV REST_PORT=8080
+
+# A local or test stack has no service-token issuer: the servers take every call.
+ENV SERVICE_ISSUER_OPTIONAL=true
 
 EXPOSE 8080
 

@@ -18,7 +18,7 @@ type RestItemCreateService interface {
 
 // itemCreateErrors maps a refused item creation to its status.
 var itemCreateErrors = httpf.ErrMap{
-	core.ErrInvalidRequest: http.StatusBadRequest,
+	core.ErrInvalidRequest: http.StatusUnprocessableEntity,
 }
 
 // RestItemCreateRequest is the JSON body accepted by the create endpoint.

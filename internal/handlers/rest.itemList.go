@@ -18,7 +18,7 @@ type RestItemListService interface {
 
 // itemListErrors maps a refused page request to its status.
 var itemListErrors = httpf.ErrMap{
-	core.ErrInvalidRequest: http.StatusBadRequest,
+	core.ErrInvalidRequest: http.StatusUnprocessableEntity,
 }
 
 // RestItemListRequest carries the pagination query parameters accepted by the

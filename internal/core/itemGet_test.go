@@ -46,9 +46,9 @@ func TestItemGet(t *testing.T) {
 
 			id: itemID,
 
-			daoMock: &daoMock[*dao.Item]{err: dao.ErrItemGetNotFound},
+			daoMock: &daoMock[*dao.Item]{err: dao.ErrItemNotFound},
 
-			expectErr: core.ErrItemGetNotFound,
+			expectErr: core.ErrItemNotFound,
 		},
 		{
 			name: "Error/Dao",

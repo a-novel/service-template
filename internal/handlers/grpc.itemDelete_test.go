@@ -59,7 +59,7 @@ func TestGrpcItemDelete(t *testing.T) {
 
 			request: request,
 
-			serviceMock: &serviceMock[*core.Item]{err: core.ErrItemDeleteNotFound},
+			serviceMock: &serviceMock[*core.Item]{err: core.ErrItemNotFound},
 
 			expectStatus: codes.NotFound,
 		},

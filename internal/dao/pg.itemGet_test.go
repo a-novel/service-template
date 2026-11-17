@@ -37,7 +37,7 @@ func TestPgItemGet(t *testing.T) {
 
 			id: absentID,
 
-			expectErr: dao.ErrItemGetNotFound,
+			expectErr: dao.ErrItemNotFound,
 		},
 	}
 

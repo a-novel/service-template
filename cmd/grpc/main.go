@@ -1,5 +1,7 @@
-// Command grpc serves the private gRPC API, for other services on the internal network. cmd/rest
-// serves the same domain over HTTP, and cmd/migrations applies the database schema.
+// Command grpc serves the private gRPC API, for other services on the internal network. It admits
+// only the callers its service tokens allow, and refuses to start without a token issuer unless
+// SERVICE_ISSUER_OPTIONAL opts a local stack out. cmd/rest serves the same domain over HTTP, and
+// cmd/migrations applies the database schema.
 package main
 
 import (
@@ -92,7 +94,9 @@ func main() {
 		return postgres.TransferContext(ctx, rpCtx)
 	}
 
-	serviceToken := handlers.GrpcServiceToken(cfg.ServiceToken, httpf.NewPoolClient(httpf.PoolOptions{}))
+	serviceToken := lo.Must(handlers.GrpcServiceToken(
+		cfg.ServiceToken, cfg.ServiceIssuerOptional, httpf.NewPoolClient(httpf.PoolOptions{}),
+	))
 
 	server := grpcf.NewServer(ctx, cfg.Otel, cfg.GrpcLogger, cfg.App.DowntimeStart, ctxInterceptor, serviceToken...)
 

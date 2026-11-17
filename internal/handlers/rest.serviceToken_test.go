@@ -27,10 +27,12 @@ func TestRestServiceToken(t *testing.T) {
 	testCases := []struct {
 		name string
 
-		tokenConfig servicetoken.Config
-		token       string
+		tokenConfig    servicetoken.Config
+		issuerOptional bool
+		token          string
 
 		expectStatus int
+		expectErr    error
 	}{
 		{
 			name: "Success",
@@ -41,17 +43,18 @@ func TestRestServiceToken(t *testing.T) {
 			expectStatus: http.StatusNoContent,
 		},
 		{
-			name: "Success/Unconfigured",
+			// A local stack opts out, and the server takes every call.
+			name: "Success/IssuerOptional",
+
+			issuerOptional: true,
 
 			expectStatus: http.StatusNoContent,
 		},
 		{
-			name: "Error/UnknownCaller",
+			// A deployment that forgets the issuer stops at startup rather than admit every caller.
+			name: "Error/IssuerRequired",
 
-			tokenConfig: tokenConfig,
-			token:       issuer.Sign(t, issuer.Claims(serviceTokenStranger, serviceTokenAudience)),
-
-			expectStatus: http.StatusUnauthorized,
+			expectErr: handlers.ErrServiceTokenIssuerRequired,
 		},
 		{
 			name: "Error/Missing",
@@ -74,8 +77,16 @@ func TestRestServiceToken(t *testing.T) {
 				request.Header.Set(servicetoken.Header, testCase.token)
 			}
 
+			withServiceToken, err := handlers.RestServiceToken(
+				testCase.tokenConfig, testCase.issuerOptional, &http.Client{}, config.LoggerDev, "/v0/ping",
+			)
+			require.ErrorIs(t, err, testCase.expectErr)
+
+			if testCase.expectErr != nil {
+				return
+			}
+
 			w := httptest.NewRecorder()
-			withServiceToken := handlers.RestServiceToken(testCase.tokenConfig, &http.Client{}, config.LoggerDev, "/v0/ping")
 			withServiceToken(router).ServeHTTP(w, request)
 
 			require.Equal(t, testCase.expectStatus, w.Code)

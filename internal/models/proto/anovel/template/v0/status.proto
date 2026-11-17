@@ -25,10 +25,6 @@ enum DependencyStatus {
 // internal hostnames, ports, or schema names. The error is recorded on the trace span for
 // operators.
 message DependencyHealth {
-  // Number 2 and the name "err" stay reserved: a health report carries no raw error.
-  reserved 2;
-  reserved "err";
-
   // Whether the dependency answered its probe.
   DependencyStatus status = 1;
 }

@@ -16,9 +16,6 @@ import (
 //go:embed pg.itemGet.sql
 var itemGetQuery string
 
-// ErrItemGetNotFound is returned by [PgItemGet.Exec] when no item has the requested ID.
-var ErrItemGetNotFound = errors.New("item not found")
-
 // ItemGetRequest is the input to [PgItemGet.Exec].
 type ItemGetRequest struct {
 	ID uuid.UUID
@@ -44,7 +41,7 @@ func (dao *PgItemGet) Exec(ctx context.Context, request *ItemGetRequest) (*Item,
 
 	err = db.NewRaw(itemGetQuery, request.ID).Scan(ctx, &entity)
 	if errors.Is(err, sql.ErrNoRows) {
-		err = errors.Join(err, ErrItemGetNotFound)
+		err = errors.Join(err, ErrItemNotFound)
 	}
 
 	if err != nil {

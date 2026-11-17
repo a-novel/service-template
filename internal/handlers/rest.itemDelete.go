@@ -20,8 +20,8 @@ type RestItemDeleteService interface {
 
 // itemDeleteErrors maps a refused item deletion to its status.
 var itemDeleteErrors = httpf.ErrMap{
-	core.ErrItemDeleteNotFound: http.StatusNotFound,
-	core.ErrInvalidRequest:     http.StatusBadRequest,
+	core.ErrItemNotFound:   http.StatusNotFound,
+	core.ErrInvalidRequest: http.StatusUnprocessableEntity,
 }
 
 // RestItemDeleteRequest carries the query parameters accepted by the delete endpoint.

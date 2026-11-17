@@ -27,7 +27,7 @@ type ItemListRequest struct {
 	// Maximum number of items to return, from 1 to 100. Zero selects 20.
 	Limit int32 `protobuf:"varint,1,opt,name=limit,proto3" json:"limit,omitempty"`
 	// How many items, newest first, come before the page. Zero starts at the newest item.
-	Offset        int32 `protobuf:"varint,4,opt,name=offset,proto3" json:"offset,omitempty"`
+	Offset        int32 `protobuf:"varint,2,opt,name=offset,proto3" json:"offset,omitempty"`
 	unknownFields protoimpl.UnknownFields
 	sizeCache     protoimpl.SizeCache
 }
@@ -136,10 +136,10 @@ var File_anovel_template_v0_item_list_proto protoreflect.FileDescriptor
 
 const file_anovel_template_v0_item_list_proto_rawDesc = "" +
 	"\n" +
-	"\"anovel/template/v0/item_list.proto\x12\x12anovel.template.v0\x1a\x1danovel/template/v0/item.proto\"R\n" +
+	"\"anovel/template/v0/item_list.proto\x12\x12anovel.template.v0\x1a\x1danovel/template/v0/item.proto\"?\n" +
 	"\x0fItemListRequest\x12\x14\n" +
 	"\x05limit\x18\x01 \x01(\x05R\x05limit\x12\x16\n" +
-	"\x06offset\x18\x04 \x01(\x05R\x06offsetJ\x04\b\x02\x10\x03J\x04\b\x03\x10\x04R\x05after\"X\n" +
+	"\x06offset\x18\x02 \x01(\x05R\x06offset\"X\n" +
 	"\x10ItemListResponse\x12.\n" +
 	"\x05items\x18\x01 \x03(\v2\x18.anovel.template.v0.ItemR\x05items\x12\x14\n" +
 	"\x05total\x18\x02 \x01(\x03R\x05total2h\n" +

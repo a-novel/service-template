@@ -17,9 +17,6 @@ import (
 //go:embed pg.itemUpdate.sql
 var itemUpdateQuery string
 
-// ErrItemUpdateNotFound is returned by [PgItemUpdate.Exec] when no item has the requested ID.
-var ErrItemUpdateNotFound = errors.New("item not found")
-
 // ItemUpdateRequest is the input to [PgItemUpdate.Exec].
 type ItemUpdateRequest struct {
 	ID          uuid.UUID
@@ -49,7 +46,7 @@ func (dao *PgItemUpdate) Exec(ctx context.Context, request *ItemUpdateRequest) (
 
 	err = db.NewRaw(itemUpdateQuery, request.Name, request.Description, request.Now, request.ID).Scan(ctx, &entity)
 	if errors.Is(err, sql.ErrNoRows) {
-		err = errors.Join(err, ErrItemUpdateNotFound)
+		err = errors.Join(err, ErrItemNotFound)
 	}
 
 	if err != nil {

@@ -48,7 +48,7 @@ func (handler *GrpcItemGet) ItemGet(
 		return nil, status.Error(codes.InvalidArgument, "invalid request")
 	}
 
-	if errors.Is(err, core.ErrItemGetNotFound) {
+	if errors.Is(err, core.ErrItemNotFound) {
 		return nil, status.Error(codes.NotFound, "item not found")
 	}
 

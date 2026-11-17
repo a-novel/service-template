@@ -40,7 +40,7 @@ func TestPgItemUpdate(t *testing.T) {
 
 			id: absentID,
 
-			expectErr: dao.ErrItemUpdateNotFound,
+			expectErr: dao.ErrItemNotFound,
 		},
 	}
 

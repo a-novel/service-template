@@ -35,11 +35,13 @@ func TestGrpcServiceToken(t *testing.T) {
 	testCases := []struct {
 		name string
 
-		tokenConfig servicetoken.Config
-		token       string
-		stream      bool
+		tokenConfig    servicetoken.Config
+		issuerOptional bool
+		token          string
+		stream         bool
 
 		expectStatus codes.Code
+		expectErr    error
 	}{
 		{
 			name: "Success",
@@ -50,17 +52,18 @@ func TestGrpcServiceToken(t *testing.T) {
 			expectStatus: codes.OK,
 		},
 		{
-			name: "Success/Unconfigured",
+			// A local stack opts out, and the server takes every call.
+			name: "Success/IssuerOptional",
+
+			issuerOptional: true,
 
 			expectStatus: codes.OK,
 		},
 		{
-			name: "Error/UnknownCaller",
+			// A deployment that forgets the issuer stops at startup rather than admit every caller.
+			name: "Error/IssuerRequired",
 
-			tokenConfig: tokenConfig,
-			token:       issuer.Sign(t, issuer.Claims(serviceTokenStranger, serviceTokenAudience)),
-
-			expectStatus: codes.Unauthenticated,
+			expectErr: handlers.ErrServiceTokenIssuerRequired,
 		},
 		{
 			name: "Error/Missing",
@@ -70,6 +73,7 @@ func TestGrpcServiceToken(t *testing.T) {
 			expectStatus: codes.Unauthenticated,
 		},
 		{
+			// Streams pass the same gate.
 			name: "Error/Stream",
 
 			tokenConfig: tokenConfig,
@@ -83,14 +87,21 @@ func TestGrpcServiceToken(t *testing.T) {
 		t.Run(testCase.name, func(t *testing.T) {
 			t.Parallel()
 
-			conn := serveEcho(t, handlers.GrpcServiceToken(testCase.tokenConfig, &http.Client{}))
+			options, err := handlers.GrpcServiceToken(testCase.tokenConfig, testCase.issuerOptional, &http.Client{})
+			require.ErrorIs(t, err, testCase.expectErr)
+
+			if testCase.expectErr != nil {
+				return
+			}
+
+			conn := serveEcho(t, options)
 
 			ctx := t.Context()
 			if testCase.token != "" {
 				ctx = metadata.AppendToOutgoingContext(ctx, servicetoken.Header, testCase.token)
 			}
 
-			err := callEcho(ctx, conn, testCase.stream)
+			err = callEcho(ctx, conn, testCase.stream)
 			require.Equal(t, testCase.expectStatus, status.Code(err), "got %v", err)
 		})
 	}
