@@ -1,9 +1,7 @@
 package core_test
 
 import (
-	"errors"
 	"testing"
-	"time"
 
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/mock"
@@ -17,19 +15,12 @@ import (
 func TestItemDelete(t *testing.T) {
 	t.Parallel()
 
-	errFoo := errors.New("foo")
-
-	type daoMock struct {
-		resp *dao.Item
-		err  error
-	}
-
 	testCases := []struct {
 		name string
 
-		request *core.ItemDeleteRequest
+		id uuid.UUID
 
-		daoMock *daoMock
+		daoMock *daoMock[*dao.Item]
 
 		expect    *core.Item
 		expectErr error
@@ -37,52 +28,35 @@ func TestItemDelete(t *testing.T) {
 		{
 			name: "Success",
 
-			request: &core.ItemDeleteRequest{
-				ID: uuid.MustParse("00000000-0000-0000-0000-000000000001"),
-			},
+			id: itemID,
 
-			daoMock: &daoMock{
-				resp: &dao.Item{
-					ID:          uuid.MustParse("00000000-0000-0000-0000-000000000001"),
-					Name:        "test item",
-					Description: "test description",
-					CreatedAt:   time.Date(2021, 1, 1, 0, 0, 0, 0, time.UTC),
-					UpdatedAt:   time.Date(2021, 1, 1, 0, 0, 0, 0, time.UTC),
-				},
-			},
+			daoMock: &daoMock[*dao.Item]{resp: daoItem},
 
-			expect: &core.Item{
-				ID:          uuid.MustParse("00000000-0000-0000-0000-000000000001"),
-				Name:        "test item",
-				Description: "test description",
-				CreatedAt:   time.Date(2021, 1, 1, 0, 0, 0, 0, time.UTC),
-				UpdatedAt:   time.Date(2021, 1, 1, 0, 0, 0, 0, time.UTC),
-			},
+			expect: coreItem,
 		},
 		{
 			name: "Error/InvalidID",
 
-			request:   &core.ItemDeleteRequest{ID: uuid.Nil},
+			id: uuid.Nil,
+
 			expectErr: core.ErrInvalidRequest,
 		},
 		{
 			name: "Error/NotFound",
 
-			request: &core.ItemDeleteRequest{
-				ID: uuid.MustParse("00000000-0000-0000-0000-000000000001"),
-			},
+			id: itemID,
 
-			daoMock:   &daoMock{err: dao.ErrItemDeleteNotFound},
+			daoMock: &daoMock[*dao.Item]{err: dao.ErrItemDeleteNotFound},
+
 			expectErr: core.ErrItemDeleteNotFound,
 		},
 		{
 			name: "Error/Dao",
 
-			request: &core.ItemDeleteRequest{
-				ID: uuid.MustParse("00000000-0000-0000-0000-000000000001"),
-			},
+			id: itemID,
 
-			daoMock:   &daoMock{err: errFoo},
+			daoMock: &daoMock[*dao.Item]{err: errFoo},
+
 			expectErr: errFoo,
 		},
 	}
@@ -91,23 +65,17 @@ func TestItemDelete(t *testing.T) {
 		t.Run(testCase.name, func(t *testing.T) {
 			t.Parallel()
 
-			mockDao := coremocks.NewMockItemDeleteDao(t)
+			itemDao := coremocks.NewMockItemDeleteDao(t)
 
 			if testCase.daoMock != nil {
-				mockDao.EXPECT().
-					Exec(mock.Anything, &dao.ItemDeleteRequest{
-						ID: testCase.request.ID,
-					}).
+				itemDao.EXPECT().
+					Exec(mock.Anything, &dao.ItemDeleteRequest{ID: itemID}).
 					Return(testCase.daoMock.resp, testCase.daoMock.err)
 			}
 
-			service := core.NewItemDelete(mockDao)
-
-			resp, err := service.Exec(t.Context(), testCase.request)
+			item, err := core.NewItemDelete(itemDao).Exec(t.Context(), &core.ItemDeleteRequest{ID: testCase.id})
 			require.ErrorIs(t, err, testCase.expectErr)
-			require.Equal(t, testCase.expect, resp)
-
-			mockDao.AssertExpectations(t)
+			require.Equal(t, testCase.expect, item)
 		})
 	}
 }

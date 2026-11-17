@@ -1,9 +1,7 @@
 package core_test
 
 import (
-	"errors"
 	"testing"
-	"time"
 
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/mock"
@@ -17,19 +15,12 @@ import (
 func TestItemGet(t *testing.T) {
 	t.Parallel()
 
-	errFoo := errors.New("foo")
-
-	type daoMock struct {
-		resp *dao.Item
-		err  error
-	}
-
 	testCases := []struct {
 		name string
 
-		request *core.ItemGetRequest
+		id uuid.UUID
 
-		daoMock *daoMock
+		daoMock *daoMock[*dao.Item]
 
 		expect    *core.Item
 		expectErr error
@@ -37,52 +28,35 @@ func TestItemGet(t *testing.T) {
 		{
 			name: "Success",
 
-			request: &core.ItemGetRequest{
-				ID: uuid.MustParse("00000000-0000-0000-0000-000000000001"),
-			},
+			id: itemID,
 
-			daoMock: &daoMock{
-				resp: &dao.Item{
-					ID:          uuid.MustParse("00000000-0000-0000-0000-000000000001"),
-					Name:        "test item",
-					Description: "test description",
-					CreatedAt:   time.Date(2021, 1, 1, 0, 0, 0, 0, time.UTC),
-					UpdatedAt:   time.Date(2021, 1, 1, 0, 0, 0, 0, time.UTC),
-				},
-			},
+			daoMock: &daoMock[*dao.Item]{resp: daoItem},
 
-			expect: &core.Item{
-				ID:          uuid.MustParse("00000000-0000-0000-0000-000000000001"),
-				Name:        "test item",
-				Description: "test description",
-				CreatedAt:   time.Date(2021, 1, 1, 0, 0, 0, 0, time.UTC),
-				UpdatedAt:   time.Date(2021, 1, 1, 0, 0, 0, 0, time.UTC),
-			},
+			expect: coreItem,
 		},
 		{
 			name: "Error/InvalidID",
 
-			request:   &core.ItemGetRequest{ID: uuid.Nil},
+			id: uuid.Nil,
+
 			expectErr: core.ErrInvalidRequest,
 		},
 		{
 			name: "Error/NotFound",
 
-			request: &core.ItemGetRequest{
-				ID: uuid.MustParse("00000000-0000-0000-0000-000000000001"),
-			},
+			id: itemID,
 
-			daoMock:   &daoMock{err: dao.ErrItemGetNotFound},
+			daoMock: &daoMock[*dao.Item]{err: dao.ErrItemGetNotFound},
+
 			expectErr: core.ErrItemGetNotFound,
 		},
 		{
 			name: "Error/Dao",
 
-			request: &core.ItemGetRequest{
-				ID: uuid.MustParse("00000000-0000-0000-0000-000000000001"),
-			},
+			id: itemID,
 
-			daoMock:   &daoMock{err: errFoo},
+			daoMock: &daoMock[*dao.Item]{err: errFoo},
+
 			expectErr: errFoo,
 		},
 	}
@@ -91,23 +65,17 @@ func TestItemGet(t *testing.T) {
 		t.Run(testCase.name, func(t *testing.T) {
 			t.Parallel()
 
-			mockDao := coremocks.NewMockItemGetDao(t)
+			itemDao := coremocks.NewMockItemGetDao(t)
 
 			if testCase.daoMock != nil {
-				mockDao.EXPECT().
-					Exec(mock.Anything, &dao.ItemGetRequest{
-						ID: testCase.request.ID,
-					}).
+				itemDao.EXPECT().
+					Exec(mock.Anything, &dao.ItemGetRequest{ID: itemID}).
 					Return(testCase.daoMock.resp, testCase.daoMock.err)
 			}
 
-			service := core.NewItemGet(mockDao)
-
-			resp, err := service.Exec(t.Context(), testCase.request)
+			item, err := core.NewItemGet(itemDao).Exec(t.Context(), &core.ItemGetRequest{ID: testCase.id})
 			require.ErrorIs(t, err, testCase.expectErr)
-			require.Equal(t, testCase.expect, resp)
-
-			mockDao.AssertExpectations(t)
+			require.Equal(t, testCase.expect, item)
 		})
 	}
 }

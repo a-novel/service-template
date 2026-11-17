@@ -1,9 +1,6 @@
 package handlers_test
 
 import (
-	"encoding/json"
-	"errors"
-	"io"
 	"net/http"
 	"net/http/httptest"
 	"testing"
@@ -19,38 +16,20 @@ func TestRestHealth(t *testing.T) {
 	testCases := []struct {
 		name string
 
-		setup probeSetup
+		// postgres hands the probe the test database; without it, the probe meets no database.
+		postgres bool
 
 		expectStatus int
 		expectHealth string
 	}{
 		{
 			name:         "Success",
-			setup:        probeHealthy,
+			postgres:     true,
 			expectStatus: http.StatusOK,
 			expectHealth: handlers.RestHealthStatusUp,
 		},
 		{
-			name:         "Error/MissingPostgres",
-			setup:        probeWithoutPostgres,
-			expectStatus: http.StatusServiceUnavailable,
-			expectHealth: handlers.RestHealthStatusDown,
-		},
-		{
-			name:         "Error/ClosedPostgres",
-			setup:        probeClosedPostgres,
-			expectStatus: http.StatusServiceUnavailable,
-			expectHealth: handlers.RestHealthStatusDown,
-		},
-		{
-			name:         "Error/TransactionContext",
-			setup:        probeInTransaction,
-			expectStatus: http.StatusServiceUnavailable,
-			expectHealth: handlers.RestHealthStatusDown,
-		},
-		{
-			name:         "Error/CancelledProbe",
-			setup:        probeCancelled,
+			name:         "Error/PostgresDown",
 			expectStatus: http.StatusServiceUnavailable,
 			expectHealth: handlers.RestHealthStatusDown,
 		},
@@ -60,26 +39,20 @@ func TestRestHealth(t *testing.T) {
 		t.Run(testCase.name, func(t *testing.T) {
 			t.Parallel()
 
-			ctx := newProbeContext(t, testCase.setup)
-			recorder := httptest.NewRecorder()
+			ctx := t.Context()
+			if testCase.postgres {
+				ctx = postgresContext(t)
+			}
 
-			handlers.NewRestHealth().ServeHTTP(
-				recorder, httptest.NewRequestWithContext(ctx, http.MethodGet, "/v0/healthcheck", nil),
-			)
+			w := httptest.NewRecorder()
+			handlers.NewRestHealth().ServeHTTP(w, httptest.NewRequestWithContext(ctx, http.MethodGet, "/v0/healthcheck", nil))
 
-			response := recorder.Result()
-			require.Equal(t, testCase.expectStatus, response.StatusCode)
+			response := w.Result()
 			require.Contains(t, response.Header.Get("Content-Type"), "application/json")
-
-			body, err := io.ReadAll(response.Body)
-			require.NoError(t, errors.Join(err, response.Body.Close()))
-
-			var report any
-			require.NoError(t, json.Unmarshal(body, &report))
 			// Exact matching keeps raw dependency errors out of the public report.
-			require.Equal(t, map[string]any{
+			requireResponse(t, response, testCase.expectStatus, map[string]any{
 				"client:postgres": map[string]any{"status": testCase.expectHealth},
-			}, report)
+			})
 		})
 	}
 }

@@ -2,15 +2,58 @@ package handlers_test
 
 import (
 	"context"
+	"encoding/json"
+	"errors"
+	"io"
+	"net/http"
 	"testing"
+	"time"
 
+	"github.com/google/uuid"
 	"github.com/stretchr/testify/require"
-	"github.com/uptrace/bun"
+	"google.golang.org/grpc/codes"
+	"google.golang.org/grpc/status"
+	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/a-novel-kit/golib/postgres"
-	postgrespresets "github.com/a-novel-kit/golib/postgres/presets"
 
 	"github.com/a-novel/service-template/internal/config/configtest"
+	"github.com/a-novel/service-template/internal/core"
+	templatev0 "github.com/a-novel/service-template/internal/handlers/protogen/anovel/template/v0"
+)
+
+var (
+	// errFoo is the unexpected error a service mock returns, which every handler answers as a server
+	// fault.
+	errFoo = errors.New("foo")
+
+	itemID = uuid.MustParse("00000000-0000-0000-0000-000000000001")
+
+	// coreItem is the item the service mocks return. Its creation time carries microseconds, which
+	// both transports must keep.
+	coreItem = &core.Item{
+		ID:          itemID,
+		Name:        "test item",
+		Description: "test description",
+		CreatedAt:   time.Date(2021, 1, 1, 0, 0, 0, 123456000, time.UTC),
+		UpdatedAt:   time.Date(2021, 1, 2, 0, 0, 0, 0, time.UTC),
+	}
+	// jsonItem is coreItem as the REST handlers send it.
+	jsonItem = map[string]any{
+		"id":          itemID.String(),
+		"name":        "test item",
+		"description": "test description",
+		"createdAt":   "2021-01-01T00:00:00.123456Z",
+		"updatedAt":   "2021-01-02T00:00:00Z",
+	}
+	// protoItem is coreItem as the gRPC handlers send it.
+	protoItem = &templatev0.Item{
+		Id:          itemID.String(),
+		Name:        "test item",
+		Description: "test description",
+		CreatedAt:   &timestamppb.Timestamp{Seconds: 1609459200, Nanos: 123456000},
+		UpdatedAt:   &timestamppb.Timestamp{Seconds: 1609545600},
+	}
 )
 
 const (
@@ -22,58 +65,53 @@ const (
 	serviceTokenStranger = "system:serviceaccount:agora:stranger"
 )
 
-// probeSetup selects the state of the PostgreSQL connection a health probe meets.
-type probeSetup int
+// serviceMock is what the service mock of a handler test case returns. A nil one means the handler
+// must not call the service.
+type serviceMock[Resp any] struct {
+	resp Resp
+	err  error
+}
 
-const (
-	// probeHealthy gives the probe an open connection.
-	probeHealthy probeSetup = iota
-	// probeWithoutPostgres leaves PostgreSQL out of the context.
-	probeWithoutPostgres
-	// probeClosedPostgres gives the probe a closed connection pool.
-	probeClosedPostgres
-	// probeInTransaction runs the probe inside an open transaction, which it must leave open.
-	probeInTransaction
-	// probeCancelled gives the probe a cancelled context.
-	probeCancelled
-)
-
-// newProbeContext returns the context a health probe runs with under the given setup. Each call
-// opens a pool of its own, so closing it leaves the other tests' connections alone.
-func newProbeContext(t *testing.T, setup probeSetup) context.Context {
+// requireResponse checks the status of a REST handler's response, and its JSON body when one is
+// expected.
+func requireResponse(t *testing.T, response *http.Response, expectStatus int, expectBody any) {
 	t.Helper()
 
-	ctx := t.Context()
-	if setup == probeWithoutPostgres {
-		return ctx
+	require.Equal(t, expectStatus, response.StatusCode)
+
+	if expectBody == nil {
+		return
 	}
 
-	ctx, err := postgres.NewContext(ctx, postgrespresets.NewDefault(configtest.PostgresPreset.Options()...))
-	require.NoError(t, err)
+	data, err := io.ReadAll(response.Body)
+	require.NoError(t, errors.Join(err, response.Body.Close()))
 
-	pg, err := postgres.GetContext(ctx)
-	require.NoError(t, err)
+	var body any
+	require.NoError(t, json.Unmarshal(data, &body))
+	require.Equal(t, expectBody, body)
+}
 
-	db, ok := pg.(*bun.DB)
-	require.True(t, ok)
-	t.Cleanup(func() { require.NoError(t, db.Close()) })
+// requireStatus checks the gRPC status a handler answers with. A server fault must keep errFoo, which
+// every Internal case's service mock returns, as its cause, so the server span names its type.
+func requireStatus(t *testing.T, err error, expectStatus codes.Code) {
+	t.Helper()
 
-	switch setup {
-	case probeClosedPostgres:
-		require.NoError(t, db.Close())
-	case probeInTransaction:
-		// The transaction outlives the test context, so the rollback proves the probe left it open.
-		tx, err := db.BeginTx(context.WithoutCancel(ctx), nil)
-		require.NoError(t, err)
-		t.Cleanup(func() { require.NoError(t, tx.Rollback()) })
+	result, ok := status.FromError(err)
+	require.True(t, ok, "not a gRPC status: %v", err)
+	require.Equal(t, expectStatus, result.Code(), "got %s (%v)", result.Code(), err)
 
-		ctx = context.WithValue(ctx, postgres.ContextKey{}, tx)
-	case probeCancelled:
-		cancelled, cancel := context.WithCancel(ctx)
-		cancel()
-
-		ctx = cancelled
+	if expectStatus == codes.Internal {
+		require.ErrorIs(t, err, errFoo)
 	}
+}
+
+// postgresContext returns the test's context carrying the test database, as the servers hand it to
+// a health probe.
+func postgresContext(t *testing.T) context.Context {
+	t.Helper()
+
+	ctx, err := postgres.NewContext(t.Context(), configtest.PostgresPreset)
+	require.NoError(t, err)
 
 	return ctx
 }

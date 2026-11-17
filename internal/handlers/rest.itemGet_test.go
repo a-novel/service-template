@@ -1,17 +1,11 @@
 package handlers_test
 
 import (
-	"encoding/json"
-	"errors"
-	"io"
 	"net/http"
 	"net/http/httptest"
 	"testing"
-	"time"
 
-	"github.com/google/uuid"
 	"github.com/stretchr/testify/mock"
-	"github.com/stretchr/testify/require"
 
 	"github.com/a-novel/service-template/internal/config"
 	"github.com/a-novel/service-template/internal/core"
@@ -22,20 +16,14 @@ import (
 func TestRestItemGet(t *testing.T) {
 	t.Parallel()
 
-	errFoo := errors.New("foo")
-
-	type serviceMock struct {
-		req  *core.ItemGetRequest
-		resp *core.Item
-		err  error
-	}
+	target := "/v0/item?id=" + itemID.String()
 
 	testCases := []struct {
 		name string
 
-		request *http.Request
+		target string
 
-		serviceMock *serviceMock
+		serviceMock *serviceMock[*core.Item]
 
 		expectStatus   int
 		expectResponse any
@@ -43,82 +31,35 @@ func TestRestItemGet(t *testing.T) {
 		{
 			name: "Success",
 
-			request: httptest.NewRequestWithContext(
-				t.Context(),
-				http.MethodGet,
-				"/v0/item?id=00000000-0000-0000-0000-000000000001",
-				nil,
-			),
+			target: target,
 
-			serviceMock: &serviceMock{
-				req: &core.ItemGetRequest{
-					ID: uuid.MustParse("00000000-0000-0000-0000-000000000001"),
-				},
-				resp: &core.Item{
-					ID:          uuid.MustParse("00000000-0000-0000-0000-000000000001"),
-					Name:        "test item",
-					Description: "test description",
-					CreatedAt:   time.Date(2021, 1, 1, 0, 0, 0, 0, time.UTC),
-					UpdatedAt:   time.Date(2021, 1, 2, 0, 0, 0, 0, time.UTC),
-				},
-			},
+			serviceMock: &serviceMock[*core.Item]{resp: coreItem},
 
-			expectStatus: http.StatusOK,
-			expectResponse: map[string]any{
-				"id":          "00000000-0000-0000-0000-000000000001",
-				"name":        "test item",
-				"description": "test description",
-				"createdAt":   "2021-01-01T00:00:00Z",
-				"updatedAt":   "2021-01-02T00:00:00Z",
-			},
+			expectStatus:   http.StatusOK,
+			expectResponse: jsonItem,
 		},
 		{
-			name: "Error/InvalidID",
+			name: "Error/MalformedID",
 
-			request: httptest.NewRequestWithContext(
-				t.Context(),
-				http.MethodGet,
-				"/v0/item?id=not-a-uuid",
-				nil,
-			),
+			target: "/v0/item?id=not-a-uuid",
 
 			expectStatus: http.StatusBadRequest,
 		},
 		{
 			name: "Error/NotFound",
 
-			request: httptest.NewRequestWithContext(
-				t.Context(),
-				http.MethodGet,
-				"/v0/item?id=00000000-0000-0000-0000-000000000001",
-				nil,
-			),
+			target: target,
 
-			serviceMock: &serviceMock{
-				req: &core.ItemGetRequest{
-					ID: uuid.MustParse("00000000-0000-0000-0000-000000000001"),
-				},
-				err: core.ErrItemGetNotFound,
-			},
+			serviceMock: &serviceMock[*core.Item]{err: core.ErrItemGetNotFound},
 
 			expectStatus: http.StatusNotFound,
 		},
 		{
 			name: "Error/Internal",
 
-			request: httptest.NewRequestWithContext(
-				t.Context(),
-				http.MethodGet,
-				"/v0/item?id=00000000-0000-0000-0000-000000000001",
-				nil,
-			),
+			target: target,
 
-			serviceMock: &serviceMock{
-				req: &core.ItemGetRequest{
-					ID: uuid.MustParse("00000000-0000-0000-0000-000000000001"),
-				},
-				err: errFoo,
-			},
+			serviceMock: &serviceMock[*core.Item]{err: errFoo},
 
 			expectStatus: http.StatusInternalServerError,
 		},
@@ -132,27 +73,16 @@ func TestRestItemGet(t *testing.T) {
 
 			if testCase.serviceMock != nil {
 				service.EXPECT().
-					Exec(mock.Anything, testCase.serviceMock.req).
+					Exec(mock.Anything, &core.ItemGetRequest{ID: itemID}).
 					Return(testCase.serviceMock.resp, testCase.serviceMock.err)
 			}
 
-			handler := handlers.NewRestItemGet(service, config.LoggerDev)
+			request := httptest.NewRequestWithContext(t.Context(), http.MethodGet, testCase.target, nil)
+
 			w := httptest.NewRecorder()
+			handlers.NewRestItemGet(service, config.LoggerDev).ServeHTTP(w, request)
 
-			handler.ServeHTTP(w, testCase.request)
-
-			res := w.Result()
-
-			require.Equal(t, testCase.expectStatus, res.StatusCode)
-
-			if testCase.expectResponse != nil {
-				data, err := io.ReadAll(res.Body)
-				require.NoError(t, errors.Join(err, res.Body.Close()))
-
-				var jsonRes any
-				require.NoError(t, json.Unmarshal(data, &jsonRes))
-				require.Equal(t, testCase.expectResponse, jsonRes)
-			}
+			requireResponse(t, w.Result(), testCase.expectStatus, testCase.expectResponse)
 		})
 	}
 }

@@ -3,12 +3,10 @@ package dao_test
 import (
 	"context"
 	"testing"
-	"time"
 
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/require"
 
-	"github.com/a-novel-kit/golib/postgres"
 	"github.com/a-novel-kit/golib/postgres/postgrestest"
 
 	"github.com/a-novel/service-template/internal/config/configtest"
@@ -22,9 +20,7 @@ func TestPgItemUpdate(t *testing.T) {
 	testCases := []struct {
 		name string
 
-		fixtures []*dao.Item
-
-		request *dao.ItemUpdateRequest
+		id uuid.UUID
 
 		expect    *dao.Item
 		expectErr error
@@ -32,39 +28,17 @@ func TestPgItemUpdate(t *testing.T) {
 		{
 			name: "Success",
 
-			fixtures: []*dao.Item{
-				{
-					ID:          uuid.MustParse("00000000-0000-0000-0000-000000000001"),
-					Name:        "original item",
-					Description: "original description",
-					CreatedAt:   time.Date(2021, 1, 1, 0, 0, 0, 0, time.UTC),
-					UpdatedAt:   time.Date(2021, 1, 1, 0, 0, 0, 0, time.UTC),
-				},
-			},
+			id: itemID,
 
-			request: &dao.ItemUpdateRequest{
-				ID:          uuid.MustParse("00000000-0000-0000-0000-000000000001"),
-				Name:        "updated item",
-				Description: "updated description",
-				Now:         time.Date(2021, 1, 2, 0, 0, 0, 0, time.UTC),
-			},
-
+			// The creation time stays.
 			expect: &dao.Item{
-				ID:          uuid.MustParse("00000000-0000-0000-0000-000000000001"),
-				Name:        "updated item",
-				Description: "updated description",
-				CreatedAt:   time.Date(2021, 1, 1, 0, 0, 0, 0, time.UTC),
-				UpdatedAt:   time.Date(2021, 1, 2, 0, 0, 0, 0, time.UTC),
+				ID: itemID, Name: "updated item", Description: "updated description", CreatedAt: createdAt, UpdatedAt: now,
 			},
 		},
 		{
 			name: "Error/NotFound",
 
-			request: &dao.ItemUpdateRequest{
-				ID:   uuid.MustParse("00000000-0000-0000-0000-000000000001"),
-				Name: "updated item",
-				Now:  time.Date(2021, 1, 2, 0, 0, 0, 0, time.UTC),
-			},
+			id: absentID,
 
 			expectErr: dao.ErrItemUpdateNotFound,
 		},
@@ -79,17 +53,13 @@ func TestPgItemUpdate(t *testing.T) {
 			postgrestest.RunDBTest(t, configtest.PostgresPreset, migrations.Migrations, func(ctx context.Context, t *testing.T) {
 				t.Helper()
 
-				db, err := postgres.GetContext(ctx)
-				require.NoError(t, err)
+				insertItems(ctx, t)
 
-				if len(testCase.fixtures) > 0 {
-					_, err = db.NewInsert().Model(&testCase.fixtures).Exec(ctx)
-					require.NoError(t, err)
-				}
-
-				result, err := daoItemUpdate.Exec(ctx, testCase.request)
+				item, err := daoItemUpdate.Exec(ctx, &dao.ItemUpdateRequest{
+					ID: testCase.id, Name: "updated item", Description: "updated description", Now: now,
+				})
 				require.ErrorIs(t, err, testCase.expectErr)
-				require.Equal(t, testCase.expect, result)
+				require.Equal(t, testCase.expect, item)
 			})
 		})
 	}
