@@ -23,22 +23,26 @@ func TestPgItemDelete(t *testing.T) {
 
 		id uuid.UUID
 
-		expectFixture bool
-		expectErr     error
+		expect    *dao.Item
+		expectErr error
+		// expectCount is how many items the table holds after the call.
+		expectCount int64
 	}{
 		{
 			name: "Success",
 
 			id: itemID,
 
-			expectFixture: true,
+			expect:      &itemOne,
+			expectCount: 2,
 		},
 		{
 			name: "Error/NotFound",
 
 			id: absentID,
 
-			expectErr: dao.ErrItemDeleteNotFound,
+			expectErr:   dao.ErrItemDeleteNotFound,
+			expectCount: 3,
 		},
 	}
 
@@ -51,26 +55,18 @@ func TestPgItemDelete(t *testing.T) {
 			postgrestest.RunDBTest(t, configtest.PostgresPreset, migrations.Migrations, func(ctx context.Context, t *testing.T) {
 				t.Helper()
 
-				fixtures := insertItems(ctx, t)
+				insertItems(ctx, t)
 
 				item, err := daoItemDelete.Exec(ctx, &dao.ItemDeleteRequest{ID: testCase.id})
 				require.ErrorIs(t, err, testCase.expectErr)
+				require.Equal(t, testCase.expect, item)
 
 				db, err := postgres.GetContext(ctx)
 				require.NoError(t, err)
 
-				exists, err := db.NewSelect().Model((*dao.Item)(nil)).Where("id = ?", itemID).Exists(ctx)
+				count, err := db.NewSelect().Model((*dao.Item)(nil)).Count(ctx)
 				require.NoError(t, err)
-
-				if !testCase.expectFixture {
-					require.Nil(t, item)
-					require.True(t, exists)
-
-					return
-				}
-
-				require.Equal(t, fixtures[0], item)
-				require.False(t, exists)
+				require.Equal(t, testCase.expectCount, count)
 			})
 		})
 	}

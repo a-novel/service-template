@@ -27,9 +27,10 @@ func TestGrpcItemList(t *testing.T) {
 		{
 			name: "Success",
 
-			serviceMock: &serviceMock[*core.ItemPage]{resp: &core.ItemPage{Items: []*core.Item{coreItem}, Total: 2}},
+			serviceMock: &serviceMock[*core.ItemPage]{resp: &core.ItemPage{Items: []*core.Item{coreItem, coreItem}, Total: 4}},
 
-			expect:       &templatev0.ItemListResponse{Items: []*templatev0.Item{protoItem}, Total: 2},
+			// Every item of the page is sent.
+			expect:       &templatev0.ItemListResponse{Items: []*templatev0.Item{protoItem, protoItem}, Total: 4},
 			expectStatus: codes.OK,
 		},
 		{

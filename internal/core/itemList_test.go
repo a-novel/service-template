@@ -31,9 +31,12 @@ func TestItemList(t *testing.T) {
 			request: &core.ItemListRequest{Limit: 10, Offset: 2},
 
 			daoRequest: &dao.ItemListRequest{Limit: 10, Offset: 2},
-			daoMock:    &daoMock[[]*dao.ItemListRow]{resp: []*dao.ItemListRow{{Item: *daoItem, Total: 4}}},
+			daoMock: &daoMock[[]*dao.ItemListRow]{resp: []*dao.ItemListRow{
+				{Item: *daoItem, Total: 4}, {Item: *daoItem, Total: 4},
+			}},
 
-			expect: &core.ItemPage{Items: []*core.Item{coreItem}, Total: 4},
+			// Every row of the page maps to an item.
+			expect: &core.ItemPage{Items: []*core.Item{coreItem, coreItem}, Total: 4},
 		},
 		{
 			// A page past the end has no row to carry the total.

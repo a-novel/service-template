@@ -48,15 +48,13 @@ func TestGrpcStatus(t *testing.T) {
 			}
 
 			response, err := handlers.NewGrpcStatus().Status(ctx, &templatev0.StatusRequest{})
-			result, ok := status.FromError(err)
-			require.True(t, ok)
-			require.Equal(t, testCase.expectStatus, result.Code(), "got %s (%v)", result.Code(), err)
+			requireStatus(t, err, testCase.expectStatus)
 			require.Equal(t, testCase.expect, response)
 
 			if testCase.expectStatus != codes.OK {
 				// The message carries no raw dependency error. The fault keeps that error, so the server
 				// span names its type.
-				require.Equal(t, "service dependencies unavailable", result.Message())
+				require.Equal(t, "service dependencies unavailable", status.Convert(err).Message())
 				require.Error(t, errors.Unwrap(err))
 			}
 		})

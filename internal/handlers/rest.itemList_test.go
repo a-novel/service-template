@@ -33,10 +33,11 @@ func TestRestItemList(t *testing.T) {
 
 			target: target,
 
-			serviceMock: &serviceMock[*core.ItemPage]{resp: &core.ItemPage{Items: []*core.Item{coreItem}, Total: 2}},
+			serviceMock: &serviceMock[*core.ItemPage]{resp: &core.ItemPage{Items: []*core.Item{coreItem, coreItem}, Total: 4}},
 
+			// Every item of the page is sent.
 			expectStatus:   http.StatusOK,
-			expectResponse: map[string]any{"items": []any{jsonItem}, "total": float64(2)},
+			expectResponse: map[string]any{"items": []any{jsonItem, jsonItem}, "total": float64(4)},
 		},
 		{
 			// A page past the end lists no item as an empty array, never null.

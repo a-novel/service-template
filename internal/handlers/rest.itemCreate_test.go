@@ -7,6 +7,7 @@ import (
 	"testing"
 
 	"github.com/stretchr/testify/mock"
+	"github.com/stretchr/testify/require"
 
 	"github.com/a-novel/service-template/internal/config"
 	"github.com/a-novel/service-template/internal/core"
@@ -28,6 +29,7 @@ func TestRestItemCreate(t *testing.T) {
 
 		expectStatus   int
 		expectResponse any
+		expectLocation string
 	}{
 		{
 			name: "Success",
@@ -38,6 +40,7 @@ func TestRestItemCreate(t *testing.T) {
 
 			expectStatus:   http.StatusCreated,
 			expectResponse: jsonItem,
+			expectLocation: "item?id=" + itemID.String(),
 		},
 		{
 			name: "Error/MalformedBody",
@@ -85,7 +88,9 @@ func TestRestItemCreate(t *testing.T) {
 			w := httptest.NewRecorder()
 			handlers.NewRestItemCreate(service, config.LoggerDev).ServeHTTP(w, request)
 
-			requireResponse(t, w.Result(), testCase.expectStatus, testCase.expectResponse)
+			response := w.Result()
+			require.Equal(t, testCase.expectLocation, response.Header.Get("Location"))
+			requireResponse(t, response, testCase.expectStatus, testCase.expectResponse)
 		})
 	}
 }

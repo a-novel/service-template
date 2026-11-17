@@ -91,8 +91,8 @@ func requireResponse(t *testing.T, response *http.Response, expectStatus int, ex
 	require.Equal(t, expectBody, body)
 }
 
-// requireStatus checks the gRPC status a handler answers with. A server fault keeps the service's
-// error as its cause, so the server span names its type.
+// requireStatus checks the gRPC status a handler answers with. A server fault must keep errFoo, which
+// every Internal case's service mock returns, as its cause, so the server span names its type.
 func requireStatus(t *testing.T, err error, expectStatus codes.Code) {
 	t.Helper()
 

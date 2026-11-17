@@ -22,15 +22,15 @@ func TestPgItemGet(t *testing.T) {
 
 		id uuid.UUID
 
-		expectFixture bool
-		expectErr     error
+		expect    *dao.Item
+		expectErr error
 	}{
 		{
 			name: "Success",
 
 			id: itemID,
 
-			expectFixture: true,
+			expect: &itemOne,
 		},
 		{
 			name: "Error/NotFound",
@@ -50,18 +50,11 @@ func TestPgItemGet(t *testing.T) {
 			postgrestest.RunDBTest(t, configtest.PostgresPreset, migrations.Migrations, func(ctx context.Context, t *testing.T) {
 				t.Helper()
 
-				fixtures := insertItems(ctx, t)
+				insertItems(ctx, t)
 
 				item, err := daoItemGet.Exec(ctx, &dao.ItemGetRequest{ID: testCase.id})
 				require.ErrorIs(t, err, testCase.expectErr)
-
-				if !testCase.expectFixture {
-					require.Nil(t, item)
-
-					return
-				}
-
-				require.Equal(t, fixtures[0], item)
+				require.Equal(t, testCase.expect, item)
 			})
 		})
 	}
