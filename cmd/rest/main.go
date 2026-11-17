@@ -1,4 +1,4 @@
-// Command rest serves the public REST API. It admits only the callers its service tokens allow, and
+// Command rest serves the REST API. It admits only the callers its service tokens allow, and
 // refuses to start without a token issuer unless SERVICE_ISSUER_OPTIONAL opts a local stack out.
 // cmd/grpc serves the same domain to other services over gRPC, and cmd/migrations applies the
 // database schema.

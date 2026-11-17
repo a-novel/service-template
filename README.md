@@ -84,11 +84,11 @@ Deploy the images with any container orchestrator. The composition below shows w
 | Image                              | Role                                                                        |
 | ---------------------------------- | --------------------------------------------------------------------------- |
 | `service-template/grpc`            | Private item CRUD + status API. Internal network only.                      |
-| `service-template/rest`            | Public item CRUD + health API.                                              |
+| `service-template/rest`            | Item CRUD + health API, behind service tokens.                              |
 | `service-template/jobs/migrations` | One-shot schema migration job; runs to completion before the servers start. |
 | `service-template/database`        | PostgreSQL with pgBackRest, or bring your own Postgres.                     |
 
-Pin every image to the same release tag. A production deployment runs `database`, then `migrations` to completion, then any number of `grpc` and/or `rest` replicas. Provide `POSTGRES_USER`, `POSTGRES_PASSWORD`, and `POSTGRES_DATABASE` through the orchestrator; store the password as a secret.
+Pin every image to the same release tag. A production deployment runs `database`, then `migrations` to completion, then any number of `grpc` and/or `rest` replicas. Provide `POSTGRES_USER`, `POSTGRES_PASSWORD`, and `POSTGRES_DATABASE` through the orchestrator, store the password as a secret, and name the service-token issuer, audience and callers the servers accept.
 
 <!-- TODO(project-docs): replace v0.0.0 with the new service's release tag -->
 
@@ -138,6 +138,9 @@ services:
       POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
       POSTGRES_DATABASE: "${POSTGRES_DATABASE}"
       POSTGRES_TLS_ENABLED: "false"
+      SERVICE_TOKEN_ISSUER: "${SERVICE_TOKEN_ISSUER}"
+      SERVICE_TOKEN_AUDIENCE: service-template
+      SERVICE_TOKEN_CALLERS: "${SERVICE_TOKEN_CALLERS}"
     networks: [api]
 
 networks:
@@ -157,17 +160,20 @@ The database image packages PostgreSQL and pgBackRest on Wolfi. The container bu
 
 Every variable is read from the process environment. `SERVICE_TEMPLATE_ENV_PREFIX` prepends a prefix to every name, so the service can share an environment without collisions.
 
-| Name                   | Description                                                                                                                   | Images |
-| ---------------------- | ----------------------------------------------------------------------------------------------------------------------------- | ------ |
-| `POSTGRES_HOST`        | PostgreSQL hostname or IP address. **Required.**                                                                              | all    |
-| `POSTGRES_PORT`        | PostgreSQL port. Defaults to `5432`.                                                                                          | all    |
-| `POSTGRES_USER`        | PostgreSQL login role. **Required.**                                                                                          | all    |
-| `POSTGRES_PASSWORD`    | PostgreSQL login password. **Required; inject it as a secret.**                                                               | all    |
-| `POSTGRES_DATABASE`    | PostgreSQL database name. **Required.**                                                                                       | all    |
-| `POSTGRES_TLS_ENABLED` | Encrypt the PostgreSQL connection. Defaults to `true`; disable only when another trusted boundary protects the database link. | all    |
+| Name                     | Description                                                                                                                                                                                                                                                                                | Images         |
+| ------------------------ | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | -------------- |
+| `POSTGRES_HOST`          | PostgreSQL hostname or IP address. **Required.**                                                                                                                                                                                                                                           | all            |
+| `POSTGRES_PORT`          | PostgreSQL port. Defaults to `5432`.                                                                                                                                                                                                                                                       | all            |
+| `POSTGRES_USER`          | PostgreSQL login role. **Required.**                                                                                                                                                                                                                                                       | all            |
+| `POSTGRES_PASSWORD`      | PostgreSQL login password. **Required; inject it as a secret.**                                                                                                                                                                                                                            | all            |
+| `POSTGRES_DATABASE`      | PostgreSQL database name. **Required.**                                                                                                                                                                                                                                                    | all            |
+| `POSTGRES_TLS_ENABLED`   | Encrypt the PostgreSQL connection. Defaults to `true`; disable only when another trusted boundary protects the database link.                                                                                                                                                              | all            |
+| `SERVICE_TOKEN_ISSUER`   | Issuer of the service tokens the servers accept, such as a GKE cluster's `https://container.googleapis.com/v1/projects/<project>/locations/<location>/clusters/<cluster>`. The servers read its keys through its OpenID discovery document, so they need egress to its host. **Required.** | `grpc`, `rest` |
+| `SERVICE_TOKEN_AUDIENCE` | Audience the servers answer to. Each caller's projected token names it. **Required.**                                                                                                                                                                                                      | `grpc`, `rest` |
+| `SERVICE_TOKEN_CALLERS`  | Service accounts allowed to call, comma-separated, each as `system:serviceaccount:<namespace>:<name>`. **Required.**                                                                                                                                                                       | `grpc`, `rest` |
 
 <details>
-<summary>Optional configuration (server tuning, service tokens, OpenTelemetry)</summary>
+<summary>Optional configuration (server tuning, OpenTelemetry)</summary>
 
 gRPC tuning (images `grpc`, `standalone-grpc`):
 
@@ -209,16 +215,13 @@ Planned downtime (server images):
 | ---------------- | ------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------ | ------- |
 | `DOWNTIME_START` | When a planned downtime starts, in RFC 3339. From then until it is removed, even past the announced end, the servers answer `503` / `UNAVAILABLE` except for ping and gRPC health, and start without the database. |         |
 
-Service tokens (server images). The servers refuse a call unless its `X-Service-Authorization` header carries a token from an allowed caller. The REST ping and the gRPC health service stay open for probes. Without `SERVICE_TOKEN_ISSUER`, the servers refuse to start, unless `SERVICE_ISSUER_OPTIONAL` opts a local or test stack out:
+Service tokens (server images). The servers refuse a call unless its `X-Service-Authorization` header carries a token from an allowed caller; the required variables above configure it. The REST ping and the gRPC health service stay open for probes. Without `SERVICE_TOKEN_ISSUER`, the servers refuse to start, unless `SERVICE_ISSUER_OPTIONAL` opts a local or test stack out:
 
-| Name                      | Description                                                                                                                                                                                                                                                                  | Default |
-| ------------------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------- |
-| `SERVICE_TOKEN_ISSUER`    | Issuer of the service tokens the servers accept, such as a GKE cluster's `https://container.googleapis.com/v1/projects/<project>/locations/<location>/clusters/<cluster>`. The servers read its keys through its OpenID discovery document, so they need egress to its host. |         |
-| `SERVICE_TOKEN_AUDIENCE`  | Audience the servers answer to. Each caller's projected token names it.                                                                                                                                                                                                      |         |
-| `SERVICE_TOKEN_CALLERS`   | Service accounts allowed to call, comma-separated, each as `system:serviceaccount:<namespace>:<name>`.                                                                                                                                                                       |         |
-| `SERVICE_ISSUER_OPTIONAL` | Start without `SERVICE_TOKEN_ISSUER`, and then take every call. For a local or test stack only: the standalone images set it, and an issuer keeps the check on.                                                                                                              | `false` |
+| Name                      | Description                                                                                                                                                     | Default |
+| ------------------------- | --------------------------------------------------------------------------------------------------------------------------------------------------------------- | ------- |
+| `SERVICE_ISSUER_OPTIONAL` | Start without `SERVICE_TOKEN_ISSUER`, and then take every call. For a local or test stack only: the standalone images set it, and an issuer keeps the check on. | `false` |
 
-Logs and tracing — OpenTelemetry exports to standard output, or over OTLP/HTTP once an endpoint is set (all server images):
+Logs and tracing: OpenTelemetry exports to standard output, or over OTLP/HTTP once an endpoint is set (all server images):
 
 | Name                             | Description                                                                                                      | Default            |
 | -------------------------------- | ---------------------------------------------------------------------------------------------------------------- | ------------------ |
