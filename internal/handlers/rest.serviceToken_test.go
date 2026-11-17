@@ -51,6 +51,15 @@ func TestRestServiceToken(t *testing.T) {
 			expectStatus: http.StatusNoContent,
 		},
 		{
+			// An issuer keeps the gate on whatever the opt-out says.
+			name: "Error/IssuerOptionalWithIssuer",
+
+			tokenConfig:    tokenConfig,
+			issuerOptional: true,
+
+			expectStatus: http.StatusUnauthorized,
+		},
+		{
 			// A deployment that forgets the issuer stops at startup rather than admit every caller.
 			name: "Error/IssuerRequired",
 
