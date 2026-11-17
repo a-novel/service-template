@@ -1,16 +1,11 @@
 package handlers_test
 
 import (
-	"errors"
 	"testing"
-	"time"
 
-	"github.com/google/uuid"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
-	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/a-novel/service-template/internal/core"
 	"github.com/a-novel/service-template/internal/handlers"
@@ -21,79 +16,35 @@ import (
 func TestGrpcItemCreate(t *testing.T) {
 	t.Parallel()
 
-	errFoo := errors.New("foo")
-
-	type serviceMock struct {
-		resp *core.Item
-		err  error
-	}
-
 	testCases := []struct {
 		name string
 
-		request *templatev0.ItemCreateRequest
-
-		serviceMock *serviceMock
+		serviceMock *serviceMock[*core.Item]
 
 		expect       *templatev0.ItemCreateResponse
 		expectStatus codes.Code
-		expectCause  error
 	}{
 		{
 			name: "Success",
 
-			request: &templatev0.ItemCreateRequest{
-				Name:        "test item",
-				Description: "test description",
-			},
+			serviceMock: &serviceMock[*core.Item]{resp: coreItem},
 
-			serviceMock: &serviceMock{
-				resp: &core.Item{
-					ID:          uuid.MustParse("00000000-0000-0000-0000-000000000001"),
-					Name:        "test item",
-					Description: "test description",
-					CreatedAt:   time.Date(2021, 1, 1, 0, 0, 0, 0, time.UTC),
-					UpdatedAt:   time.Date(2021, 1, 1, 0, 0, 0, 0, time.UTC),
-				},
-			},
-
+			expect:       &templatev0.ItemCreateResponse{Item: protoItem},
 			expectStatus: codes.OK,
-			expect: &templatev0.ItemCreateResponse{
-				Item: &templatev0.Item{
-					Id:          "00000000-0000-0000-0000-000000000001",
-					Name:        "test item",
-					Description: "test description",
-					CreatedAt:   timestamppb.New(time.Date(2021, 1, 1, 0, 0, 0, 0, time.UTC)),
-					UpdatedAt:   timestamppb.New(time.Date(2021, 1, 1, 0, 0, 0, 0, time.UTC)),
-				},
-			},
 		},
 		{
-			name: "Error/InvalidArgument",
+			name: "Error/InvalidRequest",
 
-			request: &templatev0.ItemCreateRequest{
-				Name: "",
-			},
-
-			serviceMock: &serviceMock{
-				err: core.ErrInvalidRequest,
-			},
+			serviceMock: &serviceMock[*core.Item]{err: core.ErrInvalidRequest},
 
 			expectStatus: codes.InvalidArgument,
 		},
 		{
 			name: "Error/Internal",
 
-			request: &templatev0.ItemCreateRequest{
-				Name: "test item",
-			},
-
-			serviceMock: &serviceMock{
-				err: errFoo,
-			},
+			serviceMock: &serviceMock[*core.Item]{err: errFoo},
 
 			expectStatus: codes.Internal,
-			expectCause:  errFoo,
 		},
 	}
 
@@ -102,36 +53,15 @@ func TestGrpcItemCreate(t *testing.T) {
 			t.Parallel()
 
 			service := handlersmocks.NewMockGrpcItemCreateService(t)
+			service.EXPECT().
+				Exec(mock.Anything, &core.ItemCreateRequest{Name: "test item", Description: "test description"}).
+				Return(testCase.serviceMock.resp, testCase.serviceMock.err)
 
-			if testCase.serviceMock != nil {
-				serviceRequest := &core.ItemCreateRequest{
-					Name:        testCase.request.GetName(),
-					Description: testCase.request.GetDescription(),
-				}
-
-				service.EXPECT().
-					Exec(mock.Anything, serviceRequest).
-					Return(testCase.serviceMock.resp, testCase.serviceMock.err)
-			}
-
-			handler := handlers.NewGrpcItemCreate(service)
-
-			res, err := handler.ItemCreate(t.Context(), testCase.request)
-			resSt, ok := status.FromError(err)
-			require.True(t, ok, resSt.Code().String())
-			require.Equal(
-				t,
-				testCase.expectStatus, resSt.Code(),
-				"expected status code %s, got %s (%v)", testCase.expectStatus, resSt.Code(), err,
+			response, err := handlers.NewGrpcItemCreate(service).ItemCreate(
+				t.Context(), &templatev0.ItemCreateRequest{Name: "test item", Description: "test description"},
 			)
-			require.Equal(t, testCase.expect, res)
-
-			if testCase.expectCause != nil {
-				// The fault keeps its cause, so the server span names its type.
-				require.ErrorIs(t, err, testCase.expectCause)
-			}
-
-			service.AssertExpectations(t)
+			requireStatus(t, err, testCase.expectStatus)
+			require.Equal(t, testCase.expect, response)
 		})
 	}
 }

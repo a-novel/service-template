@@ -1,17 +1,11 @@
 package handlers_test
 
 import (
-	"encoding/json"
-	"errors"
-	"io"
 	"net/http"
 	"net/http/httptest"
 	"testing"
-	"time"
 
-	"github.com/google/uuid"
 	"github.com/stretchr/testify/mock"
-	"github.com/stretchr/testify/require"
 
 	"github.com/a-novel/service-template/internal/config"
 	"github.com/a-novel/service-template/internal/core"
@@ -22,20 +16,14 @@ import (
 func TestRestItemList(t *testing.T) {
 	t.Parallel()
 
-	errFoo := errors.New("foo")
-
-	type serviceMock struct {
-		req  *core.ItemListRequest
-		resp *core.ItemPage
-		err  error
-	}
+	target := "/v0/items?limit=10&offset=1"
 
 	testCases := []struct {
 		name string
 
-		request *http.Request
+		target string
 
-		serviceMock *serviceMock
+		serviceMock *serviceMock[*core.ItemPage]
 
 		expectStatus   int
 		expectResponse any
@@ -43,92 +31,46 @@ func TestRestItemList(t *testing.T) {
 		{
 			name: "Success",
 
-			request: httptest.NewRequestWithContext(
-				t.Context(), http.MethodGet, "/v0/items?limit=10&offset=1", nil,
-			),
+			target: target,
 
-			serviceMock: &serviceMock{
-				req: &core.ItemListRequest{Limit: 10, Offset: 1},
-				resp: &core.ItemPage{
-					Items: []*core.Item{
-						{
-							ID:        uuid.MustParse("00000000-0000-0000-0000-000000000002"),
-							Name:      "item two",
-							CreatedAt: time.Date(2021, 1, 2, 0, 0, 0, 0, time.UTC),
-							UpdatedAt: time.Date(2021, 1, 2, 0, 0, 0, 0, time.UTC),
-						},
-						{
-							ID:        uuid.MustParse("00000000-0000-0000-0000-000000000001"),
-							Name:      "item one",
-							CreatedAt: time.Date(2021, 1, 1, 0, 0, 0, 0, time.UTC),
-							UpdatedAt: time.Date(2021, 1, 1, 0, 0, 0, 0, time.UTC),
-						},
-					},
-					Total: 3,
-				},
-			},
+			serviceMock: &serviceMock[*core.ItemPage]{resp: &core.ItemPage{Items: []*core.Item{coreItem}, Total: 2}},
 
-			expectStatus: http.StatusOK,
-			expectResponse: map[string]any{
-				"items": []any{
-					map[string]any{
-						"id":        "00000000-0000-0000-0000-000000000002",
-						"name":      "item two",
-						"createdAt": "2021-01-02T00:00:00Z",
-						"updatedAt": "2021-01-02T00:00:00Z",
-					},
-					map[string]any{
-						"id":        "00000000-0000-0000-0000-000000000001",
-						"name":      "item one",
-						"createdAt": "2021-01-01T00:00:00Z",
-						"updatedAt": "2021-01-01T00:00:00Z",
-					},
-				},
-				"total": float64(3),
-			},
+			expectStatus:   http.StatusOK,
+			expectResponse: map[string]any{"items": []any{jsonItem}, "total": float64(2)},
 		},
 		{
-			// A page past the end lists no item, as an empty array.
+			// A page past the end lists no item as an empty array, never null.
 			name: "Success/Empty",
 
-			request: httptest.NewRequestWithContext(t.Context(), http.MethodGet, "/v0/items?offset=50", nil),
+			target: target,
 
-			serviceMock: &serviceMock{
-				req:  &core.ItemListRequest{Offset: 50},
-				resp: &core.ItemPage{Items: []*core.Item{}},
-			},
+			serviceMock: &serviceMock[*core.ItemPage]{resp: &core.ItemPage{}},
 
 			expectStatus:   http.StatusOK,
 			expectResponse: map[string]any{"items": []any{}, "total": float64(0)},
 		},
 		{
-			name: "Error/InvalidOffset",
+			name: "Error/MalformedOffset",
 
-			request: httptest.NewRequestWithContext(t.Context(), http.MethodGet, "/v0/items?offset=first", nil),
+			target: "/v0/items?offset=first",
 
 			expectStatus: http.StatusBadRequest,
 		},
 		{
 			name: "Error/InvalidRequest",
 
-			request: httptest.NewRequestWithContext(t.Context(), http.MethodGet, "/v0/items?limit=101", nil),
+			target: target,
 
-			serviceMock: &serviceMock{
-				req: &core.ItemListRequest{Limit: 101},
-				err: core.ErrInvalidRequest,
-			},
+			serviceMock: &serviceMock[*core.ItemPage]{err: core.ErrInvalidRequest},
 
 			expectStatus: http.StatusBadRequest,
 		},
 		{
 			name: "Error/Internal",
 
-			request: httptest.NewRequestWithContext(t.Context(), http.MethodGet, "/v0/items?limit=10", nil),
+			target: target,
 
-			serviceMock: &serviceMock{
-				req: &core.ItemListRequest{Limit: 10},
-				err: errFoo,
-			},
+			serviceMock: &serviceMock[*core.ItemPage]{err: errFoo},
 
 			expectStatus: http.StatusInternalServerError,
 		},
@@ -142,27 +84,16 @@ func TestRestItemList(t *testing.T) {
 
 			if testCase.serviceMock != nil {
 				service.EXPECT().
-					Exec(mock.Anything, testCase.serviceMock.req).
+					Exec(mock.Anything, &core.ItemListRequest{Limit: 10, Offset: 1}).
 					Return(testCase.serviceMock.resp, testCase.serviceMock.err)
 			}
 
-			handler := handlers.NewRestItemList(service, config.LoggerDev)
+			request := httptest.NewRequestWithContext(t.Context(), http.MethodGet, testCase.target, nil)
+
 			w := httptest.NewRecorder()
+			handlers.NewRestItemList(service, config.LoggerDev).ServeHTTP(w, request)
 
-			handler.ServeHTTP(w, testCase.request)
-
-			res := w.Result()
-
-			require.Equal(t, testCase.expectStatus, res.StatusCode)
-
-			if testCase.expectResponse != nil {
-				data, err := io.ReadAll(res.Body)
-				require.NoError(t, errors.Join(err, res.Body.Close()))
-
-				var jsonRes any
-				require.NoError(t, json.Unmarshal(data, &jsonRes))
-				require.Equal(t, testCase.expectResponse, jsonRes)
-			}
+			requireResponse(t, w.Result(), testCase.expectStatus, testCase.expectResponse)
 		})
 	}
 }

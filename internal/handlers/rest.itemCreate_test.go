@@ -1,18 +1,12 @@
 package handlers_test
 
 import (
-	"encoding/json"
-	"errors"
-	"io"
 	"net/http"
 	"net/http/httptest"
 	"strings"
 	"testing"
-	"time"
 
-	"github.com/google/uuid"
 	"github.com/stretchr/testify/mock"
-	"github.com/stretchr/testify/require"
 
 	"github.com/a-novel/service-template/internal/config"
 	"github.com/a-novel/service-template/internal/core"
@@ -23,89 +17,50 @@ import (
 func TestRestItemCreate(t *testing.T) {
 	t.Parallel()
 
-	errFoo := errors.New("foo")
-
-	type serviceMock struct {
-		req  *core.ItemCreateRequest
-		resp *core.Item
-		err  error
-	}
+	body := `{"name": "test item", "description": "test description"}`
 
 	testCases := []struct {
 		name string
 
-		request *http.Request
+		body string
 
-		serviceMock *serviceMock
+		serviceMock *serviceMock[*core.Item]
 
 		expectStatus   int
-		expectLocation string
 		expectResponse any
 	}{
 		{
 			name: "Success",
 
-			request: httptest.NewRequestWithContext(t.Context(), http.MethodPost, "/v0/items", strings.NewReader(`{
-				"name": "test item",
-				"description": "test description"
-			}`)),
+			body: body,
 
-			serviceMock: &serviceMock{
-				req: &core.ItemCreateRequest{
-					Name:        "test item",
-					Description: "test description",
-				},
-				resp: &core.Item{
-					ID:          uuid.MustParse("00000000-0000-0000-0000-000000000001"),
-					Name:        "test item",
-					Description: "test description",
-					CreatedAt:   time.Date(2021, 1, 1, 0, 0, 0, 0, time.UTC),
-					UpdatedAt:   time.Date(2021, 1, 1, 0, 0, 0, 0, time.UTC),
-				},
-			},
+			serviceMock: &serviceMock[*core.Item]{resp: coreItem},
 
 			expectStatus:   http.StatusCreated,
-			expectLocation: "item?id=00000000-0000-0000-0000-000000000001",
-			expectResponse: map[string]any{
-				"id":          "00000000-0000-0000-0000-000000000001",
-				"name":        "test item",
-				"description": "test description",
-				"createdAt":   "2021-01-01T00:00:00Z",
-				"updatedAt":   "2021-01-01T00:00:00Z",
-			},
+			expectResponse: jsonItem,
 		},
 		{
-			name: "Error/InvalidBody",
+			name: "Error/MalformedBody",
 
-			request: httptest.NewRequestWithContext(t.Context(), http.MethodPost, "/v0/items", strings.NewReader(`not json`)),
+			body: "not json",
 
 			expectStatus: http.StatusBadRequest,
 		},
 		{
-			name: "Error/EmptyName",
+			name: "Error/InvalidRequest",
 
-			request: httptest.NewRequestWithContext(t.Context(), http.MethodPost, "/v0/items", strings.NewReader(`{
-				"name": ""
-			}`)),
+			body: body,
 
-			serviceMock: &serviceMock{
-				req: &core.ItemCreateRequest{Name: ""},
-				err: core.ErrInvalidRequest,
-			},
+			serviceMock: &serviceMock[*core.Item]{err: core.ErrInvalidRequest},
 
 			expectStatus: http.StatusBadRequest,
 		},
 		{
 			name: "Error/Internal",
 
-			request: httptest.NewRequestWithContext(t.Context(), http.MethodPost, "/v0/items", strings.NewReader(`{
-				"name": "test item"
-			}`)),
+			body: body,
 
-			serviceMock: &serviceMock{
-				req: &core.ItemCreateRequest{Name: "test item"},
-				err: errFoo,
-			},
+			serviceMock: &serviceMock[*core.Item]{err: errFoo},
 
 			expectStatus: http.StatusInternalServerError,
 		},
@@ -119,31 +74,18 @@ func TestRestItemCreate(t *testing.T) {
 
 			if testCase.serviceMock != nil {
 				service.EXPECT().
-					Exec(mock.Anything, testCase.serviceMock.req).
+					Exec(mock.Anything, &core.ItemCreateRequest{Name: "test item", Description: "test description"}).
 					Return(testCase.serviceMock.resp, testCase.serviceMock.err)
 			}
 
-			handler := handlers.NewRestItemCreate(service, config.LoggerDev)
+			request := httptest.NewRequestWithContext(
+				t.Context(), http.MethodPost, "/v0/items", strings.NewReader(testCase.body),
+			)
+
 			w := httptest.NewRecorder()
+			handlers.NewRestItemCreate(service, config.LoggerDev).ServeHTTP(w, request)
 
-			handler.ServeHTTP(w, testCase.request)
-
-			res := w.Result()
-
-			require.Equal(t, testCase.expectStatus, res.StatusCode)
-			require.Equal(t, testCase.expectLocation, res.Header.Get("Location"))
-
-			if testCase.expectResponse != nil {
-				// Result snapshots the headers at WriteHeader, so a Content-Type set after it fails here.
-				require.Equal(t, "application/json", res.Header.Get("Content-Type"))
-
-				data, err := io.ReadAll(res.Body)
-				require.NoError(t, errors.Join(err, res.Body.Close()))
-
-				var jsonRes any
-				require.NoError(t, json.Unmarshal(data, &jsonRes))
-				require.Equal(t, testCase.expectResponse, jsonRes)
-			}
+			requireResponse(t, w.Result(), testCase.expectStatus, testCase.expectResponse)
 		})
 	}
 }

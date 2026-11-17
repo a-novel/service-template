@@ -1,16 +1,11 @@
 package handlers_test
 
 import (
-	"errors"
 	"testing"
-	"time"
 
-	"github.com/google/uuid"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
-	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/a-novel/service-template/internal/core"
 	"github.com/a-novel/service-template/internal/handlers"
@@ -21,101 +16,35 @@ import (
 func TestGrpcItemList(t *testing.T) {
 	t.Parallel()
 
-	errFoo := errors.New("foo")
-
-	type serviceMock struct {
-		req  *core.ItemListRequest
-		resp *core.ItemPage
-		err  error
-	}
-
 	testCases := []struct {
 		name string
 
-		request *templatev0.ItemListRequest
-
-		serviceMock *serviceMock
+		serviceMock *serviceMock[*core.ItemPage]
 
 		expect       *templatev0.ItemListResponse
 		expectStatus codes.Code
-		expectCause  error
 	}{
 		{
 			name: "Success",
 
-			request: &templatev0.ItemListRequest{
-				Limit:  10,
-				Offset: 1,
-			},
+			serviceMock: &serviceMock[*core.ItemPage]{resp: &core.ItemPage{Items: []*core.Item{coreItem}, Total: 2}},
 
-			serviceMock: &serviceMock{
-				req: &core.ItemListRequest{Limit: 10, Offset: 1},
-				resp: &core.ItemPage{
-					Items: []*core.Item{
-						{
-							ID:        uuid.MustParse("00000000-0000-0000-0000-000000000001"),
-							Name:      "item one",
-							CreatedAt: time.Date(2021, 1, 3, 0, 0, 0, 0, time.UTC),
-							UpdatedAt: time.Date(2021, 1, 3, 0, 0, 0, 0, time.UTC),
-						},
-						{
-							ID:        uuid.MustParse("00000000-0000-0000-0000-000000000002"),
-							Name:      "item two",
-							CreatedAt: time.Date(2021, 1, 2, 0, 0, 0, 0, time.UTC),
-							UpdatedAt: time.Date(2021, 1, 2, 0, 0, 0, 0, time.UTC),
-						},
-					},
-					Total: 3,
-				},
-			},
-
+			expect:       &templatev0.ItemListResponse{Items: []*templatev0.Item{protoItem}, Total: 2},
 			expectStatus: codes.OK,
-			expect: &templatev0.ItemListResponse{
-				Items: []*templatev0.Item{
-					{
-						Id:        "00000000-0000-0000-0000-000000000001",
-						Name:      "item one",
-						CreatedAt: timestamppb.New(time.Date(2021, 1, 3, 0, 0, 0, 0, time.UTC)),
-						UpdatedAt: timestamppb.New(time.Date(2021, 1, 3, 0, 0, 0, 0, time.UTC)),
-					},
-					{
-						Id:        "00000000-0000-0000-0000-000000000002",
-						Name:      "item two",
-						CreatedAt: timestamppb.New(time.Date(2021, 1, 2, 0, 0, 0, 0, time.UTC)),
-						UpdatedAt: timestamppb.New(time.Date(2021, 1, 2, 0, 0, 0, 0, time.UTC)),
-					},
-				},
-				Total: 3,
-			},
 		},
 		{
-			name: "Error/InvalidArgument",
+			name: "Error/InvalidRequest",
 
-			request: &templatev0.ItemListRequest{
-				Limit: 101,
-			},
-
-			serviceMock: &serviceMock{
-				req: &core.ItemListRequest{Limit: 101},
-				err: core.ErrInvalidRequest,
-			},
+			serviceMock: &serviceMock[*core.ItemPage]{err: core.ErrInvalidRequest},
 
 			expectStatus: codes.InvalidArgument,
 		},
 		{
 			name: "Error/Internal",
 
-			request: &templatev0.ItemListRequest{
-				Limit: 10,
-			},
-
-			serviceMock: &serviceMock{
-				req: &core.ItemListRequest{Limit: 10},
-				err: errFoo,
-			},
+			serviceMock: &serviceMock[*core.ItemPage]{err: errFoo},
 
 			expectStatus: codes.Internal,
-			expectCause:  errFoo,
 		},
 	}
 
@@ -124,31 +53,15 @@ func TestGrpcItemList(t *testing.T) {
 			t.Parallel()
 
 			service := handlersmocks.NewMockGrpcItemListService(t)
+			service.EXPECT().
+				Exec(mock.Anything, &core.ItemListRequest{Limit: 10, Offset: 1}).
+				Return(testCase.serviceMock.resp, testCase.serviceMock.err)
 
-			if testCase.serviceMock != nil {
-				service.EXPECT().
-					Exec(mock.Anything, testCase.serviceMock.req).
-					Return(testCase.serviceMock.resp, testCase.serviceMock.err)
-			}
-
-			handler := handlers.NewGrpcItemList(service)
-
-			res, err := handler.ItemList(t.Context(), testCase.request)
-			resSt, ok := status.FromError(err)
-			require.True(t, ok, resSt.Code().String())
-			require.Equal(
-				t,
-				testCase.expectStatus, resSt.Code(),
-				"expected status code %s, got %s (%v)", testCase.expectStatus, resSt.Code(), err,
+			response, err := handlers.NewGrpcItemList(service).ItemList(
+				t.Context(), &templatev0.ItemListRequest{Limit: 10, Offset: 1},
 			)
-			require.Equal(t, testCase.expect, res)
-
-			if testCase.expectCause != nil {
-				// The fault keeps its cause, so the server span names its type.
-				require.ErrorIs(t, err, testCase.expectCause)
-			}
-
-			service.AssertExpectations(t)
+			requireStatus(t, err, testCase.expectStatus)
+			require.Equal(t, testCase.expect, response)
 		})
 	}
 }

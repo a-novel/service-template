@@ -1,7 +1,7 @@
 package core_test
 
 import (
-	"errors"
+	"strings"
 	"testing"
 	"time"
 
@@ -18,19 +18,13 @@ import (
 func TestItemUpdate(t *testing.T) {
 	t.Parallel()
 
-	errFoo := errors.New("foo")
-
-	type daoMock struct {
-		resp *dao.Item
-		err  error
-	}
-
 	testCases := []struct {
 		name string
 
-		request *core.ItemUpdateRequest
+		id       uuid.UUID
+		itemName string
 
-		daoMock *daoMock
+		daoMock *daoMock[*dao.Item]
 
 		expect    *core.Item
 		expectErr error
@@ -38,77 +32,62 @@ func TestItemUpdate(t *testing.T) {
 		{
 			name: "Success",
 
-			request: &core.ItemUpdateRequest{
-				ID:          uuid.MustParse("00000000-0000-0000-0000-000000000001"),
-				Name:        "updated item",
-				Description: "updated description",
-			},
+			id:       itemID,
+			itemName: "test item",
 
-			daoMock: &daoMock{
-				resp: &dao.Item{
-					ID:          uuid.MustParse("00000000-0000-0000-0000-000000000001"),
-					Name:        "updated item",
-					Description: "updated description",
-					CreatedAt:   time.Date(2021, 1, 1, 0, 0, 0, 0, time.UTC),
-					UpdatedAt:   time.Date(2021, 1, 2, 0, 0, 0, 0, time.UTC),
-				},
-			},
+			daoMock: &daoMock[*dao.Item]{resp: daoItem},
 
-			expect: &core.Item{
-				ID:          uuid.MustParse("00000000-0000-0000-0000-000000000001"),
-				Name:        "updated item",
-				Description: "updated description",
-				CreatedAt:   time.Date(2021, 1, 1, 0, 0, 0, 0, time.UTC),
-				UpdatedAt:   time.Date(2021, 1, 2, 0, 0, 0, 0, time.UTC),
-			},
+			expect: coreItem,
 		},
 		{
 			name: "Error/InvalidID",
 
-			request:   &core.ItemUpdateRequest{ID: uuid.Nil, Name: "updated item"},
+			id:       uuid.Nil,
+			itemName: "test item",
+
 			expectErr: core.ErrInvalidRequest,
 		},
 		{
 			name: "Error/EmptyName",
 
-			request:   &core.ItemUpdateRequest{ID: uuid.MustParse("00000000-0000-0000-0000-000000000001"), Name: ""},
+			id: itemID,
+
 			expectErr: core.ErrInvalidRequest,
 		},
 		{
 			name: "Error/WhitespaceOnlyName",
 
-			request:   &core.ItemUpdateRequest{ID: uuid.MustParse("00000000-0000-0000-0000-000000000001"), Name: "   "},
+			id:       itemID,
+			itemName: "   ",
+
 			expectErr: core.ErrInvalidRequest,
 		},
 		{
 			name: "Error/NameTooLong",
 
-			request: &core.ItemUpdateRequest{
-				ID:   uuid.MustParse("00000000-0000-0000-0000-000000000001"),
-				Name: string(make([]byte, 257)),
-			},
+			id:       itemID,
+			itemName: strings.Repeat("a", 257),
+
 			expectErr: core.ErrInvalidRequest,
 		},
 		{
 			name: "Error/NotFound",
 
-			request: &core.ItemUpdateRequest{
-				ID:   uuid.MustParse("00000000-0000-0000-0000-000000000001"),
-				Name: "updated item",
-			},
+			id:       itemID,
+			itemName: "test item",
 
-			daoMock:   &daoMock{err: dao.ErrItemUpdateNotFound},
+			daoMock: &daoMock[*dao.Item]{err: dao.ErrItemUpdateNotFound},
+
 			expectErr: core.ErrItemUpdateNotFound,
 		},
 		{
 			name: "Error/Dao",
 
-			request: &core.ItemUpdateRequest{
-				ID:   uuid.MustParse("00000000-0000-0000-0000-000000000001"),
-				Name: "updated item",
-			},
+			id:       itemID,
+			itemName: "test item",
 
-			daoMock:   &daoMock{err: errFoo},
+			daoMock: &daoMock[*dao.Item]{err: errFoo},
+
 			expectErr: errFoo,
 		},
 	}
@@ -117,26 +96,24 @@ func TestItemUpdate(t *testing.T) {
 		t.Run(testCase.name, func(t *testing.T) {
 			t.Parallel()
 
-			mockDao := coremocks.NewMockItemUpdateDao(t)
+			itemDao := coremocks.NewMockItemUpdateDao(t)
 
 			if testCase.daoMock != nil {
-				mockDao.EXPECT().
-					Exec(mock.Anything, mock.MatchedBy(func(req *dao.ItemUpdateRequest) bool {
-						return assert.WithinDuration(t, time.Now(), req.Now, time.Minute) &&
-							assert.Equal(t, testCase.request.ID, req.ID) &&
-							assert.Equal(t, testCase.request.Name, req.Name) &&
-							assert.Equal(t, testCase.request.Description, req.Description)
+				itemDao.EXPECT().
+					Exec(mock.Anything, mock.MatchedBy(func(request *dao.ItemUpdateRequest) bool {
+						return assert.WithinDuration(t, time.Now(), request.Now, time.Minute) &&
+							assert.Equal(t, itemID, request.ID) &&
+							assert.Equal(t, "test item", request.Name) &&
+							assert.Equal(t, "test description", request.Description)
 					})).
 					Return(testCase.daoMock.resp, testCase.daoMock.err)
 			}
 
-			service := core.NewItemUpdate(mockDao)
-
-			resp, err := service.Exec(t.Context(), testCase.request)
+			item, err := core.NewItemUpdate(itemDao).Exec(t.Context(), &core.ItemUpdateRequest{
+				ID: testCase.id, Name: testCase.itemName, Description: "test description",
+			})
 			require.ErrorIs(t, err, testCase.expectErr)
-			require.Equal(t, testCase.expect, resp)
-
-			mockDao.AssertExpectations(t)
+			require.Equal(t, testCase.expect, item)
 		})
 	}
 }

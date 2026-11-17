@@ -1,16 +1,11 @@
 package handlers_test
 
 import (
-	"errors"
 	"testing"
-	"time"
 
-	"github.com/google/uuid"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
-	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/a-novel/service-template/internal/core"
 	"github.com/a-novel/service-template/internal/handlers"
@@ -21,87 +16,61 @@ import (
 func TestGrpcItemDelete(t *testing.T) {
 	t.Parallel()
 
-	errFoo := errors.New("foo")
-
-	type serviceMock struct {
-		resp *core.Item
-		err  error
-	}
+	request := &templatev0.ItemDeleteRequest{Id: itemID.String()}
 
 	testCases := []struct {
 		name string
 
 		request *templatev0.ItemDeleteRequest
 
-		serviceMock *serviceMock
+		serviceMock *serviceMock[*core.Item]
 
 		expect       *templatev0.ItemDeleteResponse
 		expectStatus codes.Code
-		expectCause  error
 	}{
 		{
 			name: "Success",
 
-			request: &templatev0.ItemDeleteRequest{
-				Id: "00000000-0000-0000-0000-000000000001",
-			},
+			request: request,
 
-			serviceMock: &serviceMock{
-				resp: &core.Item{
-					ID:          uuid.MustParse("00000000-0000-0000-0000-000000000001"),
-					Name:        "test item",
-					Description: "test description",
-					CreatedAt:   time.Date(2021, 1, 1, 0, 0, 0, 0, time.UTC),
-					UpdatedAt:   time.Date(2021, 1, 1, 0, 0, 0, 0, time.UTC),
-				},
-			},
+			serviceMock: &serviceMock[*core.Item]{resp: coreItem},
 
+			expect:       &templatev0.ItemDeleteResponse{Item: protoItem},
 			expectStatus: codes.OK,
-			expect: &templatev0.ItemDeleteResponse{
-				Item: &templatev0.Item{
-					Id:          "00000000-0000-0000-0000-000000000001",
-					Name:        "test item",
-					Description: "test description",
-					CreatedAt:   timestamppb.New(time.Date(2021, 1, 1, 0, 0, 0, 0, time.UTC)),
-					UpdatedAt:   timestamppb.New(time.Date(2021, 1, 1, 0, 0, 0, 0, time.UTC)),
-				},
-			},
 		},
 		{
-			name: "Error/InvalidID",
+			name: "Error/MalformedID",
 
-			request: &templatev0.ItemDeleteRequest{
-				Id: "not-a-uuid",
-			},
+			request: &templatev0.ItemDeleteRequest{Id: "not-a-uuid"},
+
+			expectStatus: codes.InvalidArgument,
+		},
+		{
+			name: "Error/InvalidRequest",
+
+			request: request,
+
+			serviceMock: &serviceMock[*core.Item]{err: core.ErrInvalidRequest},
 
 			expectStatus: codes.InvalidArgument,
 		},
 		{
 			name: "Error/NotFound",
 
-			request: &templatev0.ItemDeleteRequest{
-				Id: "00000000-0000-0000-0000-000000000001",
-			},
+			request: request,
 
-			serviceMock: &serviceMock{
-				err: core.ErrItemDeleteNotFound,
-			},
+			serviceMock: &serviceMock[*core.Item]{err: core.ErrItemDeleteNotFound},
 
 			expectStatus: codes.NotFound,
 		},
 		{
 			name: "Error/Internal",
 
-			request: &templatev0.ItemDeleteRequest{
-				Id: "00000000-0000-0000-0000-000000000001",
-			},
+			request: request,
 
-			serviceMock: &serviceMock{
-				err: errFoo,
-			},
+			serviceMock: &serviceMock[*core.Item]{err: errFoo},
 
 			expectStatus: codes.Internal,
-			expectCause:  errFoo,
 		},
 	}
 
@@ -113,30 +82,13 @@ func TestGrpcItemDelete(t *testing.T) {
 
 			if testCase.serviceMock != nil {
 				service.EXPECT().
-					Exec(mock.Anything, &core.ItemDeleteRequest{
-						ID: uuid.MustParse(testCase.request.GetId()),
-					}).
+					Exec(mock.Anything, &core.ItemDeleteRequest{ID: itemID}).
 					Return(testCase.serviceMock.resp, testCase.serviceMock.err)
 			}
 
-			handler := handlers.NewGrpcItemDelete(service)
-
-			res, err := handler.ItemDelete(t.Context(), testCase.request)
-			resSt, ok := status.FromError(err)
-			require.True(t, ok, resSt.Code().String())
-			require.Equal(
-				t,
-				testCase.expectStatus, resSt.Code(),
-				"expected status code %s, got %s (%v)", testCase.expectStatus, resSt.Code(), err,
-			)
-			require.Equal(t, testCase.expect, res)
-
-			if testCase.expectCause != nil {
-				// The fault keeps its cause, so the server span names its type.
-				require.ErrorIs(t, err, testCase.expectCause)
-			}
-
-			service.AssertExpectations(t)
+			response, err := handlers.NewGrpcItemDelete(service).ItemDelete(t.Context(), testCase.request)
+			requireStatus(t, err, testCase.expectStatus)
+			require.Equal(t, testCase.expect, response)
 		})
 	}
 }

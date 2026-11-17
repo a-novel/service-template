@@ -3,12 +3,9 @@ package dao_test
 import (
 	"context"
 	"testing"
-	"time"
 
-	"github.com/google/uuid"
 	"github.com/stretchr/testify/require"
 
-	"github.com/a-novel-kit/golib/postgres"
 	"github.com/a-novel-kit/golib/postgres/postgrestest"
 
 	"github.com/a-novel/service-template/internal/config/configtest"
@@ -19,47 +16,24 @@ import (
 func TestPgItemList(t *testing.T) {
 	t.Parallel()
 
-	one := dao.Item{
-		ID:        uuid.MustParse("00000000-0000-0000-0000-000000000001"),
-		Name:      "item one",
-		CreatedAt: time.Date(2021, 1, 1, 0, 0, 0, 0, time.UTC),
-		UpdatedAt: time.Date(2021, 1, 1, 0, 0, 0, 0, time.UTC),
-	}
-	two := dao.Item{
-		ID:        uuid.MustParse("00000000-0000-0000-0000-000000000002"),
-		Name:      "item two",
-		CreatedAt: time.Date(2021, 1, 2, 0, 0, 0, 0, time.UTC),
-		UpdatedAt: time.Date(2021, 1, 2, 0, 0, 0, 0, time.UTC),
-	}
-	three := dao.Item{
-		ID:        uuid.MustParse("00000000-0000-0000-0000-000000000003"),
-		Name:      "item three",
-		CreatedAt: time.Date(2021, 1, 3, 0, 0, 0, 0, time.UTC),
-		UpdatedAt: time.Date(2021, 1, 3, 0, 0, 0, 0, time.UTC),
-	}
-
-	row := func(item dao.Item) *dao.ItemListRow {
-		return &dao.ItemListRow{Item: item, Total: 3}
-	}
-
 	testCases := []struct {
 		name string
 
-		fixtures []dao.Item
-
+		// seed fills the table with the three [itemFixtures].
+		seed    bool
 		request *dao.ItemListRequest
 
-		expect    []*dao.ItemListRow
-		expectErr error
+		// expect lists the fixtures the page holds, by their index in [itemFixtures].
+		expect []int
 	}{
 		{
+			// Newest first.
 			name: "Success",
 
-			fixtures: []dao.Item{one, two, three},
-
+			seed:    true,
 			request: &dao.ItemListRequest{Limit: 10},
 
-			expect: []*dao.ItemListRow{row(three), row(two), row(one)},
+			expect: []int{2, 1, 0},
 		},
 		{
 			name: "Success/Empty",
@@ -69,17 +43,15 @@ func TestPgItemList(t *testing.T) {
 		{
 			name: "Success/Page",
 
-			fixtures: []dao.Item{one, two, three},
-
+			seed:    true,
 			request: &dao.ItemListRequest{Limit: 1, Offset: 1},
 
-			expect: []*dao.ItemListRow{row(two)},
+			expect: []int{1},
 		},
 		{
 			name: "Success/PastEnd",
 
-			fixtures: []dao.Item{one, two, three},
-
+			seed:    true,
 			request: &dao.ItemListRequest{Limit: 10, Offset: 3},
 		},
 	}
@@ -93,17 +65,20 @@ func TestPgItemList(t *testing.T) {
 			postgrestest.RunDBTest(t, configtest.PostgresPreset, migrations.Migrations, func(ctx context.Context, t *testing.T) {
 				t.Helper()
 
-				db, err := postgres.GetContext(ctx)
-				require.NoError(t, err)
-
-				if len(testCase.fixtures) > 0 {
-					_, err = db.NewInsert().Model(&testCase.fixtures).Exec(ctx)
-					require.NoError(t, err)
+				var fixtures []*dao.Item
+				if testCase.seed {
+					fixtures = insertItems(ctx, t)
 				}
 
-				result, err := daoItemList.Exec(ctx, testCase.request)
-				require.ErrorIs(t, err, testCase.expectErr)
-				require.Equal(t, testCase.expect, result)
+				var expect []*dao.ItemListRow
+				// Every row carries the count of the whole table.
+				for _, index := range testCase.expect {
+					expect = append(expect, &dao.ItemListRow{Item: *fixtures[index], Total: len(fixtures)})
+				}
+
+				rows, err := daoItemList.Exec(ctx, testCase.request)
+				require.NoError(t, err)
+				require.Equal(t, expect, rows)
 			})
 		})
 	}

@@ -3,9 +3,7 @@ package dao_test
 import (
 	"context"
 	"testing"
-	"time"
 
-	"github.com/google/uuid"
 	"github.com/stretchr/testify/require"
 
 	"github.com/a-novel-kit/golib/postgres/postgrestest"
@@ -21,44 +19,23 @@ func TestPgItemCreate(t *testing.T) {
 	testCases := []struct {
 		name string
 
-		request *dao.ItemCreateRequest
+		description string
 
-		expect    *dao.Item
-		expectErr error
+		expect *dao.Item
 	}{
 		{
 			name: "Success",
 
-			request: &dao.ItemCreateRequest{
-				ID:          uuid.MustParse("00000000-0000-0000-0000-000000000001"),
-				Name:        "test item",
-				Description: "test description",
-				Now:         time.Date(2021, 1, 1, 0, 0, 0, 0, time.UTC),
-			},
+			description: "test description",
 
 			expect: &dao.Item{
-				ID:          uuid.MustParse("00000000-0000-0000-0000-000000000001"),
-				Name:        "test item",
-				Description: "test description",
-				CreatedAt:   time.Date(2021, 1, 1, 0, 0, 0, 0, time.UTC),
-				UpdatedAt:   time.Date(2021, 1, 1, 0, 0, 0, 0, time.UTC),
+				ID: newItemID, Name: "test item", Description: "test description", CreatedAt: now, UpdatedAt: now,
 			},
 		},
 		{
-			name: "NoDescription",
+			name: "Success/NoDescription",
 
-			request: &dao.ItemCreateRequest{
-				ID:   uuid.MustParse("00000000-0000-0000-0000-000000000001"),
-				Name: "test item no desc",
-				Now:  time.Date(2021, 1, 1, 0, 0, 0, 0, time.UTC),
-			},
-
-			expect: &dao.Item{
-				ID:        uuid.MustParse("00000000-0000-0000-0000-000000000001"),
-				Name:      "test item no desc",
-				CreatedAt: time.Date(2021, 1, 1, 0, 0, 0, 0, time.UTC),
-				UpdatedAt: time.Date(2021, 1, 1, 0, 0, 0, 0, time.UTC),
-			},
+			expect: &dao.Item{ID: newItemID, Name: "test item", CreatedAt: now, UpdatedAt: now},
 		},
 	}
 
@@ -71,9 +48,11 @@ func TestPgItemCreate(t *testing.T) {
 			postgrestest.RunDBTest(t, configtest.PostgresPreset, migrations.Migrations, func(ctx context.Context, t *testing.T) {
 				t.Helper()
 
-				result, err := daoItemCreate.Exec(ctx, testCase.request)
-				require.ErrorIs(t, err, testCase.expectErr)
-				require.Equal(t, testCase.expect, result)
+				item, err := daoItemCreate.Exec(ctx, &dao.ItemCreateRequest{
+					ID: newItemID, Name: "test item", Description: testCase.description, Now: now,
+				})
+				require.NoError(t, err)
+				require.Equal(t, testCase.expect, item)
 			})
 		})
 	}

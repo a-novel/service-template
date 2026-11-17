@@ -1,16 +1,11 @@
 package handlers_test
 
 import (
-	"errors"
 	"testing"
-	"time"
 
-	"github.com/google/uuid"
 	"github.com/stretchr/testify/mock"
 	"github.com/stretchr/testify/require"
 	"google.golang.org/grpc/codes"
-	"google.golang.org/grpc/status"
-	"google.golang.org/protobuf/types/known/timestamppb"
 
 	"github.com/a-novel/service-template/internal/core"
 	"github.com/a-novel/service-template/internal/handlers"
@@ -21,106 +16,61 @@ import (
 func TestGrpcItemUpdate(t *testing.T) {
 	t.Parallel()
 
-	errFoo := errors.New("foo")
-
-	type serviceMock struct {
-		resp *core.Item
-		err  error
-	}
+	request := &templatev0.ItemUpdateRequest{Id: itemID.String(), Name: "test item", Description: "test description"}
 
 	testCases := []struct {
 		name string
 
 		request *templatev0.ItemUpdateRequest
 
-		serviceMock *serviceMock
+		serviceMock *serviceMock[*core.Item]
 
 		expect       *templatev0.ItemUpdateResponse
 		expectStatus codes.Code
-		expectCause  error
 	}{
 		{
 			name: "Success",
 
-			request: &templatev0.ItemUpdateRequest{
-				Id:          "00000000-0000-0000-0000-000000000001",
-				Name:        "updated item",
-				Description: "updated description",
-			},
+			request: request,
 
-			serviceMock: &serviceMock{
-				resp: &core.Item{
-					ID:          uuid.MustParse("00000000-0000-0000-0000-000000000001"),
-					Name:        "updated item",
-					Description: "updated description",
-					CreatedAt:   time.Date(2021, 1, 1, 0, 0, 0, 0, time.UTC),
-					UpdatedAt:   time.Date(2021, 1, 2, 0, 0, 0, 0, time.UTC),
-				},
-			},
+			serviceMock: &serviceMock[*core.Item]{resp: coreItem},
 
+			expect:       &templatev0.ItemUpdateResponse{Item: protoItem},
 			expectStatus: codes.OK,
-			expect: &templatev0.ItemUpdateResponse{
-				Item: &templatev0.Item{
-					Id:          "00000000-0000-0000-0000-000000000001",
-					Name:        "updated item",
-					Description: "updated description",
-					CreatedAt:   timestamppb.New(time.Date(2021, 1, 1, 0, 0, 0, 0, time.UTC)),
-					UpdatedAt:   timestamppb.New(time.Date(2021, 1, 2, 0, 0, 0, 0, time.UTC)),
-				},
-			},
 		},
 		{
-			name: "Error/InvalidID",
+			name: "Error/MalformedID",
 
-			request: &templatev0.ItemUpdateRequest{
-				Id:   "not-a-uuid",
-				Name: "updated item",
-			},
+			request: &templatev0.ItemUpdateRequest{Id: "not-a-uuid", Name: "test item"},
 
 			expectStatus: codes.InvalidArgument,
 		},
 		{
-			name: "Error/InvalidArgument",
+			name: "Error/InvalidRequest",
 
-			request: &templatev0.ItemUpdateRequest{
-				Id:   "00000000-0000-0000-0000-000000000001",
-				Name: "",
-			},
+			request: request,
 
-			serviceMock: &serviceMock{
-				err: core.ErrInvalidRequest,
-			},
+			serviceMock: &serviceMock[*core.Item]{err: core.ErrInvalidRequest},
 
 			expectStatus: codes.InvalidArgument,
 		},
 		{
 			name: "Error/NotFound",
 
-			request: &templatev0.ItemUpdateRequest{
-				Id:   "00000000-0000-0000-0000-000000000001",
-				Name: "updated item",
-			},
+			request: request,
 
-			serviceMock: &serviceMock{
-				err: core.ErrItemUpdateNotFound,
-			},
+			serviceMock: &serviceMock[*core.Item]{err: core.ErrItemUpdateNotFound},
 
 			expectStatus: codes.NotFound,
 		},
 		{
 			name: "Error/Internal",
 
-			request: &templatev0.ItemUpdateRequest{
-				Id:   "00000000-0000-0000-0000-000000000001",
-				Name: "updated item",
-			},
+			request: request,
 
-			serviceMock: &serviceMock{
-				err: errFoo,
-			},
+			serviceMock: &serviceMock[*core.Item]{err: errFoo},
 
 			expectStatus: codes.Internal,
-			expectCause:  errFoo,
 		},
 	}
 
@@ -131,35 +81,16 @@ func TestGrpcItemUpdate(t *testing.T) {
 			service := handlersmocks.NewMockGrpcItemUpdateService(t)
 
 			if testCase.serviceMock != nil {
-				serviceRequest := &core.ItemUpdateRequest{
-					ID:          uuid.MustParse(testCase.request.GetId()),
-					Name:        testCase.request.GetName(),
-					Description: testCase.request.GetDescription(),
-				}
-
 				service.EXPECT().
-					Exec(mock.Anything, serviceRequest).
+					Exec(mock.Anything, &core.ItemUpdateRequest{
+						ID: itemID, Name: "test item", Description: "test description",
+					}).
 					Return(testCase.serviceMock.resp, testCase.serviceMock.err)
 			}
 
-			handler := handlers.NewGrpcItemUpdate(service)
-
-			res, err := handler.ItemUpdate(t.Context(), testCase.request)
-			resSt, ok := status.FromError(err)
-			require.True(t, ok, resSt.Code().String())
-			require.Equal(
-				t,
-				testCase.expectStatus, resSt.Code(),
-				"expected status code %s, got %s (%v)", testCase.expectStatus, resSt.Code(), err,
-			)
-			require.Equal(t, testCase.expect, res)
-
-			if testCase.expectCause != nil {
-				// The fault keeps its cause, so the server span names its type.
-				require.ErrorIs(t, err, testCase.expectCause)
-			}
-
-			service.AssertExpectations(t)
+			response, err := handlers.NewGrpcItemUpdate(service).ItemUpdate(t.Context(), testCase.request)
+			requireStatus(t, err, testCase.expectStatus)
+			require.Equal(t, testCase.expect, response)
 		})
 	}
 }

@@ -3,7 +3,6 @@ package dao_test
 import (
 	"context"
 	"testing"
-	"time"
 
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/require"
@@ -22,44 +21,22 @@ func TestPgItemDelete(t *testing.T) {
 	testCases := []struct {
 		name string
 
-		fixtures []*dao.Item
+		id uuid.UUID
 
-		request *dao.ItemDeleteRequest
-
-		expect    *dao.Item
-		expectErr error
+		expectFixture bool
+		expectErr     error
 	}{
 		{
 			name: "Success",
 
-			fixtures: []*dao.Item{
-				{
-					ID:          uuid.MustParse("00000000-0000-0000-0000-000000000001"),
-					Name:        "test item",
-					Description: "test description",
-					CreatedAt:   time.Date(2021, 1, 1, 0, 0, 0, 0, time.UTC),
-					UpdatedAt:   time.Date(2021, 1, 1, 0, 0, 0, 0, time.UTC),
-				},
-			},
+			id: itemID,
 
-			request: &dao.ItemDeleteRequest{
-				ID: uuid.MustParse("00000000-0000-0000-0000-000000000001"),
-			},
-
-			expect: &dao.Item{
-				ID:          uuid.MustParse("00000000-0000-0000-0000-000000000001"),
-				Name:        "test item",
-				Description: "test description",
-				CreatedAt:   time.Date(2021, 1, 1, 0, 0, 0, 0, time.UTC),
-				UpdatedAt:   time.Date(2021, 1, 1, 0, 0, 0, 0, time.UTC),
-			},
+			expectFixture: true,
 		},
 		{
 			name: "Error/NotFound",
 
-			request: &dao.ItemDeleteRequest{
-				ID: uuid.MustParse("00000000-0000-0000-0000-000000000001"),
-			},
+			id: absentID,
 
 			expectErr: dao.ErrItemDeleteNotFound,
 		},
@@ -74,17 +51,26 @@ func TestPgItemDelete(t *testing.T) {
 			postgrestest.RunDBTest(t, configtest.PostgresPreset, migrations.Migrations, func(ctx context.Context, t *testing.T) {
 				t.Helper()
 
+				fixtures := insertItems(ctx, t)
+
+				item, err := daoItemDelete.Exec(ctx, &dao.ItemDeleteRequest{ID: testCase.id})
+				require.ErrorIs(t, err, testCase.expectErr)
+
 				db, err := postgres.GetContext(ctx)
 				require.NoError(t, err)
 
-				if len(testCase.fixtures) > 0 {
-					_, err = db.NewInsert().Model(&testCase.fixtures).Exec(ctx)
-					require.NoError(t, err)
+				exists, err := db.NewSelect().Model((*dao.Item)(nil)).Where("id = ?", itemID).Exists(ctx)
+				require.NoError(t, err)
+
+				if !testCase.expectFixture {
+					require.Nil(t, item)
+					require.True(t, exists)
+
+					return
 				}
 
-				result, err := daoItemDelete.Exec(ctx, testCase.request)
-				require.ErrorIs(t, err, testCase.expectErr)
-				require.Equal(t, testCase.expect, result)
+				require.Equal(t, fixtures[0], item)
+				require.False(t, exists)
 			})
 		})
 	}

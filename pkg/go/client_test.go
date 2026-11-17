@@ -2,11 +2,9 @@ package servicetemplate_test
 
 import (
 	"context"
-	"fmt"
 	"net"
-	"os"
 	"os/exec"
-	"path/filepath"
+	"slices"
 	"strings"
 	"testing"
 
@@ -15,8 +13,10 @@ import (
 	"go.opentelemetry.io/otel/propagation"
 	"go.opentelemetry.io/otel/trace"
 	"google.golang.org/grpc"
+	"google.golang.org/grpc/codes"
 	"google.golang.org/grpc/credentials/insecure"
 	"google.golang.org/grpc/metadata"
+	"google.golang.org/grpc/status"
 	"google.golang.org/grpc/test/bufconn"
 
 	"github.com/a-novel-kit/golib/grpcf"
@@ -37,44 +37,40 @@ func TestClient(t *testing.T) {
 
 		defer client.Close()
 
-		_, err = client.UnaryEcho(t.Context(), &golibproto.UnaryEchoRequest{})
+		ctx := t.Context()
+
+		_, err = client.UnaryEcho(ctx, &golibproto.UnaryEchoRequest{})
 		require.NoError(t, err)
-	})
 
-	t.Run("Success/ImportIgnoresServerEnvironment", func(t *testing.T) {
-		t.Parallel()
+		_, err = client.Status(ctx, &servicetemplate.StatusRequest{})
+		require.NoError(t, err)
 
-		consumerPath := buildClientConsumer(t)
+		// One item goes through every RPC, which proves each one is registered on the running server.
+		created, err := client.ItemCreate(ctx, &servicetemplate.ItemCreateRequest{Name: "client item"})
+		require.NoError(t, err)
 
-		testCases := []struct {
-			name   string
-			prefix string
-		}{
-			{name: "Unprefixed"},
-			{name: "Prefixed", prefix: "TEMPLATE_CLIENT_TEST_"},
-		}
+		id := created.GetItem().GetId()
 
-		for _, testCase := range testCases {
-			t.Run(testCase.name, func(t *testing.T) {
-				t.Parallel()
+		read, err := client.ItemGet(ctx, &servicetemplate.ItemGetRequest{Id: id})
+		require.NoError(t, err)
+		require.Equal(t, "client item", read.GetItem().GetName())
 
-				// Invalid server settings fail a process that reads them, so the consumer only runs
-				// while the client leaves them alone.
-				command := exec.CommandContext(t.Context(), consumerPath)
+		updated, err := client.ItemUpdate(ctx, &servicetemplate.ItemUpdateRequest{Id: id, Name: "renamed item"})
+		require.NoError(t, err)
+		require.Equal(t, "renamed item", updated.GetItem().GetName())
 
-				command.Env = append(os.Environ(),
-					"GOWORK=off",
-					"SERVICE_TEMPLATE_ENV_PREFIX="+testCase.prefix,
-					testCase.prefix+"REST_TIMEOUT_READ=invalid",
-					testCase.prefix+"GRPC_TIMEOUT_SHUTDOWN=invalid",
-					testCase.prefix+"POSTGRES_PORT=invalid",
-					testCase.prefix+"OTEL=invalid",
-				)
+		page, err := client.ItemList(ctx, &servicetemplate.ItemListRequest{Limit: 100})
+		require.NoError(t, err)
+		require.True(t, slices.ContainsFunc(page.GetItems(), func(item *servicetemplate.Item) bool {
+			return item.GetId() == id
+		}))
 
-				output, err := command.CombinedOutput()
-				require.NoError(t, err, string(output))
-			})
-		}
+		deleted, err := client.ItemDelete(ctx, &servicetemplate.ItemDeleteRequest{Id: id})
+		require.NoError(t, err)
+		require.Equal(t, id, deleted.GetItem().GetId())
+
+		_, err = client.ItemGet(ctx, &servicetemplate.ItemGetRequest{Id: id})
+		require.Equal(t, codes.NotFound, status.Code(err))
 	})
 
 	t.Run("Success/DependencyBoundary", func(t *testing.T) {
@@ -83,12 +79,15 @@ func TestClient(t *testing.T) {
 		output, err := exec.CommandContext(t.Context(), "go", "list", "-deps", ".").Output()
 		require.NoError(t, err)
 
-		dependencies := strings.Split(strings.TrimSpace(string(output)), "\n")
+		// The client links the generated protobuf code of this module and nothing else of it: neither
+		// the configuration, which reads the server's environment, nor the core or DAO layers.
+		const internalPath = "github.com/a-novel/service-template/internal/"
 
-		const configPath = "github.com/a-novel/service-template/internal/config"
-
-		require.NotContains(t, dependencies, configPath)
-		require.NotContains(t, dependencies, configPath+"/env")
+		for dependency := range strings.SplitSeq(strings.TrimSpace(string(output)), "\n") {
+			if strings.HasPrefix(dependency, internalPath) {
+				require.True(t, strings.HasPrefix(dependency, internalPath+"handlers/protogen/"), dependency)
+			}
+		}
 	})
 
 	t.Run("Success/PropagatesTraceContext", func(t *testing.T) {
@@ -140,62 +139,4 @@ func TestClient(t *testing.T) {
 		require.Len(t, traceparent, 1)
 		require.Contains(t, traceparent[0], caller.TraceID().String())
 	})
-}
-
-// clientConsumerModule and clientConsumerMain are a program outside this module that imports the
-// client, as another service does.
-const (
-	clientConsumerModule = `module test/client
-
-go 1.27.2
-
-require github.com/a-novel/service-template v0.0.0
-
-replace github.com/a-novel/service-template => %s
-`
-	clientConsumerMain = `package main
-
-import (
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials/insecure"
-
-	servicetemplate "github.com/a-novel/service-template/pkg/go"
-)
-
-func main() {
-	request := &servicetemplate.ItemGetRequest{Id: "item"}
-	if request.GetId() != "item" {
-		panic("client request alias lost its generated methods")
-	}
-
-	client, err := servicetemplate.NewClient("localhost:1", grpc.WithTransportCredentials(insecure.NewCredentials()))
-	if err != nil {
-		panic(err)
-	}
-	defer client.Close()
-}
-`
-)
-
-// buildClientConsumer builds the client consumer program and returns the path of its binary.
-func buildClientConsumer(t *testing.T) string {
-	t.Helper()
-
-	moduleRoot, err := filepath.Abs("../..")
-	require.NoError(t, err)
-
-	consumerDir := t.TempDir()
-	goMod := fmt.Sprintf(clientConsumerModule, filepath.ToSlash(moduleRoot))
-	require.NoError(t, os.WriteFile(filepath.Join(consumerDir, "go.mod"), []byte(goMod), 0o600))
-	require.NoError(t, os.WriteFile(filepath.Join(consumerDir, "main.go"), []byte(clientConsumerMain), 0o600))
-
-	build := exec.CommandContext(t.Context(), "go", "build", "-mod=mod", "-o", "consumer", ".")
-	build.Dir = consumerDir
-
-	build.Env = append(os.Environ(), "GOWORK=off")
-
-	output, err := build.CombinedOutput()
-	require.NoError(t, err, string(output))
-
-	return filepath.Join(consumerDir, "consumer")
 }

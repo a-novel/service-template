@@ -3,12 +3,10 @@ package dao_test
 import (
 	"context"
 	"testing"
-	"time"
 
 	"github.com/google/uuid"
 	"github.com/stretchr/testify/require"
 
-	"github.com/a-novel-kit/golib/postgres"
 	"github.com/a-novel-kit/golib/postgres/postgrestest"
 
 	"github.com/a-novel/service-template/internal/config/configtest"
@@ -22,44 +20,22 @@ func TestPgItemGet(t *testing.T) {
 	testCases := []struct {
 		name string
 
-		fixtures []*dao.Item
+		id uuid.UUID
 
-		request *dao.ItemGetRequest
-
-		expect    *dao.Item
-		expectErr error
+		expectFixture bool
+		expectErr     error
 	}{
 		{
 			name: "Success",
 
-			fixtures: []*dao.Item{
-				{
-					ID:          uuid.MustParse("00000000-0000-0000-0000-000000000001"),
-					Name:        "test item",
-					Description: "test description",
-					CreatedAt:   time.Date(2021, 1, 1, 0, 0, 0, 0, time.UTC),
-					UpdatedAt:   time.Date(2021, 1, 1, 0, 0, 0, 0, time.UTC),
-				},
-			},
+			id: itemID,
 
-			request: &dao.ItemGetRequest{
-				ID: uuid.MustParse("00000000-0000-0000-0000-000000000001"),
-			},
-
-			expect: &dao.Item{
-				ID:          uuid.MustParse("00000000-0000-0000-0000-000000000001"),
-				Name:        "test item",
-				Description: "test description",
-				CreatedAt:   time.Date(2021, 1, 1, 0, 0, 0, 0, time.UTC),
-				UpdatedAt:   time.Date(2021, 1, 1, 0, 0, 0, 0, time.UTC),
-			},
+			expectFixture: true,
 		},
 		{
 			name: "Error/NotFound",
 
-			request: &dao.ItemGetRequest{
-				ID: uuid.MustParse("00000000-0000-0000-0000-000000000001"),
-			},
+			id: absentID,
 
 			expectErr: dao.ErrItemGetNotFound,
 		},
@@ -74,17 +50,18 @@ func TestPgItemGet(t *testing.T) {
 			postgrestest.RunDBTest(t, configtest.PostgresPreset, migrations.Migrations, func(ctx context.Context, t *testing.T) {
 				t.Helper()
 
-				db, err := postgres.GetContext(ctx)
-				require.NoError(t, err)
+				fixtures := insertItems(ctx, t)
 
-				if len(testCase.fixtures) > 0 {
-					_, err = db.NewInsert().Model(&testCase.fixtures).Exec(ctx)
-					require.NoError(t, err)
+				item, err := daoItemGet.Exec(ctx, &dao.ItemGetRequest{ID: testCase.id})
+				require.ErrorIs(t, err, testCase.expectErr)
+
+				if !testCase.expectFixture {
+					require.Nil(t, item)
+
+					return
 				}
 
-				result, err := daoItemGet.Exec(ctx, testCase.request)
-				require.ErrorIs(t, err, testCase.expectErr)
-				require.Equal(t, testCase.expect, result)
+				require.Equal(t, fixtures[0], item)
 			})
 		})
 	}
