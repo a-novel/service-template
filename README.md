@@ -297,14 +297,28 @@ The package is published to GitHub Packages, which requires a Personal Access To
 //npm.pkg.github.com/:_authToken=${YOUR_PERSONAL_ACCESS_TOKEN}
 ```
 
+The client builds on `RestClient`, which its peer `@a-novel-kit/nodelib-browser` ships from 2.13.0:
+
 ```bash
-pnpm add @a-novel/service-template-rest
+pnpm add @a-novel/service-template-rest @a-novel-kit/nodelib-browser@^2.13.0
 ```
 
+The constructor's second argument sends every request. In production, it adds the caller's projected service token, which the server requires:
+
 ```typescript
+import { readFile } from "node:fs/promises";
+
 import { TemplateApi, itemCreate, itemList } from "@a-novel/service-template-rest";
 
-const api = new TemplateApi("http://service-template:8080");
+// The kubelet rotates the token file in place, so each request reads it again. Without a token path,
+// the client calls a local standalone image, which takes every request.
+const tokenPath = process.env.SERVICE_TEMPLATE_TOKEN_PATH;
+
+const api = new TemplateApi("http://service-template:8080", async (input, init) => {
+  const headers = new Headers(init?.headers);
+  if (tokenPath) headers.set("X-Service-Authorization", await readFile(tokenPath, "utf8"));
+  return await fetch(input, { ...init, headers });
+});
 
 const created = await itemCreate(api, "My Item", "An optional description.");
 const { items, total } = await itemList(api, 10, 0);

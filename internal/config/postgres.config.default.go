@@ -7,7 +7,8 @@ import (
 	"github.com/a-novel/service-template/internal/config/env"
 )
 
-// PostgresPresetDefault is the servers' PostgreSQL connection.
+// PostgresPresetDefault is the servers' PostgreSQL connection. It panics when the connection names a
+// host without a password.
 var PostgresPresetDefault = lo.Must(env.Postgres.Preset())
 
 // migrationsSessionParams bounds how long a migration waits for a lock. After three seconds the
