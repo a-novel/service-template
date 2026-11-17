@@ -75,10 +75,10 @@ paths:
           $ref: "#/components/responses/itemCreated"
         "400":
           $ref: "#/components/responses/badRequest"
-        "422":
-          $ref: "#/components/responses/unprocessableEntity"
         "401":
           $ref: "#/components/responses/serviceTokenRejected"
+        "422":
+          $ref: "#/components/responses/unprocessableEntity"
         "429":
           $ref: "#/components/responses/tooManyRequests"
         "503":
@@ -102,10 +102,10 @@ paths:
           $ref: "#/components/responses/itemList"
         "400":
           $ref: "#/components/responses/badRequest"
-        "422":
-          $ref: "#/components/responses/unprocessableEntity"
         "401":
           $ref: "#/components/responses/serviceTokenRejected"
+        "422":
+          $ref: "#/components/responses/unprocessableEntity"
         "429":
           $ref: "#/components/responses/tooManyRequests"
         "503":
@@ -128,12 +128,12 @@ paths:
           $ref: "#/components/responses/item"
         "400":
           $ref: "#/components/responses/badRequest"
-        "422":
-          $ref: "#/components/responses/unprocessableEntity"
-        "404":
-          $ref: "#/components/responses/notFound"
         "401":
           $ref: "#/components/responses/serviceTokenRejected"
+        "404":
+          $ref: "#/components/responses/notFound"
+        "422":
+          $ref: "#/components/responses/unprocessableEntity"
         "429":
           $ref: "#/components/responses/tooManyRequests"
         "503":
@@ -159,12 +159,12 @@ paths:
           $ref: "#/components/responses/item"
         "400":
           $ref: "#/components/responses/badRequest"
-        "422":
-          $ref: "#/components/responses/unprocessableEntity"
-        "404":
-          $ref: "#/components/responses/notFound"
         "401":
           $ref: "#/components/responses/serviceTokenRejected"
+        "404":
+          $ref: "#/components/responses/notFound"
+        "422":
+          $ref: "#/components/responses/unprocessableEntity"
         "429":
           $ref: "#/components/responses/tooManyRequests"
         "503":
@@ -186,12 +186,12 @@ paths:
           $ref: "#/components/responses/item"
         "400":
           $ref: "#/components/responses/badRequest"
-        "422":
-          $ref: "#/components/responses/unprocessableEntity"
-        "404":
-          $ref: "#/components/responses/notFound"
         "401":
           $ref: "#/components/responses/serviceTokenRejected"
+        "404":
+          $ref: "#/components/responses/notFound"
+        "422":
+          $ref: "#/components/responses/unprocessableEntity"
         "429":
           $ref: "#/components/responses/tooManyRequests"
         "503":
