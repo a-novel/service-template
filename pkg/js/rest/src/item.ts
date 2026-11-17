@@ -1,4 +1,4 @@
-import type { TemplateApi } from "./api";
+import type { TemplateApi } from "./api.js";
 
 import { z } from "zod";
 
