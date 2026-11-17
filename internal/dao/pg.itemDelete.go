@@ -16,9 +16,6 @@ import (
 //go:embed pg.itemDelete.sql
 var itemDeleteQuery string
 
-// ErrItemDeleteNotFound is returned by [PgItemDelete.Exec] when no item has the requested ID.
-var ErrItemDeleteNotFound = errors.New("item not found")
-
 // ItemDeleteRequest is the input to [PgItemDelete.Exec].
 type ItemDeleteRequest struct {
 	ID uuid.UUID
@@ -44,7 +41,7 @@ func (dao *PgItemDelete) Exec(ctx context.Context, request *ItemDeleteRequest) (
 
 	err = db.NewRaw(itemDeleteQuery, request.ID).Scan(ctx, &entity)
 	if errors.Is(err, sql.ErrNoRows) {
-		err = errors.Join(err, ErrItemDeleteNotFound)
+		err = errors.Join(err, ErrItemNotFound)
 	}
 
 	if err != nil {

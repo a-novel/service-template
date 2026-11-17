@@ -10,8 +10,8 @@ info:
   title: Service Template API
   summary: Generic CRUD service template.
   description: |
-    The public REST API of the service template, with CRUD operations on a placeholder `item`
-    resource. A fork replaces `item` with its own domain model.
+    The REST API of the service template, with CRUD operations on a placeholder `item` resource. It
+    admits only the callers its service tokens allow. A fork replaces `item` with its own domain model.
   version: v0.0.0
   license:
     name: RPL-1.5
@@ -47,6 +47,8 @@ paths:
       responses:
         "200":
           $ref: "#/components/responses/health"
+        "401":
+          $ref: "#/components/responses/serviceTokenRejected"
         "429":
           $ref: "#/components/responses/tooManyRequests"
         "503":
@@ -73,6 +75,10 @@ paths:
           $ref: "#/components/responses/itemCreated"
         "400":
           $ref: "#/components/responses/badRequest"
+        "401":
+          $ref: "#/components/responses/serviceTokenRejected"
+        "422":
+          $ref: "#/components/responses/unprocessableEntity"
         "429":
           $ref: "#/components/responses/tooManyRequests"
         "503":
@@ -96,6 +102,10 @@ paths:
           $ref: "#/components/responses/itemList"
         "400":
           $ref: "#/components/responses/badRequest"
+        "401":
+          $ref: "#/components/responses/serviceTokenRejected"
+        "422":
+          $ref: "#/components/responses/unprocessableEntity"
         "429":
           $ref: "#/components/responses/tooManyRequests"
         "503":
@@ -118,8 +128,12 @@ paths:
           $ref: "#/components/responses/item"
         "400":
           $ref: "#/components/responses/badRequest"
+        "401":
+          $ref: "#/components/responses/serviceTokenRejected"
         "404":
           $ref: "#/components/responses/notFound"
+        "422":
+          $ref: "#/components/responses/unprocessableEntity"
         "429":
           $ref: "#/components/responses/tooManyRequests"
         "503":
@@ -145,8 +159,12 @@ paths:
           $ref: "#/components/responses/item"
         "400":
           $ref: "#/components/responses/badRequest"
+        "401":
+          $ref: "#/components/responses/serviceTokenRejected"
         "404":
           $ref: "#/components/responses/notFound"
+        "422":
+          $ref: "#/components/responses/unprocessableEntity"
         "429":
           $ref: "#/components/responses/tooManyRequests"
         "503":
@@ -168,8 +186,12 @@ paths:
           $ref: "#/components/responses/item"
         "400":
           $ref: "#/components/responses/badRequest"
+        "401":
+          $ref: "#/components/responses/serviceTokenRejected"
         "404":
           $ref: "#/components/responses/notFound"
+        "422":
+          $ref: "#/components/responses/unprocessableEntity"
         "429":
           $ref: "#/components/responses/tooManyRequests"
         "503":
@@ -258,8 +280,17 @@ components:
 
     badRequest:
       description: |
-        The request sent to the server could not be parsed, or failed validation. A validation failure names
-        each invalid field and the rule it broke.
+        The request sent to the server could not be parsed.
+
+    serviceTokenRejected:
+      description: |
+        The service token of the call is missing or rejected. A server started with SERVICE_ISSUER_OPTIONAL and no
+        issuer never answers it.
+
+    unprocessableEntity:
+      description: |
+        The request was understood by the server, but cannot be processed because the data did not pass
+        required validation. The body names each invalid field and the rule it broke.
       content:
         application/problem+json:
           schema:
@@ -293,11 +324,11 @@ components:
         title:
           type: string
           description: The HTTP status text.
-          examples: [Bad Request]
+          examples: [Unprocessable Entity]
         status:
           type: integer
           description: The HTTP status code.
-          const: 400
+          const: 422
         tags:
           type: object
           description: Public details about the failure. Clients ignore tags they do not know.

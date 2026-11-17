@@ -13,13 +13,10 @@ service ItemListService {
 
 // ItemListRequest bounds the page of items to return.
 message ItemListRequest {
-  reserved 2, 3;
-  reserved "after";
-
   // Maximum number of items to return, from 1 to 100. Zero selects 20.
   int32 limit = 1;
   // How many items, newest first, come before the page. Zero starts at the newest item.
-  int32 offset = 4;
+  int32 offset = 2;
 }
 
 // ItemListResponse returns the requested page of items, empty past the end.

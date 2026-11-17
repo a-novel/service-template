@@ -41,11 +41,12 @@ export async function itemGet(api: TemplateApi, id: string): Promise<Item> {
 }
 
 /**
- * Lists a page of Items newest first, with their total, 100 at most when limit is omitted. Raise offset
- * by the page size to read the next page.
+ * Lists a page of Items newest first, with their total. The server sends 20 at most when limit is
+ * omitted. Raise offset by the page size to read the next page.
  */
 export async function itemList(api: TemplateApi, limit?: number, offset?: number): Promise<ItemPage> {
-  const params = new URLSearchParams({ limit: `${limit || 100}` });
+  const params = new URLSearchParams();
+  if (limit) params.set("limit", `${limit}`);
   if (offset) params.set("offset", `${offset}`);
   return await api.fetch(`/v0/items?${params.toString()}`, ItemPageSchema, {
     method: "GET",

@@ -4,10 +4,12 @@
 //
 // Two transports serve distinct audiences:
 //
-//   - gRPC handlers: the private API, for other services on the internal network. Once configured,
-//     [GrpcServiceToken] admits only the callers whose service token it accepts. Otherwise the
-//     network around it restricts access. Wired by cmd/grpc.
+//   - gRPC handlers: the private API, for other services on the internal network. [GrpcServiceToken]
+//     admits only the callers whose service token it accepts. Wired by cmd/grpc.
 //
-//   - REST handlers: the public API, for any HTTP client, unless [RestServiceToken] restricts it to
-//     the same callers. Wired by cmd/rest.
+//   - REST handlers: the API for the same callers, behind [RestServiceToken]. A fork that serves any
+//     HTTP client drops that wrap in cmd/rest. Wired by cmd/rest.
+//
+// Both gates fail closed: a server without a service-token issuer refuses to start, unless
+// SERVICE_ISSUER_OPTIONAL opts a local or test stack out.
 package handlers

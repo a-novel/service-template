@@ -59,7 +59,7 @@ func TestGrpcItemUpdate(t *testing.T) {
 
 			request: request,
 
-			serviceMock: &serviceMock[*core.Item]{err: core.ErrItemUpdateNotFound},
+			serviceMock: &serviceMock[*core.Item]{err: core.ErrItemNotFound},
 
 			expectStatus: codes.NotFound,
 		},

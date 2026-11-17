@@ -76,9 +76,9 @@ func TestItemUpdate(t *testing.T) {
 			id:       itemID,
 			itemName: "test item",
 
-			daoMock: &daoMock[*dao.Item]{err: dao.ErrItemUpdateNotFound},
+			daoMock: &daoMock[*dao.Item]{err: dao.ErrItemNotFound},
 
-			expectErr: core.ErrItemUpdateNotFound,
+			expectErr: core.ErrItemNotFound,
 		},
 		{
 			name: "Error/Dao",

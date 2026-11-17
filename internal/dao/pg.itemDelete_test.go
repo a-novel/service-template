@@ -41,7 +41,7 @@ func TestPgItemDelete(t *testing.T) {
 
 			id: absentID,
 
-			expectErr:   dao.ErrItemDeleteNotFound,
+			expectErr:   dao.ErrItemNotFound,
 			expectCount: 3,
 		},
 	}

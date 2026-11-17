@@ -46,9 +46,9 @@ func TestItemDelete(t *testing.T) {
 
 			id: itemID,
 
-			daoMock: &daoMock[*dao.Item]{err: dao.ErrItemDeleteNotFound},
+			daoMock: &daoMock[*dao.Item]{err: dao.ErrItemNotFound},
 
-			expectErr: core.ErrItemDeleteNotFound,
+			expectErr: core.ErrItemNotFound,
 		},
 		{
 			name: "Error/Dao",

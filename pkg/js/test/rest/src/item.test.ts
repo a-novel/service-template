@@ -27,13 +27,13 @@ describe("itemCreate", () => {
     await itemDelete(api, item.id);
   });
 
-  it("returns 400 for empty name", async () => {
-    await expectStatus(itemCreate(api, ""), 400);
+  it("returns 422 for empty name", async () => {
+    await expectStatus(itemCreate(api, ""), 422);
   });
 
   it("names the invalid field of a rejected item", async () => {
     await expect(itemCreate(api, "   ")).rejects.toThrow(
-      '{"type":"about:blank","title":"Bad Request","status":400,"tags":{"invalidFields":{"name":"notblank"}}}'
+      '{"type":"about:blank","title":"Unprocessable Entity","status":422,"tags":{"invalidFields":{"name":"notblank"}}}'
     );
   });
 });
@@ -101,8 +101,8 @@ describe("itemList", () => {
     await itemDelete(api, created.id);
   });
 
-  it("returns 400 for a negative offset", async () => {
-    await expectStatus(itemList(api, 1, -1), 400);
+  it("returns 422 for a negative offset", async () => {
+    await expectStatus(itemList(api, 1, -1), 422);
   });
 });
 
@@ -126,10 +126,10 @@ describe("itemUpdate", () => {
     await expectStatus(itemUpdate(api, "00000000-0000-0000-0000-000000000001", "name"), 404);
   });
 
-  it("returns 400 for empty name", async () => {
+  it("returns 422 for empty name", async () => {
     const created = await itemCreate(api, "item for empty name test");
 
-    await expectStatus(itemUpdate(api, created.id, ""), 400);
+    await expectStatus(itemUpdate(api, created.id, ""), 422);
 
     await itemDelete(api, created.id);
   });

@@ -20,8 +20,8 @@ type RestItemGetService interface {
 
 // itemGetErrors maps a failed item lookup to its status.
 var itemGetErrors = httpf.ErrMap{
-	core.ErrItemGetNotFound: http.StatusNotFound,
-	core.ErrInvalidRequest:  http.StatusBadRequest,
+	core.ErrItemNotFound:   http.StatusNotFound,
+	core.ErrInvalidRequest: http.StatusUnprocessableEntity,
 }
 
 // RestItemGetRequest carries the query parameters accepted by the get endpoint.

@@ -1,5 +1,7 @@
-// Command rest serves the public REST API, for any HTTP client. cmd/grpc serves the same domain to
-// other services over gRPC, and cmd/migrations applies the database schema.
+// Command rest serves the REST API. It admits only the callers its service tokens allow, and
+// refuses to start without a token issuer unless SERVICE_ISSUER_OPTIONAL opts a local stack out.
+// cmd/grpc serves the same domain to other services over gRPC, and cmd/migrations applies the
+// database schema.
 package main
 
 import (
@@ -87,9 +89,10 @@ func main() {
 	// =================================================================================================================
 
 	router := httpf.NewRouter(cfg.Rest, cfg.Otel, cfg.RestLogger, cfg.App.DowntimeStart)
-	withServiceToken := handlers.RestServiceToken(
-		cfg.ServiceToken, httpf.NewPoolClient(httpf.PoolOptions{}), cfg.Logger, cfg.Rest.Liveness,
-	)
+	withServiceToken := lo.Must(handlers.RestServiceToken(
+		cfg.ServiceToken, cfg.ServiceIssuerOptional, httpf.NewPoolClient(httpf.PoolOptions{}), cfg.Logger,
+		cfg.Rest.Liveness,
+	))
 
 	router.Route("/v0", func(api chi.Router) {
 		api.Get("/ping", handlerPing.ServeHTTP)

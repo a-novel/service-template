@@ -61,8 +61,6 @@ const (
 	serviceTokenAudience = "service-template"
 	// serviceTokenCaller is the one caller the service token tests allow.
 	serviceTokenCaller = "system:serviceaccount:agora:caller"
-	// serviceTokenStranger is a caller outside the allowed ones.
-	serviceTokenStranger = "system:serviceaccount:agora:stranger"
 )
 
 // serviceMock is what the service mock of a handler test case returns. A nil one means the handler

@@ -11,10 +11,21 @@ import (
 
 // GrpcServiceToken returns the server options that refuse a call unless its service token matches
 // tokenConfig. The health service stays open for the kubelet's probes, and client fetches the
-// issuer's keys. Without an issuer, it returns no option, and the server takes every call.
-func GrpcServiceToken(tokenConfig servicetoken.Config, client *http.Client) []grpc.ServerOption {
+// issuer's keys.
+//
+// The gate fails closed: without an issuer it returns [ErrServiceTokenIssuerRequired], so a
+// deployment that forgets the issuer stops at startup instead of admitting every caller. Only
+// issuerOptional, which a local or test stack sets, turns that into no option, and the server then
+// takes every call.
+func GrpcServiceToken(
+	tokenConfig servicetoken.Config, issuerOptional bool, client *http.Client,
+) ([]grpc.ServerOption, error) {
 	if tokenConfig.Issuer == "" {
-		return nil
+		if issuerOptional {
+			return nil, nil
+		}
+
+		return nil, ErrServiceTokenIssuerRequired
 	}
 
 	verifier := servicetoken.NewVerifier(tokenConfig, client)
@@ -22,5 +33,5 @@ func GrpcServiceToken(tokenConfig servicetoken.Config, client *http.Client) []gr
 	return []grpc.ServerOption{
 		grpc.ChainUnaryInterceptor(grpcf.ServiceTokenUnaryInterceptor(verifier)),
 		grpc.ChainStreamInterceptor(grpcf.ServiceTokenStreamInterceptor(verifier)),
-	}
+	}, nil
 }

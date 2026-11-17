@@ -31,7 +31,12 @@ services:
       postgres-template:
         condition: service_healthy
     environment:
-      POSTGRES_DSN: "postgres://${POSTGRES_USER}:${POSTGRES_PASSWORD}@postgres-template:5432/${POSTGRES_DB}?sslmode=disable"
+      POSTGRES_HOST: postgres-template
+      POSTGRES_PORT: 5432
+      POSTGRES_USER: "${POSTGRES_USER}"
+      POSTGRES_PASSWORD: "${POSTGRES_PASSWORD}"
+      POSTGRES_DATABASE: "${POSTGRES_DB}"
+      POSTGRES_TLS_ENABLED: false
       # The suite sends many requests per route within a second from one address.
       REST_RATE_LIMITS_ENABLED: false
     networks:

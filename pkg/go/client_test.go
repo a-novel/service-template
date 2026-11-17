@@ -22,7 +22,7 @@ import (
 	"github.com/a-novel-kit/golib/grpcf"
 	golibproto "github.com/a-novel-kit/golib/grpcf/proto/gen"
 
-	"github.com/a-novel/service-template/internal/config/env"
+	"github.com/a-novel/service-template/internal/config/configtest"
 	"github.com/a-novel/service-template/pkg/go"
 )
 
@@ -32,7 +32,7 @@ func TestClient(t *testing.T) {
 	t.Run("Success/RemoteCalls", func(t *testing.T) {
 		t.Parallel()
 
-		client, err := servicetemplate.NewClient(env.GrpcURL, grpc.WithTransportCredentials(insecure.NewCredentials()))
+		client, err := servicetemplate.NewClient(configtest.GrpcURL, grpc.WithTransportCredentials(insecure.NewCredentials()))
 		require.NoError(t, err)
 
 		defer client.Close()

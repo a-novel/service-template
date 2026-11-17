@@ -42,7 +42,11 @@ services:
       postgres-template:
         condition: service_healthy
     environment:
-      POSTGRES_DSN: postgres://postgres:postgres@postgres-template:5432/postgres?sslmode=disable
+      POSTGRES_HOST: postgres-template
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DATABASE: postgres
+      POSTGRES_TLS_ENABLED: false
     networks:
       - api
 
@@ -61,7 +65,13 @@ services:
       postgres-template:
         condition: service_healthy
     environment:
-      POSTGRES_DSN: postgres://postgres:postgres@postgres-template:5432/postgres?sslmode=disable
+      POSTGRES_HOST: postgres-template
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DATABASE: postgres
+      POSTGRES_TLS_ENABLED: false
+      # The standalone image sets it too, but a go-exec target reads only this block.
+      SERVICE_ISSUER_OPTIONAL: true
     networks:
       - api
 
@@ -76,7 +86,13 @@ services:
       postgres-template:
         condition: service_healthy
     environment:
-      POSTGRES_DSN: postgres://postgres:postgres@postgres-template:5432/postgres?sslmode=disable
+      POSTGRES_HOST: postgres-template
+      POSTGRES_USER: postgres
+      POSTGRES_PASSWORD: postgres
+      POSTGRES_DATABASE: postgres
+      POSTGRES_TLS_ENABLED: false
+      # The standalone image sets it too, but a go-exec target reads only this block.
+      SERVICE_ISSUER_OPTIONAL: true
     networks:
       - api
 
