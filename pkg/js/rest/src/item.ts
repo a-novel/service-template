@@ -1,7 +1,5 @@
 import type { TemplateApi } from "./api";
 
-import { HTTP_HEADERS } from "@a-novel-kit/nodelib-browser/http";
-
 import { z } from "zod";
 
 /** Parses an Item as returned by the service, coercing the timestamp strings to Date. */
@@ -27,17 +25,13 @@ export type ItemPage = z.infer<typeof ItemPageSchema>;
 
 /** Creates a new Item and returns the stored record. */
 export async function itemCreate(api: TemplateApi, name: string, description?: string): Promise<Item> {
-  return await api.fetch("/v0/items", ItemSchema, {
-    method: "POST",
-    headers: HTTP_HEADERS.JSON,
-    body: JSON.stringify({ name, description }),
-  });
+  return await api.fetch("/v0/items", ItemSchema, { method: "POST", json: { name, description } });
 }
 
 /** Fetches a single Item by ID. */
 export async function itemGet(api: TemplateApi, id: string): Promise<Item> {
   const params = new URLSearchParams({ id });
-  return await api.fetch(`/v0/item?${params.toString()}`, ItemSchema, { method: "GET", headers: HTTP_HEADERS.JSON });
+  return await api.fetch(`/v0/item?${params.toString()}`, ItemSchema, { method: "GET" });
 }
 
 /**
@@ -48,23 +42,16 @@ export async function itemList(api: TemplateApi, limit?: number, offset?: number
   const params = new URLSearchParams();
   if (limit) params.set("limit", `${limit}`);
   if (offset) params.set("offset", `${offset}`);
-  return await api.fetch(`/v0/items?${params.toString()}`, ItemPageSchema, {
-    method: "GET",
-    headers: HTTP_HEADERS.JSON,
-  });
+  return await api.fetch(`/v0/items?${params.toString()}`, ItemPageSchema, { method: "GET" });
 }
 
 /** Updates an existing Item and returns the stored record. */
 export async function itemUpdate(api: TemplateApi, id: string, name: string, description?: string): Promise<Item> {
-  return await api.fetch("/v0/item", ItemSchema, {
-    method: "PUT",
-    headers: HTTP_HEADERS.JSON,
-    body: JSON.stringify({ id, name, description }),
-  });
+  return await api.fetch("/v0/item", ItemSchema, { method: "PUT", json: { id, name, description } });
 }
 
 /** Deletes an Item by ID and returns the record that was removed. */
 export async function itemDelete(api: TemplateApi, id: string): Promise<Item> {
   const params = new URLSearchParams({ id });
-  return await api.fetch(`/v0/item?${params.toString()}`, ItemSchema, { method: "DELETE", headers: HTTP_HEADERS.JSON });
+  return await api.fetch(`/v0/item?${params.toString()}`, ItemSchema, { method: "DELETE" });
 }
