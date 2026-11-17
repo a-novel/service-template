@@ -253,9 +253,9 @@ package main
 import (
 	"context"
 	"log"
+	"os"
 
-	"google.golang.org/grpc"
-	"google.golang.org/grpc/credentials/insecure"
+	"github.com/a-novel-kit/golib/grpcf"
 
 	servicetemplate "github.com/a-novel/service-template/pkg/go"
 )
@@ -263,12 +263,14 @@ import (
 func main() {
 	ctx := context.Background()
 
-	// In production, pass the options of golib's grpcf.ServiceTokenCredentialsProvider: the server
-	// admits only the callers its service tokens allow. A local standalone image takes every call.
-	client, err := servicetemplate.NewClient(
-		"service-template:8080",
-		grpc.WithTransportCredentials(insecure.NewCredentials()),
+	// LoadClientConfig reads SERVICE_TEMPLATE_HOST, _PORT, _TLS and _TOKEN_PATH. In production, the
+	// token path names the caller's projected service token, which the server requires. Without
+	// it, the client dials a local standalone image in plaintext.
+	target := grpcf.LoadClientConfig(
+		os.Getenv, "SERVICE_TEMPLATE", grpcf.ClientConfig{Host: "service-template", Port: 8080},
 	)
+
+	client, err := servicetemplate.NewClient(target.Address(), target.DialOptions()...)
 	if err != nil {
 		log.Fatal(err)
 	}
@@ -295,14 +297,28 @@ The package is published to GitHub Packages, which requires a Personal Access To
 //npm.pkg.github.com/:_authToken=${YOUR_PERSONAL_ACCESS_TOKEN}
 ```
 
+The client builds on `RestClient`, which its peer `@a-novel-kit/nodelib-browser` ships from 2.13.0:
+
 ```bash
-pnpm add @a-novel/service-template-rest
+pnpm add @a-novel/service-template-rest @a-novel-kit/nodelib-browser@^2.13.0
 ```
 
+The constructor's second argument sends every request. In production, it adds the caller's projected service token, which the server requires:
+
 ```typescript
+import { readFile } from "node:fs/promises";
+
 import { TemplateApi, itemCreate, itemList } from "@a-novel/service-template-rest";
 
-const api = new TemplateApi("http://service-template:8080");
+// The kubelet rotates the token file in place, so each request reads it again. Without a token path,
+// the client calls a local standalone image, which takes every request.
+const tokenPath = process.env.SERVICE_TEMPLATE_TOKEN_PATH;
+
+const api = new TemplateApi("http://service-template:8080", async (input, init) => {
+  const headers = new Headers(init?.headers);
+  if (tokenPath) headers.set("X-Service-Authorization", await readFile(tokenPath, "utf8"));
+  return await fetch(input, { ...init, headers });
+});
 
 const created = await itemCreate(api, "My Item", "An optional description.");
 const { items, total } = await itemList(api, 10, 0);

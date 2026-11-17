@@ -6,7 +6,7 @@ package main
 
 import (
 	"context"
-	"io"
+	"fmt"
 	"log"
 	"os"
 	"os/signal"
@@ -15,7 +15,7 @@ import (
 	"time"
 
 	"github.com/samber/lo"
-	healthpb "google.golang.org/grpc/health/grpc_health_v1"
+	"google.golang.org/grpc"
 	"google.golang.org/grpc/reflection"
 
 	"github.com/a-novel-kit/golib/downtime"
@@ -25,7 +25,6 @@ import (
 	"github.com/a-novel-kit/golib/postgres"
 
 	"github.com/a-novel/service-template/internal/config"
-	"github.com/a-novel/service-template/internal/config/env"
 	"github.com/a-novel/service-template/internal/core"
 	"github.com/a-novel/service-template/internal/dao"
 	"github.com/a-novel/service-template/internal/handlers"
@@ -43,16 +42,26 @@ func main() {
 	lo.Must0(otel.Init(cfg.Otel))
 	defer cfg.Otel.Flush()
 
-	if env.OTLPEndpoint == "" {
-		log.SetFlags(log.Flags() &^ (log.Ldate | log.Ltime))
-	}
-
 	// A server started during a planned downtime refuses work, so it leaves the database alone.
 	if !downtime.Started(cfg.App.DowntimeStart, time.Now()) {
 		ctx = lo.Must(postgres.NewContext(ctx, cfg.Postgres))
+		defer cfg.Postgres.Close()
+	}
 
-		database := lo.Must(cfg.Postgres.DB(ctx))
-		defer closeDatabase(database)
+	server := lo.Must(newServer(ctx, cfg))
+
+	log.Println("Starting gRPC server on :" + strconv.Itoa(cfg.Grpc.Port))
+
+	lo.Must0(grpcf.ListenAndServe(ctx, cfg.Grpc, server))
+}
+
+// newServer builds the gRPC server. Each call carries the database of ctx, and passes the
+// service-token gate first, but for the health service. The gate refuses an empty issuer unless cfg
+// opts a local stack out, so the server never starts open by mistake.
+func newServer(ctx context.Context, cfg config.App) (*grpc.Server, error) {
+	serviceToken, err := grpcf.ServiceTokenGate(cfg.ServiceToken, httpf.NewPoolClient(httpf.PoolOptions{}))
+	if err != nil {
+		return nil, fmt.Errorf("service token gate: %w", err)
 	}
 
 	// =================================================================================================================
@@ -90,23 +99,9 @@ func main() {
 	// SERVER
 	// =================================================================================================================
 
-	ctxInterceptor := func(rpCtx context.Context) context.Context {
-		return postgres.TransferContext(ctx, rpCtx)
-	}
+	server := grpcf.NewGRPCServer(ctx, cfg.GrpcLogger, cfg.App.DowntimeStart, nil, serviceToken...)
 
-	serviceToken := lo.Must(handlers.GrpcServiceToken(
-		cfg.ServiceToken, cfg.ServiceIssuerOptional, httpf.NewPoolClient(httpf.PoolOptions{}),
-	))
-
-	server := grpcf.NewServer(ctx, cfg.Otel, cfg.GrpcLogger, cfg.App.DowntimeStart, ctxInterceptor, serviceToken...)
-
-	healthcheck := grpcf.RegisterEchoServers(server)
-	healthcheck.SetServingStatus("", healthpb.HealthCheckResponse_SERVING)
-
-	go func() {
-		<-ctx.Done()
-		healthcheck.SetServingStatus("", healthpb.HealthCheckResponse_NOT_SERVING)
-	}()
+	grpcf.RegisterHealth(ctx, server)
 
 	templatev0.RegisterStatusServiceServer(server, handlerStatus)
 	templatev0.RegisterItemCreateServiceServer(server, handlerItemCreate)
@@ -117,18 +112,5 @@ func main() {
 
 	reflection.Register(server)
 
-	// =================================================================================================================
-	// RUN
-	// =================================================================================================================
-
-	log.Println("Starting gRPC server on :" + strconv.Itoa(cfg.Grpc.Port))
-
-	lo.Must0(grpcf.ListenAndServe(ctx, cfg.Grpc, server))
-}
-
-func closeDatabase(database io.Closer) {
-	err := database.Close()
-	if err != nil {
-		log.Println("Close Postgres: " + err.Error())
-	}
+	return server, nil
 }
